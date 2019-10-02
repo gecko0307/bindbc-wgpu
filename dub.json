@@ -1,0 +1,30 @@
+{
+    "name": "bindbc-wgpu",
+    "description": "D language binding to gfx-rs/wgpu",
+    "homepage": "https://github.com/gecko0307/bindbc-wgpu",
+    "license": "BSL-1.0",
+    "authors": [
+        "Timur Gafarov"
+    ],
+    
+    "dependencies": {
+        "bindbc-loader": "~>0.2.1"
+    },
+
+    "importPaths": ["src"],
+    "sourcePaths": ["src"],
+
+    "buildRequirements": [
+        "allowWarnings"
+    ],
+
+    "configurations": [
+        {
+            "name": "library",
+            "targetType": "library"
+        }
+    ],
+    
+    "copyFiles-windows-x86_64": ["lib/x64/*.dll"]
+}
+
