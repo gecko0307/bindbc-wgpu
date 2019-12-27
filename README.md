@@ -4,7 +4,7 @@ BindBC binding to [gfx-rs/wgpu](https://github.com/gfx-rs/wgpu), native WebGPU i
 Usage:
 ```
 "dependencies": {
-    "bindbc-wgpu": "~>0.1.0-alpha2"
+    "bindbc-wgpu": "~>0.1.0-alpha3"
 }
 ```
 
