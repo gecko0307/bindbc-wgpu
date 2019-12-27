@@ -35,6 +35,8 @@ enum WGPUSupport {
     wgpu04
 }
 
+enum WGPUDEFAULT_BIND_GROUPS = 4;
+enum WGPUDESIRED_NUM_FRAMES = 3;
 enum WGPUMAX_BIND_GROUPS = 4;
 enum WGPUMAX_COLOR_TARGETS = 4;
 enum WGPUMAX_MIP_LEVELS = 16;
@@ -1066,7 +1068,7 @@ WGPUSupport loadWGPU(const(char)* libName)
     lib.bindSymbol(cast(void**)&wgpu_texture_destroy, "wgpu_texture_destroy");
     lib.bindSymbol(cast(void**)&wgpu_texture_view_destroy, "wgpu_texture_view_destroy");
 
-    loadedVersion = WGPUSupport.wgpu03;
+    loadedVersion = WGPUSupport.wgpu04;
 
     if (errorCount() != errCount)
         return WGPUSupport.badLibrary;
