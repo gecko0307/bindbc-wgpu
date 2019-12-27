@@ -32,7 +32,7 @@ import bindbc.loader;
 enum WGPUSupport {
     noLibrary,
     badLibrary,
-    wgpu03
+    wgpu04
 }
 
 enum WGPUMAX_BIND_GROUPS = 4;
@@ -703,8 +703,9 @@ alias WGPUBackendBit = uint;
 struct WGPURequestAdapterOptions
 {
     WGPUPowerPreference power_preference;
-    WGPUBackendBit backends;
 }
+
+alias WGPURequestAdapterCallback = extern(C) void function(WGPUAdapterId adapter, void* userdata);
 
 struct WGPUSwapChainOutput
 {
@@ -852,7 +853,8 @@ extern(C) @nogc nothrow
                                        float h,
                                        float min_depth,
                                        float max_depth);
-    alias da_wgpu_request_adapter = WGPUAdapterId function(const WGPURequestAdapterOptions* desc);
+    alias da_wgpu_request_adapter_async = void function(const WGPURequestAdapterOptions *desc, WGPUBackendBit mask, WGPURequestAdapterCallback callback, void *userdata);
+    
     alias da_wgpu_swap_chain_get_next_texture = WGPUSwapChainOutput function(WGPUSwapChainId swap_chain_id);
     alias da_wgpu_swap_chain_present = void function(WGPUSwapChainId swap_chain_id);
     alias da_wgpu_texture_create_view = WGPUTextureViewId function(WGPUTextureId texture_id, const WGPUTextureViewDescriptor *desc);
@@ -919,7 +921,7 @@ __gshared
     da_wgpu_render_pass_set_stencil_reference wgpu_render_pass_set_stencil_reference;
     da_wgpu_render_pass_set_vertex_buffers wgpu_render_pass_set_vertex_buffers;
     da_wgpu_render_pass_set_viewport wgpu_render_pass_set_viewport;
-    da_wgpu_request_adapter wgpu_request_adapter;
+    da_wgpu_request_adapter_async wgpu_request_adapter_async;
     da_wgpu_swap_chain_get_next_texture wgpu_swap_chain_get_next_texture;
     da_wgpu_swap_chain_present wgpu_swap_chain_present;
     da_wgpu_texture_create_view wgpu_texture_create_view;
@@ -1057,7 +1059,7 @@ WGPUSupport loadWGPU(const(char)* libName)
     lib.bindSymbol(cast(void**)&wgpu_render_pass_set_stencil_reference, "wgpu_render_pass_set_stencil_reference");
     lib.bindSymbol(cast(void**)&wgpu_render_pass_set_vertex_buffers, "wgpu_render_pass_set_vertex_buffers");
     lib.bindSymbol(cast(void**)&wgpu_render_pass_set_viewport, "wgpu_render_pass_set_viewport");
-    lib.bindSymbol(cast(void**)&wgpu_request_adapter, "wgpu_request_adapter");
+    lib.bindSymbol(cast(void**)&wgpu_request_adapter_async, "wgpu_request_adapter_async");
     lib.bindSymbol(cast(void**)&wgpu_swap_chain_get_next_texture, "wgpu_swap_chain_get_next_texture");
     lib.bindSymbol(cast(void**)&wgpu_swap_chain_present, "wgpu_swap_chain_present");
     lib.bindSymbol(cast(void**)&wgpu_texture_create_view, "wgpu_texture_create_view");
