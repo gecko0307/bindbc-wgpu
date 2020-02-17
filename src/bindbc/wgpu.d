@@ -384,7 +384,7 @@ struct WGPURenderPassDepthStencilAttachmentDescriptorBase_TextureViewId
     uint clear_stencil;
 }
 
-typedef WGPURenderPassDepthStencilAttachmentDescriptor = WGPURenderPassDepthStencilAttachmentDescriptorBase_TextureViewId;
+alias WGPURenderPassDepthStencilAttachmentDescriptor = WGPURenderPassDepthStencilAttachmentDescriptorBase_TextureViewId;
 
 
 struct WGPURenderPassDescriptor
