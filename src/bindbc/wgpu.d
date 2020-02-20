@@ -319,7 +319,7 @@ alias WGPUBufferId = WGPUId_Buffer_Dummy;
 
 alias WGPUBufferAddress = ulong;
 
-alias WGPUBufferMapReadCallback = extern(C) void function(WGPUBufferMapAsyncStatus status, const ubyte* data, ubyte* userdata);
+alias WGPUBufferMapReadCallback = extern(C) void function(WGPUBufferMapAsyncStatus status, const(ubyte)* data, ubyte* userdata);
 
 alias WGPUBufferMapWriteCallback = extern(C) void function(WGPUBufferMapAsyncStatus status, ubyte* data, ubyte* userdata);
 
@@ -344,7 +344,7 @@ struct WGPUComputePassDescriptor
 alias WGPUId_TextureView_Dummy = ulong;
 alias WGPUTextureViewId = WGPUId_TextureView_Dummy;
 
-alias WGPUOptionRef_TextureViewId = const WGPUTextureViewId*;
+alias WGPUOptionRef_TextureViewId = const(WGPUTextureViewId)*;
 
 struct WGPUColor
 {
@@ -435,7 +435,7 @@ struct WGPUCommandBufferDescriptor
 
 alias WGPUComputePassId = WGPURawPass*;
 
-alias WGPURawString = const char*;
+alias WGPURawString = const(char)*;
 
 alias WGPUDynamicOffset = uint;
 
@@ -500,7 +500,7 @@ struct WGPUBindGroupBinding
 struct WGPUBindGroupDescriptor
 {
     WGPUBindGroupLayoutId layout;
-    const WGPUBindGroupBinding* bindings;
+    const(WGPUBindGroupBinding)* bindings;
     uintptr_t bindings_length;
 }
 
@@ -523,7 +523,7 @@ struct WGPUBindGroupLayoutBinding
 
 struct WGPUBindGroupLayoutDescriptor
 {
-    const WGPUBindGroupLayoutBinding* bindings;
+    const(WGPUBindGroupLayoutBinding)* bindings;
     uintptr_t bindings_length;
 }
 
@@ -571,7 +571,7 @@ struct WGPUComputePipelineDescriptor
 
 struct WGPUPipelineLayoutDescriptor
 {
-    const WGPUBindGroupLayoutId* bind_group_layouts;
+    const(WGPUBindGroupLayoutId)* bind_group_layouts;
     uintptr_t bind_group_layouts_length;
 }
 
@@ -642,14 +642,14 @@ struct WGPUVertexBufferDescriptor
 {
     WGPUBufferAddress stride;
     WGPUInputStepMode step_mode;
-    const WGPUVertexAttributeDescriptor* attributes;
+    const(WGPUVertexAttributeDescriptor)* attributes;
     uintptr_t attributes_length;
 }
 
 struct WGPUVertexInputDescriptor
 {
     WGPUIndexFormat index_format;
-    const WGPUVertexBufferDescriptor* vertex_buffers;
+    const(WGPUVertexBufferDescriptor)* vertex_buffers;
     uintptr_t vertex_buffers_length;
 }
 
@@ -657,12 +657,12 @@ struct WGPURenderPipelineDescriptor
 {
     WGPUPipelineLayoutId layout;
     WGPUProgrammableStageDescriptor vertex_stage;
-    const WGPUProgrammableStageDescriptor* fragment_stage;
+    const(WGPUProgrammableStageDescriptor)* fragment_stage;
     WGPUPrimitiveTopology primitive_topology;
-    const WGPURasterizationStateDescriptor* rasterization_state;
-    const WGPUColorStateDescriptor* color_states;
+    const(WGPURasterizationStateDescriptor)* rasterization_state;
+    const(WGPUColorStateDescriptor)* color_states;
     uintptr_t color_states_length;
-    const WGPUDepthStencilStateDescriptor* depth_stencil_state;
+    const(WGPUDepthStencilStateDescriptor)* depth_stencil_state;
     WGPUVertexInputDescriptor vertex_input;
     uint sample_count;
     uint sample_mask;
@@ -684,7 +684,7 @@ struct WGPUSamplerDescriptor
 
 struct WGPUU32Array
 {
-    const uint* bytes;
+    const(uint)* bytes;
     uintptr_t length;
 }
 
