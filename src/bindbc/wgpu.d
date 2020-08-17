@@ -33,7 +33,7 @@ import bindbc.loader;
 enum WGPUSupport {
     noLibrary,
     badLibrary,
-    wgpu051
+    wgpu052
 }
 
 alias WGPUNonZeroU64 = ulong;
@@ -46,6 +46,12 @@ alias WGPUOption_TextureViewId = ulong;
  */
 enum WGPUBIND_BUFFER_ALIGNMENT = 256;
 
+/**
+ * Buffer-Texture copies on command encoders have to have the `bytes_per_row`
+ * aligned to this number.
+ *
+ * This doesn't apply to `Queue::write_texture`.
+ */
 enum WGPUCOPY_BYTES_PER_ROW_ALIGNMENT = 256;
 
 enum WGPUDEFAULT_BIND_GROUPS = 4;
@@ -58,13 +64,23 @@ enum WGPUMAX_COLOR_TARGETS = 4;
 
 enum WGPUMAX_MIP_LEVELS = 16;
 
-enum WGPUMAX_VERTEX_BUFFERS = 8;
+enum WGPUMAX_VERTEX_BUFFERS = 16;
 
 enum WGPUAddressMode
 {
     ClampToEdge = 0,
     Repeat = 1,
     MirrorRepeat = 2
+}
+
+enum WGPUBackend: ubyte {
+    Empty = 0,
+    Vulkan = 1,
+    Metal = 2,
+    Dx12 = 3,
+    Dx11 = 4,
+    Gl = 5,
+    BrowserWebGpu = 6
 }
 
 enum WGPUBindingType
@@ -111,6 +127,15 @@ enum WGPUBufferMapAsyncStatus
     Error,
     Unknown,
     ContextLost
+}
+
+enum WGPUCDeviceType: ubyte
+{
+    Other = 0,
+    IntegratedGpu,
+    DiscreteGpu,
+    VirtualGpu,
+    Cpu,
 }
 
 enum WGPUCompareFunction
@@ -211,6 +236,22 @@ enum WGPUPrimitiveTopology
     LineStrip = 2,
     TriangleList = 3,
     TriangleStrip = 4
+}
+
+enum WGPUSType
+{
+    Invalid = 0,
+    SurfaceDescriptorFromMetalLayer = 1,
+    SurfaceDescriptorFromWindowsHWND = 2,
+    SurfaceDescriptorFromXlib = 3,
+    SurfaceDescriptorFromHTMLCanvasId = 4,
+    ShaderModuleSPIRVDescriptor = 5,
+    ShaderModuleWGSLDescriptor = 6,
+   /**
+    * Placeholder value until real value can be determined
+    */
+    AnisotropicFiltering = 268435456,
+    Force32 = 2147483647,
 }
 
 enum WGPUStencilOperation
@@ -350,9 +391,6 @@ enum WGPUVertexFormat
 alias WGPUId_Adapter_Dummy = WGPUNonZeroU64;
 alias WGPUAdapterId = WGPUId_Adapter_Dummy;
 
-alias WGPUId_Device_Dummy = WGPUNonZeroU64;
-alias WGPUDeviceId = WGPUId_Device_Dummy;
-
 alias WGPUExtensions = uint64_t;
 
 enum
@@ -363,10 +401,23 @@ enum
     WGPUExtensions_ALL_NATIVE = 18446744073709486080UL
 }
 
+struct WGPUCAdapterInfo
+{
+    char* name;
+    uintptr_t name_length;
+    uintptr_t vendor;
+    uintptr_t device;
+    WGPUCDeviceType device_type;
+    WGPUBackend backend;
+}
+
 struct WGPUCLimits
 {
     uint max_bind_groups;
 }
+
+alias WGPUId_Device_Dummy = WGPUNonZeroU64;
+alias WGPUDeviceId = WGPUId_Device_Dummy;
 
 alias WGPUId_BindGroup_Dummy = WGPUNonZeroU64;
 alias WGPUBindGroupId = WGPUId_BindGroup_Dummy;
@@ -403,7 +454,7 @@ struct WGPUComputePassDescriptor
 alias WGPUId_TextureView_Dummy = WGPUNonZeroU64;
 alias WGPUTextureViewId = WGPUId_TextureView_Dummy;
 
-alias WGPUOptionRef_TextureViewId = WGPUTextureViewId; //const(WGPUTextureViewId)*;
+alias WGPUOptionRef_TextureViewId = WGPUTextureViewId;
 
 struct WGPUColor
 {
@@ -737,9 +788,16 @@ struct WGPURenderPipelineDescriptor
     ubyte alpha_to_coverage_enabled;
 }
 
+struct WGPUChainedStruct
+{
+    const(WGPUChainedStruct)* next;
+    WGPUSType s_type;
+}
+
 struct WGPUSamplerDescriptor
 {
-    const(char)* label;
+    const(WGPUChainedStruct)* next_in_chain;
+    WGPULabel label;
     WGPUAddressMode address_mode_u;
     WGPUAddressMode address_mode_v;
     WGPUAddressMode address_mode_w;
@@ -783,7 +841,7 @@ struct WGPUSwapChainDescriptor
 
 struct WGPUTextureDescriptor
 {
-    const(char)* label;
+    WGPULabel label;
     WGPUExtent3d size;
     uint mip_level_count;
     uint sample_count;
@@ -829,9 +887,22 @@ struct WGPUTextureViewDescriptor
     uint array_layer_count;
 }
 
+struct WGPUAnisotropicSamplerDescriptorExt
+{
+    const(WGPUChainedStruct)* next_in_chain;
+    WGPUSType s_type;
+    ubyte anisotropic_clamp;
+}
+
 extern(C) @nogc nothrow
 {
     alias da_wgpu_adapter_destroy = void function(WGPUAdapterId adapter_id);
+    
+    alias da_wgpu_adapter_extensions = WGPUExtensions function(WGPUAdapterId adapter_id);
+
+    alias da_wgpu_adapter_get_info = void function(WGPUAdapterId adapter_id, WGPUCAdapterInfo *info);
+
+    alias da_wgpu_adapter_limits = WGPUCLimits function(WGPUAdapterId adapter_id);
 
     alias da_wgpu_adapter_request_device = WGPUDeviceId function(WGPUAdapterId adapter_id, 
                                                                  WGPUExtensions extensions,
@@ -986,12 +1057,19 @@ extern(C) @nogc nothrow
     alias da_wgpu_device_create_texture = WGPUTextureId function(WGPUDeviceId device_id, const(WGPUTextureDescriptor)* desc);
 
     alias da_wgpu_device_destroy = void function(WGPUDeviceId device_id);
+    
+    alias da_wgpu_device_extensions = WGPUExtensions function(WGPUDeviceId device_id);
 
     alias da_wgpu_device_get_default_queue = WGPUQueueId function(WGPUDeviceId device_id);
     
-    alias da_wgpu_device_get_limits = void function(WGPUDeviceId _device_id, WGPUCLimits* limits);
+    //alias da_wgpu_device_get_limits = void function(WGPUDeviceId _device_id, WGPUCLimits* limits);
+    alias da_wgpu_device_limits = WGPUCLimits function(WGPUDeviceId device_id);
     
     alias da_wgpu_device_poll = void function(WGPUDeviceId device_id, ubyte force_wait);
+    
+    alias da_wgpu_get_version = uint function();
+    
+    alias da_wgpu_pipeline_layout_destroy = void function(WGPUPipelineLayoutId pipeline_layout_id);
     
     /**
      * # Safety
@@ -1149,6 +1227,11 @@ extern(C) @nogc nothrow
 __gshared
 {
     da_wgpu_adapter_destroy wgpu_adapter_destroy;
+    
+    da_wgpu_adapter_extensions wgpu_adapter_extensions;
+    da_wgpu_adapter_get_info wgpu_adapter_get_info;
+    da_wgpu_adapter_limits wgpu_adapter_limits;
+    
     da_wgpu_adapter_request_device wgpu_adapter_request_device;
     da_wgpu_bind_group_destroy wgpu_bind_group_destroy;
     da_wgpu_bind_group_layout_destroy wgpu_bind_group_layout_destroy;
@@ -1190,11 +1273,23 @@ __gshared
     da_wgpu_device_create_sampler wgpu_device_create_sampler;
     da_wgpu_device_create_shader_module wgpu_device_create_shader_module;
     da_wgpu_device_create_swap_chain wgpu_device_create_swap_chain;
+    
     da_wgpu_device_create_texture wgpu_device_create_texture;
     da_wgpu_device_destroy wgpu_device_destroy;
-    da_wgpu_device_get_limits wgpu_device_get_limits;
+    
+    da_wgpu_device_extensions wgpu_device_extensions;
+
     da_wgpu_device_get_default_queue wgpu_device_get_default_queue;
+    
+    //da_wgpu_device_get_limits wgpu_device_get_limits;   
+    da_wgpu_device_limits wgpu_device_limits;
+    
     da_wgpu_device_poll wgpu_device_poll;
+    
+    da_wgpu_get_version wgpu_get_version;
+    
+    da_wgpu_pipeline_layout_destroy wgpu_pipeline_layout_destroy;
+    
     da_wgpu_queue_submit wgpu_queue_submit;
     da_wgpu_queue_write_buffer wgpu_queue_write_buffer;
     da_wgpu_queue_write_texture wgpu_queue_write_texture;
@@ -1294,6 +1389,11 @@ WGPUSupport loadWGPU(const(char)* libName)
     loadedVersion = WGPUSupport.badLibrary;
 
     lib.bindSymbol(cast(void**)&wgpu_adapter_destroy, "wgpu_adapter_destroy");
+    
+    lib.bindSymbol(cast(void**)&wgpu_adapter_extensions, "wgpu_adapter_extensions");
+    lib.bindSymbol(cast(void**)&wgpu_adapter_get_info, "wgpu_adapter_get_info");
+    lib.bindSymbol(cast(void**)&wgpu_adapter_limits, "wgpu_adapter_limits");
+    
     lib.bindSymbol(cast(void**)&wgpu_adapter_request_device, "wgpu_adapter_request_device");
     lib.bindSymbol(cast(void**)&wgpu_bind_group_destroy, "wgpu_bind_group_destroy");
     lib.bindSymbol(cast(void**)&wgpu_bind_group_layout_destroy, "wgpu_bind_group_layout_destroy");
@@ -1352,9 +1452,20 @@ WGPUSupport loadWGPU(const(char)* libName)
     lib.bindSymbol(cast(void**)&wgpu_device_create_swap_chain, "wgpu_device_create_swap_chain");
     lib.bindSymbol(cast(void**)&wgpu_device_create_texture, "wgpu_device_create_texture");
     lib.bindSymbol(cast(void**)&wgpu_device_destroy, "wgpu_device_destroy");
-    lib.bindSymbol(cast(void**)&wgpu_device_get_limits, "wgpu_device_get_limits");
+    
+    lib.bindSymbol(cast(void**)&wgpu_device_extensions, "wgpu_device_extensions");
+
     lib.bindSymbol(cast(void**)&wgpu_device_get_default_queue, "wgpu_device_get_default_queue");
+    
+    //lib.bindSymbol(cast(void**)&wgpu_device_get_limits, "wgpu_device_get_limits");
+    lib.bindSymbol(cast(void**)&wgpu_device_limits, "wgpu_device_limits");
+    
     lib.bindSymbol(cast(void**)&wgpu_device_poll, "wgpu_device_poll");
+    
+    lib.bindSymbol(cast(void**)&wgpu_get_version, "wgpu_get_version");
+    
+    lib.bindSymbol(cast(void**)&wgpu_pipeline_layout_destroy, "wgpu_pipeline_layout_destroy");   
+    
     lib.bindSymbol(cast(void**)&wgpu_queue_submit, "wgpu_queue_submit");
     lib.bindSymbol(cast(void**)&wgpu_queue_write_buffer, "wgpu_queue_write_buffer");
     lib.bindSymbol(cast(void**)&wgpu_queue_write_texture, "wgpu_queue_write_texture");
@@ -1387,7 +1498,7 @@ WGPUSupport loadWGPU(const(char)* libName)
     lib.bindSymbol(cast(void**)&wgpu_texture_destroy, "wgpu_texture_destroy");
     lib.bindSymbol(cast(void**)&wgpu_texture_view_destroy, "wgpu_texture_view_destroy");
 
-    loadedVersion = WGPUSupport.wgpu051;
+    loadedVersion = WGPUSupport.wgpu052;
 
     if (errorCount() != errCount)
         return WGPUSupport.badLibrary;
