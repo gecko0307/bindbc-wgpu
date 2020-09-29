@@ -8,7 +8,7 @@ BindBC binding to [gfx-rs/wgpu-native](https://github.com/gfx-rs/wgpu-native). T
 Usage:
 ```
 "dependencies": {
-    "bindbc-wgpu": "~>0.1.0-alpha8"
+    "bindbc-wgpu": "~>0.1.0-alpha9"
 }
 ```
 
