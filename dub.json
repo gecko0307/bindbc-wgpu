@@ -8,7 +8,7 @@
     ],
     
     "dependencies": {
-        "bindbc-loader": "~>0.2.1"
+        "bindbc-loader": "~>0.3.0"
     },
 
     "importPaths": ["src"],
