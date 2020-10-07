@@ -178,8 +178,8 @@ __gshared
     alias da_wgpu_compute_pass_set_bind_group = void function(WGPUComputePass* pass,
                                                               uint index,
                                                               WGPUBindGroupId bind_group_id,
-                                                              const(WGPUBufferAddress)* offsets,
-                                                              size_t offsets_length);
+                                                              const(WGPUDynamicOffset)* offsets,
+                                                              uintptr_t offsets_length);
     da_wgpu_compute_pass_set_bind_group wgpu_compute_pass_set_bind_group;
     
     alias da_wgpu_compute_pass_set_pipeline = void function(WGPUComputePass* pass, WGPUComputePipelineId pipeline_id);
@@ -478,7 +478,7 @@ __gshared
     alias da_wgpu_render_pass_set_bind_group = void function(WGPURenderPass* pass,
                                                              uint index,
                                                              WGPUBindGroupId bind_group_id,
-                                                             const WGPUBufferAddress* offsets,
+                                                             const WGPUDynamicOffset* offsets,
                                                              uintptr_t offsets_length);
     da_wgpu_render_pass_set_bind_group wgpu_render_pass_set_bind_group;
     
