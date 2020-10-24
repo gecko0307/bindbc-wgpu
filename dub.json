@@ -26,6 +26,7 @@
     ],
     
     "copyFiles-windows-x86": ["lib/x86/*.dll"],
-    "copyFiles-windows-x86_64": ["lib/x64/*.dll"]
+    "copyFiles-windows-x86_64": ["lib/x64/*.dll"],
+    "copyFiles-linux-x86": ["lib/x86/*.so"],
+    "copyFiles-linux-x86_64": ["lib/x64/*.so"]
 }
-
