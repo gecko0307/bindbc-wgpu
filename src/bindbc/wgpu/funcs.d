@@ -121,19 +121,19 @@ __gshared
     alias da_wgpu_command_encoder_copy_buffer_to_texture = void function(WGPUCommandEncoderId command_encoder_id,
                                                                          const(WGPUBufferCopyView)* source,
                                                                          const(WGPUTextureCopyView)* destination,
-                                                                         WGPUExtent3d copy_size);
+                                                                         const(WGPUExtent3d)* copy_size);
     da_wgpu_command_encoder_copy_buffer_to_texture wgpu_command_encoder_copy_buffer_to_texture;
     
     alias da_wgpu_command_encoder_copy_texture_to_buffer = void function(WGPUCommandEncoderId command_encoder_id,
                                                                          const(WGPUTextureCopyView)* source,
                                                                          const(WGPUBufferCopyView)* destination,
-                                                                         WGPUExtent3d copy_size);
+                                                                         const(WGPUExtent3d)* copy_size);
     da_wgpu_command_encoder_copy_texture_to_buffer wgpu_command_encoder_copy_texture_to_buffer;
     
     alias da_wgpu_command_encoder_copy_texture_to_texture = void function(WGPUCommandEncoderId command_encoder_id,
                                                                           const(WGPUTextureCopyView)* source,
                                                                           const(WGPUTextureCopyView)* destination,
-                                                                          WGPUExtent3d copy_size);
+                                                                          const(WGPUExtent3d)* copy_size);
     da_wgpu_command_encoder_copy_texture_to_texture wgpu_command_encoder_copy_texture_to_texture;
     
     alias da_wgpu_command_encoder_destroy = void function(WGPUCommandEncoderId command_encoder_id);
