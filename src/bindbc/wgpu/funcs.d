@@ -185,6 +185,9 @@ __gshared
     alias da_wgpu_compute_pass_set_pipeline = void function(WGPUComputePass* pass, WGPUComputePipelineId pipeline_id);
     da_wgpu_compute_pass_set_pipeline wgpu_compute_pass_set_pipeline;
     
+    alias da_wgpu_compute_pipeline_destroy = void function(WGPUComputePipelineId compute_pipeline_id);
+    da_wgpu_compute_pipeline_destroy wgpu_compute_pipeline_destroy;
+    
     version(Android)
     {
         alias da_wgpu_create_surface_from_android = WGPUSurfaceId function(void* a_native_window);
