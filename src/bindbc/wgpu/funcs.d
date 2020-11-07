@@ -30,6 +30,25 @@ module bindbc.wgpu.funcs;
 import core.stdc.stdint;
 import bindbc.wgpu.types;
 
+// this matches the test in wgpu sources guarding x11/wayland fns, which is:
+// #[cfg(all(
+//     unix,
+//     not(target_os = "android"),
+//     not(target_os = "ios"),
+//     not(target_os = "macos")
+// ))]
+version(Posix)
+{
+    version (Android) private enum have_xorg = false;
+    else version (OSX) private enum have_xorg = false;
+    else version (iOS) private enum have_xorg = false;
+    else private enum have_xorg = true;
+} else private enum have_xorg = false;
+
+version (OSX) private enum have_metal = true;
+else version (iOS) private enum have_metal = true;
+else private enum have_metal = false;
+
 __gshared
 {
     extern(C) @nogc nothrow:
@@ -194,13 +213,13 @@ __gshared
         da_wgpu_create_surface_from_android wgpu_create_surface_from_android;
     }
     
-    version(OSX)
+    static if (have_metal)
     {
         alias da_wgpu_create_surface_from_metal_layer = WGPUSurfaceId function(void* layer);
         da_wgpu_create_surface_from_metal_layer wgpu_create_surface_from_metal_layer;
     }
     
-    version(linux)
+    static if (have_xorg) //close enough
     {
         alias da_wgpu_create_surface_from_wayland = WGPUSurfaceId function(void* surface, void* display);
         da_wgpu_create_surface_from_wayland wgpu_create_surface_from_wayland;
@@ -212,7 +231,7 @@ __gshared
         da_wgpu_create_surface_from_windows_hwnd wgpu_create_surface_from_windows_hwnd;
     }
     
-    version(linux)
+    static if (have_xorg)
     {
         alias da_wgpu_create_surface_from_xlib = WGPUSurfaceId function(const void** display, ulong window);
         da_wgpu_create_surface_from_xlib wgpu_create_surface_from_xlib;
