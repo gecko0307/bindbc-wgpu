@@ -37,6 +37,8 @@ alias WGPUOption_BufferId = ulong;
 alias WGPUOption_SamplerId = ulong;
 alias WGPUOption_SurfaceId = ulong;
 alias WGPUOption_TextureViewId = ulong;
+alias WGPUOption_BufferSize = ulong;
+alias WGPUOption_PipelineLayoutId = ulong;
 
 /**
  * Bound uniform/storage buffer offsets must be aligned to this number.
@@ -51,7 +53,14 @@ enum WGPUBIND_BUFFER_ALIGNMENT = 256;
  */
 enum WGPUCOPY_BYTES_PER_ROW_ALIGNMENT = 256;
 
-enum WGPUDEFAULT_BIND_GROUPS = 4;
+/**
+ * Alignment all push constants need
+ */
+enum WGPUPUSH_CONSTANT_ALIGNMENT = 4;
+
+enum WGPUDEFAULT_BIND_GROUPS = 8;
+
+enum WGPUSHADER_STAGE_COUNT = 3;
 
 enum WGPUDESIRED_NUM_FRAMES = 3;
 
@@ -90,7 +99,16 @@ enum WGPUAddressMode
     * -0.25 -> 0.25
     * 1.25 -> 0.75
     */
-    MirrorRepeat = 2
+    MirrorRepeat = 2,
+
+  /**
+   * Clamp the value to the border of the texture
+   * Requires feature `Features.ADDRESS_MODE_CLAMP_TO_BORDER`
+   *
+   * -0.25 -> border
+   * 1.25 -> border
+   */
+    ClampToBorder = 3,
 }
 
 /**
@@ -179,47 +197,47 @@ enum WGPUCompareFunction
    /**
     * Invalid value, do not use
     */
-    Undefined = 0,
+    Undefined,
     
    /**
     * Function never passes
     */
-    Never = 1,
+    Never,
     
    /**
     * Function passes if new value less than existing value
     */
-    Less = 2,
-    
-   /**
-    * Function passes if new value is equal to existing value
-    */
-    Equal = 3,
+    Less,
     
    /**
     * Function passes if new value is less than or equal to existing value
     */
-    LessEqual = 4,
+    LessEqual,
     
    /**
     * Function passes if new value is greater than existing value
     */
-    Greater = 5,
-    
-   /**
-    * Function passes if new value is not equal to existing value
-    */
-    NotEqual = 6,
+    Greater,
     
    /**
     * Function passes if new value is greater than or equal to existing value
     */
-    GreaterEqual = 7,
+    GreaterEqual,
+
+   /**
+    * Function passes if new value is equal to existing value
+    */
+    Equal,
+    
+   /**
+    * Function passes if new value is not equal to existing value
+    */
+    NotEqual,
     
    /**
     * Function always passes
     */
-    Always = 8
+    Always
 }
 
 /**
@@ -342,24 +360,37 @@ enum WGPULogLevel
 }
 
 /**
+ * Type of drawing mode for polygons
+ */
+enum WGPUPolygonMode {
+  /**
+   * Polygons are filled
+   */
+  Fill = 0,
+  /**
+   * Polygons are draw as line segments
+   */
+  Line = 1,
+  /**
+   * Polygons are draw as points
+   */
+  Point = 2,
+}
+
+/**
  * Power Preference when choosing a physical adapter.
  */
 enum WGPUPowerPreference
 {
    /**
-    * Prefer low power when on battery, high performance when on mains.
-    */
-    Default = 0,
-    
-   /**
     * Adapter that uses the least possible power. This is often an integerated GPU.
     */
-    LowPower = 1,
+    LowPower = 0,
     
    /**
     * Adapter that has the highest performance. This is often a discrete GPU.
     */
-    HighPerformance = 2
+    HighPerformance = 1
 }
 
 /**
@@ -447,6 +478,15 @@ enum WGPUSType
 }
 
 /**
+ * Color variation to use when sampler addressing mode is [`AddressMode::ClampToBorder`]
+ */
+enum WGPUSamplerBorderColor {
+  TransparentBlack,
+  OpaqueBlack,
+  OpaqueWhite,
+}
+
+/**
  * Operation to perform on the stencil value.
  */
 enum WGPUStencilOperation
@@ -516,8 +556,7 @@ enum WGPUSwapChainStatus {
     Suboptimal,
     Timeout,
     Outdated,
-    Lost,
-    OutOfMemory
+    Lost
 }
 
 /**
@@ -561,7 +600,12 @@ enum WGPUTextureComponentType
    /**
     * They see it as a unsigned integer `utexture1D`, `utexture2D` etc
     */
-    Uint
+    Uint,
+
+   /**
+    * They see it as a floating point 0-1 result of comparison, i.e. `shadowTexture2D`
+    */
+    DepthComparison,
 }
 
 /**
@@ -719,7 +763,7 @@ enum WGPUTextureFormat
     Rgb10a2Unorm = 24,
     
    /**
-    * Red, green, and blue channels. 11 bit float with no sign bit for RG channels. 10 bit float with no sign bti for blue channel. Float in shader.
+    * Red, green, and blue channels. 11 bit float with no sign bit for RG channels. 10 bit float with no sign bit for blue channel. Float in shader.
     */
     Rg11b10Float = 25,
     
@@ -781,7 +825,145 @@ enum WGPUTextureFormat
    /**
     * Special depth/stencil format with at least 24 bit integer depth and 8 bits integer stencil.
     */
-    Depth24PlusStencil8 = 37
+    Depth24PlusStencil8 = 37,
+
+   /**
+    * 4x4 block compressed texture. 8 bytes per block (4 bit/px). 4 color + alpha pallet. 5 bit R + 6 bit G + 5 bit B + 1 bit alpha.
+    * [0, 64] ([0, 1] for alpha) converted to/from float [0, 1] in shader.
+    *
+    * Also known as DXT1.
+    *
+    * [`Features::TEXTURE_COMPRESSION_BC`] must be enabled to use this texture format.
+    */
+    Bc1RgbaUnorm = 38,
+
+   /**
+    * 4x4 block compressed texture. 8 bytes per block (4 bit/px). 4 color + alpha pallet. 5 bit R + 6 bit G + 5 bit B + 1 bit alpha.
+    * Srgb-color [0, 64] ([0, 16] for alpha) converted to/from linear-color float [0, 1] in shader.
+    *
+    * Also known as DXT1.
+    *
+    * [`Features::TEXTURE_COMPRESSION_BC`] must be enabled to use this texture format.
+    */
+    Bc1RgbaUnormSrgb = 39,
+
+   /**
+    * 4x4 block compressed texture. 16 bytes per block (8 bit/px). 4 color pallet. 5 bit R + 6 bit G + 5 bit B + 4 bit alpha.
+    * [0, 64] ([0, 16] for alpha) converted to/from float [0, 1] in shader.
+    *
+    * Also known as DXT3.
+    *
+    * [`Features::TEXTURE_COMPRESSION_BC`] must be enabled to use this texture format.
+    */
+    Bc2RgbaUnorm = 40,
+
+   /**
+    * 4x4 block compressed texture. 16 bytes per block (8 bit/px). 4 color pallet. 5 bit R + 6 bit G + 5 bit B + 4 bit alpha.
+    * Srgb-color [0, 64] ([0, 256] for alpha) converted to/from linear-color float [0, 1] in shader.
+    *
+    * Also known as DXT3.
+    *
+    * [`Features::TEXTURE_COMPRESSION_BC`] must be enabled to use this texture format.
+    */
+    Bc2RgbaUnormSrgb = 41,
+
+   /**
+    * 4x4 block compressed texture. 16 bytes per block (8 bit/px). 4 color pallet + 8 alpha pallet. 5 bit R + 6 bit G + 5 bit B + 8 bit alpha.
+    * [0, 64] ([0, 256] for alpha) converted to/from float [0, 1] in shader.
+    *
+    * Also known as DXT5.
+    *
+    * [`Features::TEXTURE_COMPRESSION_BC`] must be enabled to use this texture format.
+    */
+    Bc3RgbaUnorm = 42,
+
+   /**
+    * 4x4 block compressed texture. 16 bytes per block (8 bit/px). 4 color pallet + 8 alpha pallet. 5 bit R + 6 bit G + 5 bit B + 8 bit alpha.
+    * Srgb-color [0, 64] ([0, 256] for alpha) converted to/from linear-color float [0, 1] in shader.
+    *
+    * Also known as DXT5.
+    *
+    * [`Features::TEXTURE_COMPRESSION_BC`] must be enabled to use this texture format.
+    */
+    Bc3RgbaUnormSrgb = 43,
+
+   /**
+    * 4x4 block compressed texture. 8 bytes per block (4 bit/px). 8 color pallet. 8 bit R.
+    * [0, 256] converted to/from float [0, 1] in shader.
+    *
+    * Also known as RGTC1.
+    *
+    * [`Features::TEXTURE_COMPRESSION_BC`] must be enabled to use this texture format.
+    */
+    Bc4RUnorm = 44,
+
+   /**
+    * 4x4 block compressed texture. 8 bytes per block (4 bit/px). 8 color pallet. 8 bit R.
+    * [-127, 127] converted to/from float [-1, 1] in shader.
+    *
+    * Also known as RGTC1.
+    *
+    * [`Features::TEXTURE_COMPRESSION_BC`] must be enabled to use this texture format.
+    */
+    Bc4RSnorm = 45,
+
+   /**
+    * 4x4 block compressed texture. 16 bytes per block (16 bit/px). 8 color red pallet + 8 color green pallet. 8 bit RG.
+    * [0, 256] converted to/from float [0, 1] in shader.
+    *
+    * Also known as RGTC2.
+    *
+    * [`Features::TEXTURE_COMPRESSION_BC`] must be enabled to use this texture format.
+    */
+    Bc5RgUnorm = 46,
+
+   /**
+    * 4x4 block compressed texture. 16 bytes per block (16 bit/px). 8 color red pallet + 8 color green pallet. 8 bit RG.
+    * [-127, 127] converted to/from float [-1, 1] in shader.
+    *
+    * Also known as RGTC2.
+    *
+    * [`Features::TEXTURE_COMPRESSION_BC`] must be enabled to use this texture format.
+    */
+    Bc5RgSnorm = 47,
+
+   /**
+    * 4x4 block compressed texture. 16 bytes per block (16 bit/px). Variable sized pallet. 16 bit unsigned float RGB. Float in shader.
+    *
+    * Also known as BPTC (float).
+    *
+    * [`Features::TEXTURE_COMPRESSION_BC`] must be enabled to use this texture format.
+    */
+    Bc6hRgbUfloat = 48,
+
+   /**
+    * 4x4 block compressed texture. 16 bytes per block (16 bit/px). Variable sized pallet. 16 bit signed float RGB. Float in shader.
+    *
+    * Also known as BPTC (float).
+    *
+    * [`Features::TEXTURE_COMPRESSION_BC`] must be enabled to use this texture format.
+    */
+    Bc6hRgbSfloat = 49,
+
+   /**
+    * 4x4 block compressed texture. 16 bytes per block (16 bit/px). Variable sized pallet. 8 bit integer RGBA.
+    * [0, 256] converted to/from float [0, 1] in shader.
+    *
+    * Also known as BPTC (unorm).
+    *
+    * [`Features::TEXTURE_COMPRESSION_BC`] must be enabled to use this texture format.
+    */
+    Bc7RgbaUnorm = 50,
+
+   /**
+    * 4x4 block compressed texture. 16 bytes per block (16 bit/px). Variable sized pallet. 8 bit integer RGBA.
+    * Srgb-color [0, 255] converted to/from linear-color float [0, 1] in shader.
+    *
+    * Also known as BPTC (unorm).
+    *
+    * [`Features::TEXTURE_COMPRESSION_BC`] must be enabled to use this texture format.
+    */
+    Bc7RgbaUnormSrgb = 51
 }
 
 /**
@@ -876,12 +1058,12 @@ enum WGPUVertexFormat
     Ushort4 = 9,
     
    /**
-    * Two unsigned shorts (i16). `ivec2` in shaders.
+    * Two signed shorts (i16). `ivec2` in shaders.
     */
     Short2 = 10,
     
    /**
-    * Four unsigned shorts (i16). `ivec4` in shaders.
+    * Four signed shorts (i16). `ivec4` in shaders.
     */
     Short4 = 11,
     
@@ -977,7 +1159,6 @@ enum WGPUVertexFormat
 }
 
 struct WGPUComputePass;
-//struct WGPUOption_BufferSize;
 struct WGPURenderBundleEncoder;
 struct WGPURenderPass;
 
@@ -997,6 +1178,35 @@ alias WGPUAdapterId = WGPUId_Adapter_Dummy;
 enum WGPUFeatures: uint64_t
 {
     NONE = 0,
+
+   /**
+    * By default, polygon depth is clipped to 0-1 range. Anything outside of that range
+    * is rejected, and respective fragments are not touched.
+    *
+    * With this extension, we can force clamping of the polygon depth to 0-1. That allows
+    * shadow map occluders to be rendered into a tighter depth range.
+    *
+    * Supported platforms:
+    * - desktops
+    * - some mobile chips
+    *
+    * This is a web and native feature.
+    */
+    DEPTH_CLAMPING = 1,
+
+   /**
+    * Enables BCn family of compressed textures. All BCn textures use 4x4 pixel blocks
+    * with 8 or 16 bytes per block.
+    *
+    * Compressed textures sacrifice some quality in exchange for signifigantly reduced
+    * bandwidth usage.
+    *
+    * Supported Platforms:
+    * - desktops
+    *
+    * This is a web and native feature.
+    */
+    TEXTURE_COMPRESSION_BC = 2,
     
    /**
     * Webgpu only allows the MAP_READ and MAP_WRITE buffer usage to be matched with
@@ -1111,19 +1321,61 @@ enum WGPUFeatures: uint64_t
     * This is a native only feature.
     */
     MULTI_DRAW_INDIRECT_COUNT = 4194304,
+
+   /**
+    * Allows the use of push constants: small, fast bits of memory that can be updated
+    * inside a [`RenderPass`].
+    *
+    * Allows the user to call [`RenderPass::set_push_constants`], provide a non-empty array
+    * to [`PipelineLayoutDescriptor`], and provide a non-zero limit to [`Limits::max_push_constant_size`].
+    *
+    * A block of push constants can be declared with `layout(push_constant) uniform Name {..}` in shaders.
+    *
+    * Supported platforms:
+    * - DX12
+    * - Vulkan
+    * - Metal
+    * - DX11 (emulated with uniforms)
+    * - OpenGL (emulated with uniforms)
+    *
+    * This is a native only feature.
+    */
+    PUSH_CONSTANTS = 8388608,
+
+   /**
+    * Allows the use of [`AddressMode::ClampToBorder`].
+    *
+    * Supported platforms:
+    * - DX12
+    * - Vulkan
+    * - Metal (macOS 10.12+ only)
+    * - DX11
+    * - OpenGL
+    *
+    * This is a web and native feature.
+    */
+    ADDRESS_MODE_CLAMP_TO_BORDER = 16777216,
+
+   /**
+    * Allows the user to set a non-fill polygon mode in [`RasterizationStateDescriptor::polygon_mode`]
+    *
+    * This allows drawing polygons/triangles as lines (wireframe) or points instead of filled
+    *
+    * Supported platforms:
+    * - DX12
+    * - Vulkan
+    *
+    * This is a native only feature.
+    */
+    NON_FILL_POLYGON_MODE = 33554432,
     
    /**
-    * Features which are part of the upstream webgpu standard
+    * Features which are part of the upstream WebGPU standard.
     */
     ALL_WEBGPU = 65535,
     
    /**
-    * Features that require activating the unsafe feature flag
-    */
-    ALL_UNSAFE = 18446462598732840960UL,
-    
-   /**
-    * Features that are only available when targeting native (not web)
+    * Features that are only available when targeting native (not web).
     */
     ALL_NATIVE = 18446744073709486080UL
 }
@@ -1243,7 +1495,7 @@ struct WGPUPassChannel_Color
     WGPUStoreOp store_op;
     
    /**
-    * If load_op is [`LoadOp::Clear`], the attachement will be cleared to this color.
+    * If load_op is [`LoadOp::Clear`], the attachment will be cleared to this color.
     */
     WGPUColor clear_value;
     
@@ -1251,33 +1503,29 @@ struct WGPUPassChannel_Color
     * If true, the relevant channel is not changed by a renderpass, and the corresponding attachment
     * can be used inside the pass by other read-only usages.
     */
-    ubyte read_only;
+    bool read_only;
 }
 
 /**
- * Describes a color attachment to a [`RenderPass`].
+ * Describes a color attachment to a render pass.
  */
-struct WGPURenderPassColorAttachmentDescriptorBase_TextureViewId
+struct WGPUColorAttachmentDescriptor
 {
    /**
-    * Texture attachment to render to. Must contain [`TextureUsage::OUTPUT_ATTACHMENT`].
+    * The view to use as an attachment.
     */
     WGPUTextureViewId attachment;
     
    /**
-    * MSAA resolve target. Must contain [`TextureUsage::OUTPUT_ATTACHMENT`]. Must be `None` if
-    * attachment has 1 sample (does not have MSAA). This is not mandatory for rendering with multisampling,
-    * you can choose to resolve later or manually.
+    * The view that will receive the resolved output if multisampling is used.
     */
-    WGPUOptionRef_TextureViewId resolve_target;
+    WGPUOption_TextureViewId resolve_target;
     
    /**
-    * Color channel.
+    * What operations will be performed on this color attachment.
     */
     WGPUPassChannel_Color channel;
 }
-
-alias WGPURenderPassColorAttachmentDescriptor = WGPURenderPassColorAttachmentDescriptorBase_TextureViewId;
 
 /**
  * Describes an individual channel within a render pass, such as color, depth, or stencil.
@@ -1296,7 +1544,7 @@ struct WGPUPassChannel_f32
     WGPUStoreOp store_op;
     
    /**
-    * If load_op is [`LoadOp::Clear`], the attachement will be cleared to this color.
+    * If load_op is [`LoadOp::Clear`], the attachment will be cleared to this color.
     */
     float clear_value;
     
@@ -1304,7 +1552,7 @@ struct WGPUPassChannel_f32
     * If true, the relevant channel is not changed by a renderpass, and the corresponding attachment
     * can be used inside the pass by other read-only usages.
     */
-    ubyte read_only;
+    bool read_only;
 }
 
 /**
@@ -1332,39 +1580,36 @@ struct WGPUPassChannel_u32
     * If true, the relevant channel is not changed by a renderpass, and the corresponding attachment
     * can be used inside the pass by other read-only usages.
     */
-    ubyte read_only;
+    bool read_only;
 }
 
 /**
- * Describes a depth/stencil attachment to a [`RenderPass`].
+ * Describes a depth/stencil attachment to a render pass.
  */
-struct WGPURenderPassDepthStencilAttachmentDescriptorBase_TextureViewId
+struct WGPUDepthStencilAttachmentDescriptor
 {
    /**
-    * Texture attachment to render to. Must contain [`TextureUsage::OUTPUT_ATTACHMENT`] and be a valid
-    * texture type for a depth/stencil attachment.
+    * The view to use as an attachment.
     */
     WGPUTextureViewId attachment;
     
    /**
-    * Depth channel.
+    * What operations will be performed on the depth part of the attachment.
     */
     WGPUPassChannel_f32 depth;
     
    /**
-    * Stencil channel.
+    * What operations will be performed on the stencil part of the attachment.
     */
     WGPUPassChannel_u32 stencil;
 }
 
-alias WGPURenderPassDepthStencilAttachmentDescriptor = WGPURenderPassDepthStencilAttachmentDescriptorBase_TextureViewId;
-
 
 struct WGPURenderPassDescriptor
 {
-    const WGPURenderPassColorAttachmentDescriptor* color_attachments;
+    const WGPUColorAttachmentDescriptor* color_attachments;
     size_t color_attachments_length;
-    const WGPURenderPassDepthStencilAttachmentDescriptor* depth_stencil_attachment;
+    const WGPUDepthStencilAttachmentDescriptor* depth_stencil_attachment;
 }
 
 /**
@@ -1400,8 +1645,8 @@ struct WGPUTextureDataLayout
 
 struct WGPUBufferCopyView
 {
-    WGPUBufferId buffer;
     WGPUTextureDataLayout layout;
+    WGPUBufferId buffer;
 }
 
 alias WGPUId_Texture_Dummy = WGPUNonZeroU64;
@@ -1440,10 +1685,7 @@ struct WGPUExtent3d
  */
 struct WGPUCommandBufferDescriptor
 {
-   /**
-    * Set this member to zero
-    */
-    uint todo;
+    WGPULabel label;
 }
 
 alias WGPURawString = const(char)*;
@@ -1489,22 +1731,22 @@ struct WGPUBindGroupDescriptor
 enum WGPUShaderStage: uint
 {
    /**
-    * Binding is not visible from any shader stage
+    * Binding is not visible from any shader stage.
     */
     NONE = 0,
     
    /**
-    * Binding is visible from the vertex shader of a render pipeline
+    * Binding is visible from the vertex shader of a render pipeline.
     */
     VERTEX = 1,
     
    /**
-    * Binding is visible from the fragment shader of a render pipeline
+    * Binding is visible from the fragment shader of a render pipeline.
     */
     FRAGMENT = 2,
     
    /**
-    * Binding is visible from the compute shader of a compute pipeline
+    * Binding is visible from the compute shader of a compute pipeline.
     */
     COMPUTE = 4
 }
@@ -1514,13 +1756,13 @@ struct WGPUBindGroupLayoutEntry
     uint binding;
     WGPUShaderStage visibility;
     WGPUBindingType ty;
-    ubyte has_dynamic_offset;
-    WGPUOption_NonZeroU64 min_buffer_binding_size;
-    ubyte multisampled;
+    bool has_dynamic_offset;
+    uint64_t min_buffer_binding_size;
+    bool multisampled;
     WGPUTextureViewDimension view_dimension;
     WGPUTextureComponentType texture_component_type;
     WGPUTextureFormat storage_texture_format;
-    WGPUOption_NonZeroU32 count;
+    uint32_t count;
 }
 
 struct WGPUBindGroupLayoutDescriptor
@@ -1563,7 +1805,7 @@ enum WGPUBufferUsage: uint
     COPY_SRC = 4,
     
    /**
-    * Allow a buffer to be the source buffer for a [`CommandEncoder::copy_buffer_to_buffer`], [`CommandEncoder::copy_buffer_to_texture`],
+    * Allow a buffer to be the source buffer for a [`CommandEncoder::copy_buffer_to_buffer`], [`CommandEncoder::copy_texture_to_buffer`],
     * or [`Queue::write_buffer`] operation.
     */
     COPY_DST = 8,
@@ -1647,12 +1889,14 @@ struct WGPUProgrammableStageDescriptor
 
 struct WGPUComputePipelineDescriptor
 {
-    WGPUPipelineLayoutId layout;
+    WGPULabel label;
+    WGPUOption_PipelineLayoutId layout;
     WGPUProgrammableStageDescriptor compute_stage;
 }
 
 struct WGPUPipelineLayoutDescriptor
 {
+    WGPULabel label;
     const(WGPUBindGroupLayoutId)* bind_group_layouts;
     uintptr_t bind_group_layouts_length;
 }
@@ -1678,6 +1922,18 @@ struct WGPURasterizationStateDescriptor
 {
     WGPUFrontFace front_face;
     WGPUCullMode cull_mode;
+   /**
+    * Controls the way each polygon is rasterized. Can be either `Fill` (default), `Line` or `Point`
+    *
+    * Setting this to something other than `Fill` requires `Features::NON_FILL_POLYGON_MODE` to be enabled.
+    */
+    WGPUPolygonMode polygon_mode;
+   /**
+    * If enabled polygon depth is clamped to 0-1 range instead of being clipped.
+    *
+    * Requires `Features::DEPTH_CLAMPING` enabled.
+    */
+    bool clamp_depth;
     int depth_bias;
     float depth_bias_slope_scale;
     float depth_bias_clamp;
@@ -1761,7 +2017,7 @@ struct WGPUColorStateDescriptor
 /**
  * Describes stencil state in a render pipeline.
  *
- * If you are not using stencil state, set this to [`StencilStateFaceDescriptor::IGNORE`].
+ * If you are not using stencil state, set this to `WGPUStencilStateFaceDescriptor_Ignore`.
  */
 struct WGPUStencilStateFaceDescriptor
 {
@@ -1786,6 +2042,36 @@ struct WGPUStencilStateFaceDescriptor
     WGPUStencilOperation pass_op;
 }
 
+enum WGPUStencilStateFaceDescriptor WGPUStencilStateFaceDescriptor_Ignore = WGPUStencilStateFaceDescriptor(
+    WGPUCompareFunction.Always,
+    WGPUStencilOperation.Keep,
+    WGPUStencilOperation.Keep,
+    WGPUStencilOperation.Keep
+);
+
+struct WGPUStencilStateDescriptor
+{
+   /**
+    * Front face mode.
+    */
+    WGPUStencilStateFaceDescriptor front;
+    
+   /**
+    * Back face mode.
+    */
+    WGPUStencilStateFaceDescriptor back;
+    
+   /**
+    * Stencil values are AND'd with this mask when reading and writing from the stencil buffer. Only low 8 bits are used.
+    */
+    uint read_mask;
+    
+   /**
+    * Stencil values are AND'd with this mask when writing to the stencil buffer. Only low 8 bits are used.
+    */
+    uint write_mask;
+}
+
 /**
  * Describes the depth/stencil state in a render pipeline.
  */
@@ -1807,25 +2093,7 @@ struct WGPUDepthStencilStateDescriptor
     */
     WGPUCompareFunction depth_compare;
     
-   /**
-    * Stencil state used for front faces.
-    */
-    WGPUStencilStateFaceDescriptor stencil_front;
-    
-   /**
-    * Stencil state used for back faces.
-    */
-    WGPUStencilStateFaceDescriptor stencil_back;
-    
-   /**
-    * Stencil values are AND'd with this mask when reading and writing from the stencil buffer. Only low 8 bits are used.
-    */
-    uint stencil_read_mask;
-    
-   /**
-    * Stencil values are AND'd with this mask when writing to the stencil buffer. Only low 8 bits are used.
-    */
-    uint stencil_write_mask;
+    WGPUStencilStateDescriptor stencil;
 }
 
 /**
@@ -1856,9 +2124,9 @@ struct WGPUVertexAttributeDescriptor
     WGPUShaderLocation shader_location;
 }
 
-struct WGPUVertexBufferLayoutDescriptor
+struct WGPUVertexBufferDescriptor
 {
-    WGPUBufferAddress array_stride;
+    WGPUBufferAddress stride;
     WGPUInputStepMode step_mode;
     const(WGPUVertexAttributeDescriptor)* attributes;
     uintptr_t attributes_length;
@@ -1867,24 +2135,25 @@ struct WGPUVertexBufferLayoutDescriptor
 struct WGPUVertexStateDescriptor
 {
     WGPUIndexFormat index_format;
-    const(WGPUVertexBufferLayoutDescriptor)* vertex_buffers;
+    const(WGPUVertexBufferDescriptor)* vertex_buffers;
     uintptr_t vertex_buffers_length;
 }
 
 struct WGPURenderPipelineDescriptor
 {
-    WGPUPipelineLayoutId layout;
+    WGPULabel label;
+    WGPUOption_PipelineLayoutId layout;
     WGPUProgrammableStageDescriptor vertex_stage;
     const(WGPUProgrammableStageDescriptor)* fragment_stage;
-    WGPUPrimitiveTopology primitive_topology;
     const(WGPURasterizationStateDescriptor)* rasterization_state;
+    WGPUPrimitiveTopology primitive_topology;
     const(WGPUColorStateDescriptor)* color_states;
     uintptr_t color_states_length;
     const(WGPUDepthStencilStateDescriptor)* depth_stencil_state;
     WGPUVertexStateDescriptor vertex_state;
     uint sample_count;
     uint sample_mask;
-    ubyte alpha_to_coverage_enabled;
+    bool alpha_to_coverage;
 }
 
 alias WGPUId_Sampler_Dummy = WGPUNonZeroU64;
@@ -1909,6 +2178,7 @@ struct WGPUSamplerDescriptor
     float lod_min_clamp;
     float lod_max_clamp;
     WGPUCompareFunction compare;
+    WGPUSamplerBorderColor border_color;
 }
 
 struct WGPUShaderSource
@@ -1951,9 +2221,9 @@ enum WGPUTextureUsage: uint
     STORAGE = 8,
     
    /**
-    * Allows a texture to be a output attachment of a renderpass.
+    * Allows a texture to be an output attachment of a renderpass.
     */
-    OUTPUT_ATTACHMENT = 16
+    RENDER_ATTACHMENT = 16
 }
 
 /**
@@ -2047,9 +2317,19 @@ struct WGPURenderBundleDescriptor_Label
     WGPULabel label;
 }
 
+/**
+ * Options for requesting adapter.
+ */
 struct WGPURequestAdapterOptions
 {
+   /**
+    * Power preference for the adapter.
+    */
     WGPUPowerPreference power_preference;
+   /**
+    * Surface that is required to be presentable with the requested adapter. This does not
+    * create the surface, only guarantees that the adapter can present to said surface.
+    */
     WGPUOption_SurfaceId compatible_surface;
 }
 
