@@ -3,7 +3,7 @@
 # bindbc-wgpu
 BindBC binding to [gfx-rs/wgpu-native](https://github.com/gfx-rs/wgpu-native). Targets the library at [v0.6.0](https://github.com/gfx-rs/wgpu-native/tree/v0.6.0).
 
-> WegGPU is a work-in-progress specification, it is not really usable yet. This binding may be not up to date with latest API revisions.
+> WebGPU is a work-in-progress specification, it is not really usable yet. This binding may be not up to date with latest API revisions.
 
 Usage:
 ```
