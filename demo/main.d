@@ -233,12 +233,7 @@ void main(string[] args)
             resolveTarget: null,
             loadOp: WGPULoadOp.Clear,
             storeOp: WGPUStoreOp.Store,
-            clearColor: {
-                r: 0.0,
-                g: 1.0,
-                b: 0.0,
-                a: 1.0,
-            }
+            clearColor: { r: 0.5, g: 0.5, b: 0.5, a: 1.0 }
         };
         WGPURenderPassDescriptor passDesc = {
             colorAttachments: &caDesc,
@@ -287,7 +282,7 @@ WGPUSurface createSurface(SDL_SysWMinfo wmInfo)
         }
         else
         {
-             quit("Unsupported subsystem, sorry");
+            quit("Unsupported subsystem, sorry");
         }
     }
     else version(linux)
