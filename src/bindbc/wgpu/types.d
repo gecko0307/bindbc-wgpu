@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2019-2020 Timur Gafarov.
+Copyright (c) 2019-2021 Timur Gafarov.
 
 Boost Software License - Version 1.0 - August 17th, 2003
 
@@ -29,1440 +29,551 @@ module bindbc.wgpu.types;
 
 import core.stdc.stdint;
 
-alias WGPUNonZeroU64 = ulong;
-alias WGPUOption_NonZeroU32 = ulong;
-alias WGPUOption_NonZeroU64 = ulong;
-alias WGPUOption_AdapterId = ulong;
-alias WGPUOption_BufferId = ulong;
-alias WGPUOption_SamplerId = ulong;
-alias WGPUOption_SurfaceId = ulong;
-alias WGPUOption_TextureViewId = ulong;
-alias WGPUOption_BufferSize = ulong;
-alias WGPUOption_PipelineLayoutId = ulong;
+enum ulong WGPU_WHOLE_SIZE = 0xffffffffffffffffUL;
+enum ulong WGPU_COPY_STRIDE_UNDEFINED = 0xffffffffUL;
 
-/**
- * Bound uniform/storage buffer offsets must be aligned to this number.
- */
-enum WGPUBIND_BUFFER_ALIGNMENT = 256;
+alias WGPUFlags = uint;
 
-/**
- * Buffer-Texture copies on command encoders have to have the `bytes_per_row`
- * aligned to this number.
- *
- * This doesn't apply to `Queue::write_texture`.
- */
-enum WGPUCOPY_BYTES_PER_ROW_ALIGNMENT = 256;
+alias WGPUAdapter = void*;
+alias WGPUBindGroup = void*;
+alias WGPUBindGroupLayout = void*;
+alias WGPUBuffer = void*;
+alias WGPUCommandBuffer = void*;
+alias WGPUCommandEncoder = void*;
+alias WGPUComputePassEncoder = void*;
+alias WGPUComputePipeline = void*;
+alias WGPUDevice = void*;
+alias WGPUInstance = void*;
+alias WGPUPipelineLayout = void*;
+alias WGPUQuerySet = void*;
+alias WGPUQueue = void*;
+alias WGPURenderBundle = void*;
+alias WGPURenderBundleEncoder = void*;
+alias WGPURenderPassEncoder = void*;
+alias WGPURenderPipeline = void*;
+alias WGPUSampler = void*;
+alias WGPUShaderModule = void*;
+alias WGPUSurface = void*;
+alias WGPUSwapChain = void*;
+alias WGPUTexture = void*;
+alias WGPUTextureView = void*;
 
-/**
- * Alignment all push constants need
- */
-enum WGPUPUSH_CONSTANT_ALIGNMENT = 4;
+enum WGPUAdapterType
+{
+    DiscreteGPU = 0x00000000,
+    IntegratedGPU = 0x00000001,
+    CPU = 0x00000002,
+    Unknown = 0x00000003,
+    Force32 = 0x7FFFFFFF
+}
 
-enum WGPUDEFAULT_BIND_GROUPS = 8;
-
-enum WGPUSHADER_STAGE_COUNT = 3;
-
-enum WGPUDESIRED_NUM_FRAMES = 3;
-
-enum WGPUMAX_ANISOTROPY = 16;
-
-enum WGPUMAX_COLOR_TARGETS = 4;
-
-enum WGPUMAX_MIP_LEVELS = 16;
-
-enum WGPUMAX_VERTEX_BUFFERS = 16;
-
-/**
- * How edges should be handled in texture addressing.
- */
 enum WGPUAddressMode
 {
-   /**
-    * Clamp the value to the edge of the texture
-    *
-    * -0.25 -> 0.0
-    * 1.25  -> 1.0
-    */
-    ClampToEdge = 0,
-    
-   /**
-    * Repeat the texture in a tiling fashion
-    *
-    * -0.25 -> 0.75
-    * 1.25 -> 0.25
-    */
-    Repeat = 1,
-    
-   /**
-    * Repeat the texture, mirroring it every repeat
-    *
-    * -0.25 -> 0.25
-    * 1.25 -> 0.75
-    */
-    MirrorRepeat = 2,
-
-  /**
-   * Clamp the value to the border of the texture
-   * Requires feature `Features.ADDRESS_MODE_CLAMP_TO_BORDER`
-   *
-   * -0.25 -> border
-   * 1.25 -> border
-   */
-    ClampToBorder = 3,
+    Repeat = 0x00000000,
+    MirrorRepeat = 0x00000001,
+    ClampToEdge = 0x00000002,
+    Force32 = 0x7FFFFFFF
 }
 
-/**
- * Backends supported by wgpu.
- */
-enum WGPUBackend: ubyte {
-    Empty = 0,
-    Vulkan = 1,
-    Metal = 2,
-    Dx12 = 3,
-    Dx11 = 4,
-    Gl = 5,
-    BrowserWebGpu = 6
-}
-
-enum WGPUBindingType: uint
+enum WGPUBackendType
 {
-    UniformBuffer = 0,
-    StorageBuffer = 1,
-    ReadonlyStorageBuffer = 2,
-    Sampler = 3,
-    ComparisonSampler = 4,
-    SampledTexture = 5,
-    ReadonlyStorageTexture = 6,
-    WriteonlyStorageTexture = 7
+    Null = 0x00000000,
+    D3D11 = 0x00000001,
+    D3D12 = 0x00000002,
+    Metal = 0x00000003,
+    Vulkan = 0x00000004,
+    OpenGL = 0x00000005,
+    OpenGLES = 0x00000006,
+    Force32 = 0x7FFFFFFF
 }
 
-/**
- * Alpha blend factor.
- *
- * Alpha blending is very complicated: see the OpenGL or Vulkan spec for more information.
- */
 enum WGPUBlendFactor
 {
-    Zero = 0,
-    One = 1,
-    SrcColor = 2,
-    OneMinusSrcColor = 3,
-    SrcAlpha = 4,
-    OneMinusSrcAlpha = 5,
-    DstColor = 6,
-    OneMinusDstColor = 7,
-    DstAlpha = 8,
-    OneMinusDstAlpha = 9,
-    SrcAlphaSaturated = 10,
-    BlendColor = 11,
-    OneMinusBlendColor = 12
+    Zero = 0x00000000,
+    One = 0x00000001,
+    SrcColor = 0x00000002,
+    OneMinusSrcColor = 0x00000003,
+    SrcAlpha = 0x00000004,
+    OneMinusSrcAlpha = 0x00000005,
+    DstColor = 0x00000006,
+    OneMinusDstColor = 0x00000007,
+    DstAlpha = 0x00000008,
+    OneMinusDstAlpha = 0x00000009,
+    SrcAlphaSaturated = 0x0000000A,
+    BlendColor = 0x0000000B,
+    OneMinusBlendColor = 0x0000000C,
+    Force32 = 0x7FFFFFFF
 }
 
-/**
- * Alpha blend operation.
- *
- * Alpha blending is very complicated: see the OpenGL or Vulkan spec for more information.
- */
 enum WGPUBlendOperation
 {
-    Add = 0,
-    Subtract = 1,
-    ReverseSubtract = 2,
-    Min = 3,
-    Max = 4
+    Add = 0x00000000,
+    Subtract = 0x00000001,
+    ReverseSubtract = 0x00000002,
+    Min = 0x00000003,
+    Max = 0x00000004,
+    Force32 = 0x7FFFFFFF
+}
+
+enum WGPUBufferBindingType
+{
+    Undefined = 0x00000000,
+    Uniform = 0x00000001,
+    Storage = 0x00000002,
+    ReadOnlyStorage = 0x00000003,
+    Force32 = 0x7FFFFFFF
 }
 
 enum WGPUBufferMapAsyncStatus
 {
-    Success,
-    Error,
-    Unknown,
-    ContextLost
+    Success = 0x00000000,
+    Error = 0x00000001,
+    Unknown = 0x00000002,
+    DeviceLost = 0x00000003,
+    DestroyedBeforeCallback = 0x00000004,
+    UnmappedBeforeCallback = 0x00000005,
+    Force32 = 0x7FFFFFFF
 }
 
-enum WGPUCDeviceType: ubyte
-{
-    Other = 0,
-    IntegratedGpu,
-    DiscreteGpu,
-    VirtualGpu,
-    Cpu,
-}
-
-/**
- * Comparison function used for depth and stencil operations.
- */
 enum WGPUCompareFunction
 {
-   /**
-    * Invalid value, do not use
-    */
-    Undefined,
-    
-   /**
-    * Function never passes
-    */
-    Never,
-    
-   /**
-    * Function passes if new value less than existing value
-    */
-    Less,
-    
-   /**
-    * Function passes if new value is less than or equal to existing value
-    */
-    LessEqual,
-    
-   /**
-    * Function passes if new value is greater than existing value
-    */
-    Greater,
-    
-   /**
-    * Function passes if new value is greater than or equal to existing value
-    */
-    GreaterEqual,
-
-   /**
-    * Function passes if new value is equal to existing value
-    */
-    Equal,
-    
-   /**
-    * Function passes if new value is not equal to existing value
-    */
-    NotEqual,
-    
-   /**
-    * Function always passes
-    */
-    Always
+    Undefined = 0x00000000,
+    Never = 0x00000001,
+    Less = 0x00000002,
+    LessEqual = 0x00000003,
+    Greater = 0x00000004,
+    GreaterEqual = 0x00000005,
+    Equal = 0x00000006,
+    NotEqual = 0x00000007,
+    Always = 0x00000008,
+    Force32 = 0x7FFFFFFF
 }
 
-/**
- * Type of faces to be culled.
- */
+enum WGPUCreatePipelineAsyncStatus
+{
+    Success = 0x00000000,
+    Error = 0x00000001,
+    DeviceLost = 0x00000002,
+    DeviceDestroyed = 0x00000003,
+    Unknown = 0x00000004,
+    Force32 = 0x7FFFFFFF
+}
+
 enum WGPUCullMode
 {
-   /**
-    * No faces should be culled
-    */
-    None = 0,
-    
-   /**
-    * Front faces should be culled
-    */
-    Front = 1,
-    
-   /**
-    * Back faces should be culled
-    */
-    Back = 2
+    None = 0x00000000,
+    Front = 0x00000001,
+    Back = 0x00000002,
+    Force32 = 0x7FFFFFFF
 }
 
-/**
- * Texel mixing mode when sampling between texels.
- */
+enum WGPUErrorFilter
+{
+    None = 0x00000000,
+    Validation = 0x00000001,
+    OutOfMemory = 0x00000002,
+    Force32 = 0x7FFFFFFF
+}
+
+enum WGPUErrorType
+{
+    NoError = 0x00000000,
+    Validation = 0x00000001,
+    OutOfMemory = 0x00000002,
+    Unknown = 0x00000003,
+    DeviceLost = 0x00000004,
+    Force32 = 0x7FFFFFFF
+}
+
 enum WGPUFilterMode
 {
-   /**
-    * Nearest neighbor sampling.
-    *
-    * This creates a pixelated effect when used as a mag filter
-    */
-    Nearest = 0,
-    
-   /**
-    * Linear Interpolation
-    *
-    * This makes textures smooth but blurry when used as a mag filter.
-    */
-    Linear = 1
+    Nearest = 0x00000000,
+    Linear = 0x00000001,
+    Force32 = 0x7FFFFFFF
 }
 
-/**
- * Winding order which classifies the "front" face.
- */
 enum WGPUFrontFace
 {
-   /**
-    * Triangles with vertices in counter clockwise order are considered the front face.
-    *
-    * This is the default with right handed coordinate spaces.
-    */
-    Ccw = 0,
-    
-   /**
-    * Triangles with vertices in clockwise order are considered the front face.
-    *
-    * This is the default with left handed coordinate spaces.
-    */
-    Cw = 1
+    CCW = 0x00000000,
+    CW = 0x00000001,
+    Force32 = 0x7FFFFFFF
 }
 
-/**
- * Format of indices used with pipeline.
- */
 enum WGPUIndexFormat
 {
-   /**
-    * Indices are 16 bit unsigned integers.
-    */
-    Uint16 = 0,
-    
-   /**
-    * Indices are 32 bit unsigned integers.
-    */
-    Uint32 = 1
+    Undefined = 0x00000000,
+    Uint16 = 0x00000001,
+    Uint32 = 0x00000002,
+    Force32 = 0x7FFFFFFF
 }
 
-/**
- * Rate that determines when vertex data is advanced.
- */
 enum WGPUInputStepMode
 {
-   /**
-    * Input data is advanced every vertex. This is the standard value for vertex data.
-    */
-    Vertex = 0,
-    
-   /**
-    * Input data is advanced every instance.
-    */
-    Instance = 1
+    Vertex = 0x00000000,
+    Instance = 0x00000001,
+    Force32 = 0x7FFFFFFF
 }
 
-/**
- * Operation to perform to the output attachment at the start of a renderpass.
- */
 enum WGPULoadOp
 {
-   /**
-    * Clear the output attachment with the clear color. Clearing is faster than loading.
-    */
-    Clear = 0,
-    
-   /**
-    * Do not clear output attachment.
-    */
-    Load = 1
+    Clear = 0x00000000,
+    Load = 0x00000001,
+    Force32 = 0x7FFFFFFF
 }
 
-enum WGPULogLevel
+enum WGPUPipelineStatisticName
 {
-    Off = 0,
-    Error = 1,
-    Warn = 2,
-    Info = 3,
-    Debug = 4,
-    Trace = 5
+    VertexShaderInvocations = 0x00000000,
+    ClipperInvocations = 0x00000001,
+    ClipperPrimitivesOut = 0x00000002,
+    FragmentShaderInvocations = 0x00000003,
+    ComputeShaderInvocations = 0x00000004,
+    Force32 = 0x7FFFFFFF
 }
 
-/**
- * Type of drawing mode for polygons
- */
-enum WGPUPolygonMode {
-  /**
-   * Polygons are filled
-   */
-  Fill = 0,
-  /**
-   * Polygons are draw as line segments
-   */
-  Line = 1,
-  /**
-   * Polygons are draw as points
-   */
-  Point = 2,
-}
-
-/**
- * Power Preference when choosing a physical adapter.
- */
-enum WGPUPowerPreference
-{
-   /**
-    * Adapter that uses the least possible power. This is often an integerated GPU.
-    */
-    LowPower = 0,
-    
-   /**
-    * Adapter that has the highest performance. This is often a discrete GPU.
-    */
-    HighPerformance = 1
-}
-
-/**
- * Behavior of the presentation engine based on frame rate.
- */
 enum WGPUPresentMode
 {
-   /**
-    * The presentation engine does **not** wait for a vertical blanking period and
-    * the request is presented immediately. This is a low-latency presentation mode,
-    * but visible tearing may be observed. Will fallback to `Fifo` if unavailable on the
-    * selected  platform and backend. Not optimal for mobile.
-    */
-    Immediate = 0,
-    
-   /**
-    * The presentation engine waits for the next vertical blanking period to update
-    * the current image, but frames may be submitted without delay. This is a low-latency
-    * presentation mode and visible tearing will **not** be observed. Will fallback to `Fifo`
-    * if unavailable on the selected platform and backend. Not optimal for mobile.
-    */
-    Mailbox = 1,
-    
-   /**
-    * The presentation engine waits for the next vertical blanking period to update
-    * the current image. The framerate will be capped at the display refresh rate,
-    * corresponding to the `VSync`. Tearing cannot be observed. Optimal for mobile.
-    */
-    Fifo = 2
+    Immediate = 0x00000000,
+    Mailbox = 0x00000001,
+    Fifo = 0x00000002,
+    Force32 = 0x7FFFFFFF
 }
 
-/**
- * Primitive type the input mesh is composed of.
- */
 enum WGPUPrimitiveTopology
 {
-   /**
-    * Vertex data is a list of points. Each vertex is a new point.
-    */
-    PointList = 0,
-    
-   /**
-    * Vertex data is a list of lines. Each pair of vertices composes a new line.
-    *
-    * Vertices `0 1 2 3` create two lines `0 1` and `2 3`
-    */
-    LineList = 1,
-    
-   /**
-    * Vertex data is a strip of lines. Each set of two adjacent vertices form a line.
-    *
-    * Vertices `0 1 2 3` create three lines `0 1`, `1 2`, and `2 3`.
-    */
-    LineStrip = 2,
-    
-   /**
-    * Vertex data is a list of triangles. Each set of 3 vertices composes a new triangle.
-    *
-    * Vertices `0 1 2 3 4 5` create two triangles `0 1 2` and `3 4 5`
-    */
-    TriangleList = 3,
-    
-   /**
-    * Vertex data is a triangle strip. Each set of three adjacent vertices form a triangle.
-    *
-    * Vertices `0 1 2 3 4 5` creates four triangles `0 1 2`, `2 1 3`, `3 2 4`, and `4 3 5`
-    */
-    TriangleStrip = 4
+    PointList = 0x00000000,
+    LineList = 0x00000001,
+    LineStrip = 0x00000002,
+    TriangleList = 0x00000003,
+    TriangleStrip = 0x00000004,
+    Force32 = 0x7FFFFFFF
+}
+
+enum WGPUQueryType
+{
+    Occlusion = 0x00000000,
+    PipelineStatistics = 0x00000001,
+    Timestamp = 0x00000002,
+    Force32 = 0x7FFFFFFF
+}
+
+enum WGPUQueueWorkDoneStatus
+{
+    Success = 0x00000000,
+    Error = 0x00000001,
+    Unknown = 0x00000002,
+    DeviceLost = 0x00000003,
+    Force32 = 0x7FFFFFFF
 }
 
 enum WGPUSType
 {
-    Invalid = 0,
-    SurfaceDescriptorFromMetalLayer = 1,
-    SurfaceDescriptorFromWindowsHWND = 2,
-    SurfaceDescriptorFromXlib = 3,
-    SurfaceDescriptorFromHTMLCanvasId = 4,
-    ShaderModuleSPIRVDescriptor = 5,
-    ShaderModuleWGSLDescriptor = 6,
-   /**
-    * Placeholder value until real value can be determined
-    */
-    AnisotropicFiltering = 268435456,
-    Force32 = 2147483647,
+    Invalid = 0x00000000,
+    SurfaceDescriptorFromMetalLayer = 0x00000001,
+    SurfaceDescriptorFromWindowsHWND = 0x00000002,
+    SurfaceDescriptorFromXlib = 0x00000003,
+    SurfaceDescriptorFromCanvasHTMLSelector = 0x00000004,
+    ShaderModuleSPIRVDescriptor = 0x00000005,
+    ShaderModuleWGSLDescriptor = 0x00000006,
+    Force32 = 0x7FFFFFFF
 }
 
-/**
- * Color variation to use when sampler addressing mode is [`AddressMode::ClampToBorder`]
- */
-enum WGPUSamplerBorderColor {
-  TransparentBlack,
-  OpaqueBlack,
-  OpaqueWhite,
+enum WGPUSamplerBindingType
+{
+    Undefined = 0x00000000,
+    Filtering = 0x00000001,
+    NonFiltering = 0x00000002,
+    Comparison = 0x00000003,
+    Force32 = 0x7FFFFFFF
 }
 
-/**
- * Operation to perform on the stencil value.
- */
 enum WGPUStencilOperation
 {
-   /**
-    * Keep stencil value unchanged.
-    */
-    Keep = 0,
-    
-   /**
-    * Set stencil value to zero.
-    */
-    Zero = 1,
-    
-   /**
-    * Replace stencil value with value provided in most recent call to [`RenderPass::set_stencil_reference`].
-    */
-    Replace = 2,
-    
-   /**
-    * Bitwise inverts stencil value.
-    */
-    Invert = 3,
-    
-   /**
-    * Increments stencil value by one, clamping on overflow.
-    */
-    IncrementClamp = 4,
-    
-   /**
-    * Decrements stencil value by one, clamping on underflow.
-    */
-    DecrementClamp = 5,
-    
-   /**
-    * Increments stencil value by one, wrapping on overflow.
-    */
-    IncrementWrap = 6,
-    
-   /**
-    * Decrements stencil value by one, wrapping on underflow.
-    */
-    DecrementWrap = 7
+    Keep = 0x00000000,
+    Zero = 0x00000001,
+    Replace = 0x00000002,
+    Invert = 0x00000003,
+    IncrementClamp = 0x00000004,
+    DecrementClamp = 0x00000005,
+    IncrementWrap = 0x00000006,
+    DecrementWrap = 0x00000007,
+    Force32 = 0x7FFFFFFF
 }
 
-/**
- * Operation to perform to the output attachment at the end of a renderpass.
- */
+enum WGPUStorageTextureAccess
+{
+    Undefined = 0x00000000,
+    ReadOnly = 0x00000001,
+    WriteOnly = 0x00000002,
+    Force32 = 0x7FFFFFFF
+}
+
 enum WGPUStoreOp
 {
-   /**
-    * Clear the render target. If you don't care about the contents of the target, this can be faster.
-    */
-    Clear = 0,
-    
-   /**
-    * Store the result of the renderpass.
-    */
-    Store = 1
+    Store = 0x00000000,
+    Clear = 0x00000001,
+    Force32 = 0x7FFFFFFF
 }
 
-/**
- * Status of the recieved swapchain image.
- */
-enum WGPUSwapChainStatus {
-    Good,
-    Suboptimal,
-    Timeout,
-    Outdated,
-    Lost
-}
-
-/**
- * Kind of data the texture holds.
- */
 enum WGPUTextureAspect
 {
-   /**
-    * Depth, Stencil, and Color.
-    */
-    All,
-    
-   /**
-    * Stencil.
-    */
-    StencilOnly,
-    
-   /**
-    * Depth.
-    */
-    DepthOnly
+    All = 0x00000000,
+    StencilOnly = 0x00000001,
+    DepthOnly = 0x00000002,
+    Force32 = 0x7FFFFFFF
 }
 
-/**
- * Type of data shaders will read from a texture.
- *
- * Only relevant for [`BindingType::SampledTexture`] bindings. See [`TextureFormat`] for more information.
- */
 enum WGPUTextureComponentType
 {
-   /**
-    * They see it as a floating point number `texture1D`, `texture2D` etc
-    */
-    Float,
-    
-   /**
-    * They see it as a signed integer `itexture1D`, `itexture2D` etc
-    */
-    Sint,
-    
-   /**
-    * They see it as a unsigned integer `utexture1D`, `utexture2D` etc
-    */
-    Uint,
-
-   /**
-    * They see it as a floating point 0-1 result of comparison, i.e. `shadowTexture2D`
-    */
-    DepthComparison,
+    Float = 0x00000000,
+    Sint = 0x00000001,
+    Uint = 0x00000002,
+    DepthComparison = 0x00000003,
+    Force32 = 0x7FFFFFFF
 }
 
-/**
- * Dimensionality of a texture.
- */
 enum WGPUTextureDimension
 {
-   /**
-    * 1D texture
-    */
-    D1,
-    
-   /**
-    * 2D texture
-    */
-    D2,
-    
-   /**
-    * 3D texture
-    */
-    D3
+    D1 = 0x00000000,
+    D2 = 0x00000001,
+    D3 = 0x00000002,
+    Force32 = 0x7FFFFFFF
 }
 
-/**
- * Underlying texture data format.
- *
- * If there is a conversion in the format (such as srgb -> linear), The conversion listed is for
- * loading from texture in a shader. When writing to the texture, the opposite conversion takes place.
- */
 enum WGPUTextureFormat
 {
-   /**
-    * Red channel only. 8 bit integer per channel. [0, 255] converted to/from float [0, 1] in shader.
-    */
-    R8Unorm = 0,
-    
-   /**
-    * Red channel only. 8 bit integer per channel. [-127, 127] converted to/from float [-1, 1] in shader.
-    */
-    R8Snorm = 1,
-    
-   /**
-    * Red channel only. 8 bit integer per channel. Unsigned in shader.
-    */
-    R8Uint = 2,
-    
-   /**
-    * Red channel only. 8 bit integer per channel. Signed in shader.
-    */
-    R8Sint = 3,
-    
-   /**
-    * Red channel only. 16 bit integer per channel. Unsigned in shader.
-    */
-    R16Uint = 4,
-    
-   /**
-    * Red channel only. 16 bit integer per channel. Signed in shader.
-    */
-    R16Sint = 5,
-    
-   /**
-    * Red channel only. 16 bit float per channel. Float in shader.
-    */
-    R16Float = 6,
-    
-   /**
-    * Red and green channels. 8 bit integer per channel. [0, 255] converted to/from float [0, 1] in shader.
-    */
-    Rg8Unorm = 7,
-    
-   /**
-    * Red and green channels. 8 bit integer per channel. [-127, 127] converted to/from float [-1, 1] in shader.
-    */
-    Rg8Snorm = 8,
-    
-   /**
-    * Red and green channels. 8 bit integer per channel. Unsigned in shader.
-    */
-    Rg8Uint = 9,
-    
-   /**
-    * Red and green channel s. 8 bit integer per channel. Signed in shader.
-    */
-    Rg8Sint = 10,
-    
-   /**
-    * Red channel only. 32 bit integer per channel. Unsigned in shader.
-    */
-    R32Uint = 11,
-    
-   /**
-    * Red channel only. 32 bit integer per channel. Signed in shader.
-    */
-    R32Sint = 12,
-    
-   /**
-    * Red channel only. 32 bit float per channel. Float in shader.
-    */
-    R32Float = 13,
-    
-   /**
-    * Red and green channels. 16 bit integer per channel. Unsigned in shader.
-    */
-    Rg16Uint = 14,
-    
-   /**
-    * Red and green channels. 16 bit integer per channel. Signed in shader.
-    */
-    Rg16Sint = 15,
-    
-   /**
-    * Red and green channels. 16 bit float per channel. Float in shader.
-    */
-    Rg16Float = 16,
-    
-   /**
-    * Red, green, blue, and alpha channels. 8 bit integer per channel. [0, 255] converted to/from float [0, 1] in shader.
-    */
-    Rgba8Unorm = 17,
-    
-   /**
-    * Red, green, blue, and alpha channels. 8 bit integer per channel. Srgb-color [0, 255] converted to/from linear-color float [0, 1] in shader.
-    */
-    Rgba8UnormSrgb = 18,
-    
-   /**
-    * Red, green, blue, and alpha channels. 8 bit integer per channel. [-127, 127] converted to/from float [-1, 1] in shader.
-    */
-    Rgba8Snorm = 19,
-    
-   /**
-    * Red, green, blue, and alpha channels. 8 bit integer per channel. Unsigned in shader.
-    */
-    Rgba8Uint = 20,
-    
-   /**
-    * Red, green, blue, and alpha channels. 8 bit integer per channel. Signed in shader.
-    */
-    Rgba8Sint = 21,
-    
-   /**
-    * Blue, green, red, and alpha channels. 8 bit integer per channel. [0, 255] converted to/from float [0, 1] in shader.
-    */
-    Bgra8Unorm = 22,
-    
-   /**
-    * Blue, green, red, and alpha channels. 8 bit integer per channel. Srgb-color [0, 255] converted to/from linear-color float [0, 1] in shader.
-    */
-    Bgra8UnormSrgb = 23,
-    
-   /**
-    * Red, green, blue, and alpha channels. 10 bit integer for RGB channels, 2 bit integer for alpha channel. [0, 1023] ([0, 3] for alpha) converted to/from float [0, 1] in shader.
-    */
-    Rgb10a2Unorm = 24,
-    
-   /**
-    * Red, green, and blue channels. 11 bit float with no sign bit for RG channels. 10 bit float with no sign bit for blue channel. Float in shader.
-    */
-    Rg11b10Float = 25,
-    
-   /**
-    * Red and green channels. 32 bit integer per channel. Unsigned in shader.
-    */
-    Rg32Uint = 26,
-    
-   /**
-    * Red and green channels. 32 bit integer per channel. Signed in shader.
-    */
-    Rg32Sint = 27,
-    
-   /**
-    * Red and green channels. 32 bit float per channel. Float in shader.
-    */
-    Rg32Float = 28,
-    
-   /**
-    * Red, green, blue, and alpha channels. 16 bit integer per channel. Unsigned in shader.
-    */
-    Rgba16Uint = 29,
-    
-   /**
-    * Red, green, blue, and alpha channels. 16 bit integer per channel. Signed in shader.
-    */
-    Rgba16Sint = 30,
-    
-   /**
-    * Red, green, blue, and alpha channels. 16 bit float per channel. Float in shader.
-    */
-    Rgba16Float = 31,
-    
-   /**
-    * Red, green, blue, and alpha channels. 32 bit integer per channel. Unsigned in shader.
-    */
-    Rgba32Uint = 32,
-    
-   /**
-    * Red, green, blue, and alpha channels. 32 bit integer per channel. Signed in shader.
-    */
-    Rgba32Sint = 33,
-    
-   /**
-    * Red, green, blue, and alpha channels. 32 bit float per channel. Float in shader.
-    */
-    Rgba32Float = 34,
-    
-   /**
-    * Special depth format with 32 bit floating point depth.
-    */
-    Depth32Float = 35,
-    
-   /**
-    * Special depth format with at least 24 bit integer depth.
-    */
-    Depth24Plus = 36,
-    
-   /**
-    * Special depth/stencil format with at least 24 bit integer depth and 8 bits integer stencil.
-    */
-    Depth24PlusStencil8 = 37,
-
-   /**
-    * 4x4 block compressed texture. 8 bytes per block (4 bit/px). 4 color + alpha pallet. 5 bit R + 6 bit G + 5 bit B + 1 bit alpha.
-    * [0, 64] ([0, 1] for alpha) converted to/from float [0, 1] in shader.
-    *
-    * Also known as DXT1.
-    *
-    * [`Features::TEXTURE_COMPRESSION_BC`] must be enabled to use this texture format.
-    */
-    Bc1RgbaUnorm = 38,
-
-   /**
-    * 4x4 block compressed texture. 8 bytes per block (4 bit/px). 4 color + alpha pallet. 5 bit R + 6 bit G + 5 bit B + 1 bit alpha.
-    * Srgb-color [0, 64] ([0, 16] for alpha) converted to/from linear-color float [0, 1] in shader.
-    *
-    * Also known as DXT1.
-    *
-    * [`Features::TEXTURE_COMPRESSION_BC`] must be enabled to use this texture format.
-    */
-    Bc1RgbaUnormSrgb = 39,
-
-   /**
-    * 4x4 block compressed texture. 16 bytes per block (8 bit/px). 4 color pallet. 5 bit R + 6 bit G + 5 bit B + 4 bit alpha.
-    * [0, 64] ([0, 16] for alpha) converted to/from float [0, 1] in shader.
-    *
-    * Also known as DXT3.
-    *
-    * [`Features::TEXTURE_COMPRESSION_BC`] must be enabled to use this texture format.
-    */
-    Bc2RgbaUnorm = 40,
-
-   /**
-    * 4x4 block compressed texture. 16 bytes per block (8 bit/px). 4 color pallet. 5 bit R + 6 bit G + 5 bit B + 4 bit alpha.
-    * Srgb-color [0, 64] ([0, 256] for alpha) converted to/from linear-color float [0, 1] in shader.
-    *
-    * Also known as DXT3.
-    *
-    * [`Features::TEXTURE_COMPRESSION_BC`] must be enabled to use this texture format.
-    */
-    Bc2RgbaUnormSrgb = 41,
-
-   /**
-    * 4x4 block compressed texture. 16 bytes per block (8 bit/px). 4 color pallet + 8 alpha pallet. 5 bit R + 6 bit G + 5 bit B + 8 bit alpha.
-    * [0, 64] ([0, 256] for alpha) converted to/from float [0, 1] in shader.
-    *
-    * Also known as DXT5.
-    *
-    * [`Features::TEXTURE_COMPRESSION_BC`] must be enabled to use this texture format.
-    */
-    Bc3RgbaUnorm = 42,
-
-   /**
-    * 4x4 block compressed texture. 16 bytes per block (8 bit/px). 4 color pallet + 8 alpha pallet. 5 bit R + 6 bit G + 5 bit B + 8 bit alpha.
-    * Srgb-color [0, 64] ([0, 256] for alpha) converted to/from linear-color float [0, 1] in shader.
-    *
-    * Also known as DXT5.
-    *
-    * [`Features::TEXTURE_COMPRESSION_BC`] must be enabled to use this texture format.
-    */
-    Bc3RgbaUnormSrgb = 43,
-
-   /**
-    * 4x4 block compressed texture. 8 bytes per block (4 bit/px). 8 color pallet. 8 bit R.
-    * [0, 256] converted to/from float [0, 1] in shader.
-    *
-    * Also known as RGTC1.
-    *
-    * [`Features::TEXTURE_COMPRESSION_BC`] must be enabled to use this texture format.
-    */
-    Bc4RUnorm = 44,
-
-   /**
-    * 4x4 block compressed texture. 8 bytes per block (4 bit/px). 8 color pallet. 8 bit R.
-    * [-127, 127] converted to/from float [-1, 1] in shader.
-    *
-    * Also known as RGTC1.
-    *
-    * [`Features::TEXTURE_COMPRESSION_BC`] must be enabled to use this texture format.
-    */
-    Bc4RSnorm = 45,
-
-   /**
-    * 4x4 block compressed texture. 16 bytes per block (16 bit/px). 8 color red pallet + 8 color green pallet. 8 bit RG.
-    * [0, 256] converted to/from float [0, 1] in shader.
-    *
-    * Also known as RGTC2.
-    *
-    * [`Features::TEXTURE_COMPRESSION_BC`] must be enabled to use this texture format.
-    */
-    Bc5RgUnorm = 46,
-
-   /**
-    * 4x4 block compressed texture. 16 bytes per block (16 bit/px). 8 color red pallet + 8 color green pallet. 8 bit RG.
-    * [-127, 127] converted to/from float [-1, 1] in shader.
-    *
-    * Also known as RGTC2.
-    *
-    * [`Features::TEXTURE_COMPRESSION_BC`] must be enabled to use this texture format.
-    */
-    Bc5RgSnorm = 47,
-
-   /**
-    * 4x4 block compressed texture. 16 bytes per block (16 bit/px). Variable sized pallet. 16 bit unsigned float RGB. Float in shader.
-    *
-    * Also known as BPTC (float).
-    *
-    * [`Features::TEXTURE_COMPRESSION_BC`] must be enabled to use this texture format.
-    */
-    Bc6hRgbUfloat = 48,
-
-   /**
-    * 4x4 block compressed texture. 16 bytes per block (16 bit/px). Variable sized pallet. 16 bit signed float RGB. Float in shader.
-    *
-    * Also known as BPTC (float).
-    *
-    * [`Features::TEXTURE_COMPRESSION_BC`] must be enabled to use this texture format.
-    */
-    Bc6hRgbSfloat = 49,
-
-   /**
-    * 4x4 block compressed texture. 16 bytes per block (16 bit/px). Variable sized pallet. 8 bit integer RGBA.
-    * [0, 256] converted to/from float [0, 1] in shader.
-    *
-    * Also known as BPTC (unorm).
-    *
-    * [`Features::TEXTURE_COMPRESSION_BC`] must be enabled to use this texture format.
-    */
-    Bc7RgbaUnorm = 50,
-
-   /**
-    * 4x4 block compressed texture. 16 bytes per block (16 bit/px). Variable sized pallet. 8 bit integer RGBA.
-    * Srgb-color [0, 255] converted to/from linear-color float [0, 1] in shader.
-    *
-    * Also known as BPTC (unorm).
-    *
-    * [`Features::TEXTURE_COMPRESSION_BC`] must be enabled to use this texture format.
-    */
-    Bc7RgbaUnormSrgb = 51
+    Undefined = 0x00000000,
+    R8Unorm = 0x00000001,
+    R8Snorm = 0x00000002,
+    R8Uint = 0x00000003,
+    R8Sint = 0x00000004,
+    R16Uint = 0x00000005,
+    R16Sint = 0x00000006,
+    R16Float = 0x00000007,
+    RG8Unorm = 0x00000008,
+    RG8Snorm = 0x00000009,
+    RG8Uint = 0x0000000A,
+    RG8Sint = 0x0000000B,
+    R32Float = 0x0000000C,
+    R32Uint = 0x0000000D,
+    R32Sint = 0x0000000E,
+    RG16Uint = 0x0000000F,
+    RG16Sint = 0x00000010,
+    RG16Float = 0x00000011,
+    RGBA8Unorm = 0x00000012,
+    RGBA8UnormSrgb = 0x00000013,
+    RGBA8Snorm = 0x00000014,
+    RGBA8Uint = 0x00000015,
+    RGBA8Sint = 0x00000016,
+    BGRA8Unorm = 0x00000017,
+    BGRA8UnormSrgb = 0x00000018,
+    RGB10A2Unorm = 0x00000019,
+    RG11B10Ufloat = 0x0000001A,
+    RGB9E5Ufloat = 0x0000001B,
+    RG32Float = 0x0000001C,
+    RG32Uint = 0x0000001D,
+    RG32Sint = 0x0000001E,
+    RGBA16Uint = 0x0000001F,
+    RGBA16Sint = 0x00000020,
+    RGBA16Float = 0x00000021,
+    RGBA32Float = 0x00000022,
+    RGBA32Uint = 0x00000023,
+    RGBA32Sint = 0x00000024,
+    Depth32Float = 0x00000025,
+    Depth24Plus = 0x00000026,
+    Depth24PlusStencil8 = 0x00000027,
+    Stencil8 = 0x00000028,
+    BC1RGBAUnorm = 0x00000029,
+    BC1RGBAUnormSrgb = 0x0000002A,
+    BC2RGBAUnorm = 0x0000002B,
+    BC2RGBAUnormSrgb = 0x0000002C,
+    BC3RGBAUnorm = 0x0000002D,
+    BC3RGBAUnormSrgb = 0x0000002E,
+    BC4RUnorm = 0x0000002F,
+    BC4RSnorm = 0x00000030,
+    BC5RGUnorm = 0x00000031,
+    BC5RGSnorm = 0x00000032,
+    BC6HRGBUfloat = 0x00000033,
+    BC6HRGBFloat = 0x00000034,
+    BC7RGBAUnorm = 0x00000035,
+    BC7RGBAUnormSrgb = 0x00000036,
+    Force32 = 0x7FFFFFFF
 }
 
-/**
- * Dimensions of a particular texture view.
- */
+enum WGPUTextureSampleType
+{
+    Undefined = 0x00000000,
+    Float = 0x00000001,
+    UnfilterableFloat = 0x00000002,
+    Depth = 0x00000003,
+    Sint = 0x00000004,
+    Uint = 0x00000005,
+    Force32 = 0x7FFFFFFF
+}
+
 enum WGPUTextureViewDimension
 {
-   /**
-    * A one dimensional texture. `texture1D` in glsl shaders.
-    */
-    D1,
-    
-   /**
-    * A two dimensional texture. `texture2D` in glsl shaders.
-    */
-    D2,
-    
-   /**
-    * A two dimensional array texture. `texture2DArray` in glsl shaders.
-    */
-    D2Array,
-    
-   /**
-    * A cubemap texture. `textureCube` in glsl shaders.
-    */
-    Cube,
-    
-   /**
-    * A cubemap array texture. `textureCubeArray` in glsl shaders.
-    */
-    CubeArray,
-    
-   /**
-    * A three dimensional texture. `texture3D` in glsl shaders.
-    */
-    D3
+    Undefined = 0x00000000,
+    D1 = 0x00000001,
+    D2 = 0x00000002,
+    D2Array = 0x00000003,
+    Cube = 0x00000004,
+    CubeArray = 0x00000005,
+    D3 = 0x00000006,
+    Force32 = 0x7FFFFFFF
 }
 
-/**
- * Vertex Format for a Vertex Attribute (input).
- */
 enum WGPUVertexFormat
 {
-   /**
-    * Two unsigned bytes (u8). `uvec2` in shaders.
-    */
-    Uchar2 = 0,
-    
-   /**
-    * Four unsigned bytes (u8). `uvec4` in shaders.
-    */
-    Uchar4 = 1,
-    
-   /**
-    * Two signed bytes (i8). `ivec2` in shaders.
-    */
-    Char2 = 2,
-    
-   /**
-    * Four signed bytes (i8). `ivec4` in shaders.
-    */
-    Char4 = 3,
-    
-   /**
-    * Two unsigned bytes (u8). [0, 255] converted to float [0, 1] `vec2` in shaders.
-    */
-    Uchar2Norm = 4,
-    
-   /**
-    * Four unsigned bytes (u8). [0, 255] converted to float [0, 1] `vec4` in shaders.
-    */
-    Uchar4Norm = 5,
-    
-   /**
-    * Two signed bytes (i8). [-127, 127] converted to float [-1, 1] `vec2` in shaders.
-    */
-    Char2Norm = 6,
-    
-   /**
-    * Four signed bytes (i8). [-127, 127] converted to float [-1, 1] `vec4` in shaders.
-    */
-    Char4Norm = 7,
-    
-   /**
-    * Two unsigned shorts (u16). `uvec2` in shaders.
-    */
-    Ushort2 = 8,
-    
-   /**
-    * Four unsigned shorts (u16). `uvec4` in shaders.
-    */
-    Ushort4 = 9,
-    
-   /**
-    * Two signed shorts (i16). `ivec2` in shaders.
-    */
-    Short2 = 10,
-    
-   /**
-    * Four signed shorts (i16). `ivec4` in shaders.
-    */
-    Short4 = 11,
-    
-   /**
-    * Two unsigned shorts (u16). [0, 65535] converted to float [0, 1] `vec2` in shaders.
-    */
-    Ushort2Norm = 12,
-    
-   /**
-    * Four unsigned shorts (u16). [0, 65535] converted to float [0, 1] `vec4` in shaders.
-    */
-    Ushort4Norm = 13,
-    
-   /**
-    * Two signed shorts (i16). [-32767, 32767] converted to float [-1, 1] `vec2` in shaders.
-    */
-    Short2Norm = 14,
-    
-   /**
-    * Four signed shorts (i16). [-32767, 32767] converted to float [-1, 1] `vec4` in shaders.
-    */
-    Short4Norm = 15,
-    
-   /**
-    * Two half-precision floats (no Rust equiv). `vec2` in shaders.
-    */
-    Half2 = 16,
-    
-   /**
-    * Four half-precision floats (no Rust equiv). `vec4` in shaders.
-    */
-    Half4 = 17,
-    
-   /**
-    * One single-precision float (f32). `float` in shaders.
-    */
-    Float = 18,
-    
-   /**
-    * Two single-precision floats (f32). `vec2` in shaders.
-    */
-    Float2 = 19,
-    
-   /**
-    * Three single-precision floats (f32). `vec3` in shaders.
-    */
-    Float3 = 20,
-    
-   /**
-    * Four single-precision floats (f32). `vec4` in shaders.
-    */
-    Float4 = 21,
-    
-   /**
-    * One unsigned int (u32). `uint` in shaders.
-    */
-    Uint = 22,
-    
-   /**
-    * Two unsigned ints (u32). `uvec2` in shaders.
-    */
-    Uint2 = 23,
-    
-   /**
-    * Three unsigned ints (u32). `uvec3` in shaders.
-    */
-    Uint3 = 24,
-    
-   /**
-    * Four unsigned ints (u32). `uvec4` in shaders.
-    */
-    Uint4 = 25,
-    
-   /**
-    * One signed int (i32). `int` in shaders.
-    */
-    Int = 26,
-    
-   /**
-    * Two signed ints (i32). `ivec2` in shaders.
-    */
-    Int2 = 27,
-    
-   /**
-    * Three signed ints (i32). `ivec3` in shaders.
-    */
-    Int3 = 28,
-    
-   /**
-    * Four signed ints (i32). `ivec4` in shaders.
-    */
-    Int4 = 29
+    Undefined = 0x00000000,
+    Uint8x2 = 0x00000001,
+    Uint8x4 = 0x00000002,
+    Sint8x2 = 0x00000003,
+    Sint8x4 = 0x00000004,
+    Unorm8x2 = 0x00000005,
+    Unorm8x4 = 0x00000006,
+    Snorm8x2 = 0x00000007,
+    Snorm8x4 = 0x00000008,
+    Uint16x2 = 0x00000009,
+    Uint16x4 = 0x0000000A,
+    Sint16x2 = 0x0000000B,
+    Sint16x4 = 0x0000000C,
+    Unorm16x2 = 0x0000000D,
+    Unorm16x4 = 0x0000000E,
+    Snorm16x2 = 0x0000000F,
+    Snorm16x4 = 0x00000010,
+    Float16x2 = 0x00000011,
+    Float16x4 = 0x00000012,
+    Float32 = 0x00000013,
+    Float32x2 = 0x00000014,
+    Float32x3 = 0x00000015,
+    Float32x4 = 0x00000016,
+    Uint32 = 0x00000017,
+    Uint32x2 = 0x00000018,
+    Uint32x3 = 0x00000019,
+    Uint32x4 = 0x0000001A,
+    Sint32 = 0x0000001B,
+    Sint32x2 = 0x0000001C,
+    Sint32x3 = 0x0000001D,
+    Sint32x4 = 0x0000001E,
+    Force32 = 0x7FFFFFFF
 }
 
-struct WGPUComputePass;
-struct WGPURenderBundleEncoder;
-struct WGPURenderPass;
-
-alias WGPUId_Adapter_Dummy = WGPUNonZeroU64;
-alias WGPUAdapterId = WGPUId_Adapter_Dummy;
-
-/**
- * Features that are not guaranteed to be supported.
- *
- * These are either part of the webgpu standard, or are extension features supported by
- * wgpu when targeting native.
- *
- * If you want to use a feature, you need to first verify that the adapter supports
- * the feature. If the adapter does not support the feature, requesting a device with it enabled
- * will panic.
- */
-enum WGPUFeatures: uint64_t
+enum WGPUBufferUsage
 {
-    NONE = 0,
-
-   /**
-    * By default, polygon depth is clipped to 0-1 range. Anything outside of that range
-    * is rejected, and respective fragments are not touched.
-    *
-    * With this extension, we can force clamping of the polygon depth to 0-1. That allows
-    * shadow map occluders to be rendered into a tighter depth range.
-    *
-    * Supported platforms:
-    * - desktops
-    * - some mobile chips
-    *
-    * This is a web and native feature.
-    */
-    DEPTH_CLAMPING = 1,
-
-   /**
-    * Enables BCn family of compressed textures. All BCn textures use 4x4 pixel blocks
-    * with 8 or 16 bytes per block.
-    *
-    * Compressed textures sacrifice some quality in exchange for signifigantly reduced
-    * bandwidth usage.
-    *
-    * Supported Platforms:
-    * - desktops
-    *
-    * This is a web and native feature.
-    */
-    TEXTURE_COMPRESSION_BC = 2,
-    
-   /**
-    * Webgpu only allows the MAP_READ and MAP_WRITE buffer usage to be matched with
-    * COPY_DST and COPY_SRC respectively. This removes this requirement.
-    *
-    * This is only beneficial on systems that share memory between CPU and GPU. If enabled
-    * on a system that doesn't, this can severely hinder performance. Only use if you understand
-    * the consequences.
-    *
-    * Supported platforms:
-    * - All
-    *
-    * This is a native only feature.
-    */
-    MAPPABLE_PRIMARY_BUFFERS = 65536,
-    
-   /**
-    * Allows the user to create uniform arrays of sampled textures in shaders:
-    *
-    * eg. `uniform texture2D textures[10]`.
-    *
-    * This capability allows them to exist and to be indexed by compile time constant
-    * values.
-    *
-    * Supported platforms:
-    * - DX12
-    * - Metal (with MSL 2.0+ on macOS 10.13+)
-    * - Vulkan
-    *
-    * This is a native only feature.
-    */
-    SAMPLED_TEXTURE_BINDING_ARRAY = 131072,
-
-   /**
-    * Allows shaders to index sampled texture arrays with dynamically uniform values:
-    *
-    * eg. `texture_array[uniform_value]`
-    *
-    * This capability means the hardware will also support SAMPLED_TEXTURE_BINDING_ARRAY.
-    *
-    * Supported platforms:
-    * - DX12
-    * - Metal (with MSL 2.0+ on macOS 10.13+)
-    * - Vulkan's shaderSampledImageArrayDynamicIndexing feature
-    *
-    * This is a native only feature.
-    */
-    SAMPLED_TEXTURE_ARRAY_DYNAMIC_INDEXING = 262144,
-
-   /**
-    * Allows shaders to index sampled texture arrays with dynamically non-uniform values:
-    *
-    * eg. `texture_array[vertex_data]`
-    *
-    * In order to use this capability, the corresponding GLSL extension must be enabled like so:
-    *
-    * `#extension GL_EXT_nonuniform_qualifier : require`
-    *
-    * HLSL does not need any extension.
-    *
-    * This capability means the hardware will also support SAMPLED_TEXTURE_ARRAY_DYNAMIC_INDEXING
-    * and SAMPLED_TEXTURE_BINDING_ARRAY.
-    *
-    * Supported platforms:
-    * - DX12
-    * - Metal (with MSL 2.0+ on macOS 10.13+)
-    * - Vulkan 1.2+ (or VK_EXT_descriptor_indexing)'s shaderSampledImageArrayNonUniformIndexing feature)
-    *
-    * This is a native only feature.
-    */
-    SAMPLED_TEXTURE_ARRAY_NON_UNIFORM_INDEXING = 524288,
-
-   /**
-    * Allows the user to create unsized uniform arrays of bindings:
-    *
-    * eg. `uniform texture2D textures[]`.
-    *
-    * If this capability is supported, SAMPLED_TEXTURE_ARRAY_NON_UNIFORM_INDEXING is very likely
-    * to also be supported
-    *
-    * Supported platforms:
-    * - DX12
-    * - Vulkan 1.2+ (or VK_EXT_descriptor_indexing)'s runtimeDescriptorArray feature
-    *
-    * This is a native only feature.
-    */
-    UNSIZED_BINDING_ARRAY = 1048576,
-    
-   /**
-    * Allows the user to call [`RenderPass::multi_draw_indirect`] and [`RenderPass::multi_draw_indexed_indirect`].
-    *
-    * Allows multiple indirect calls to be dispatched from a single buffer.
-    *
-    * Supported platforms:
-    * - DX12
-    * - Metal
-    * - Vulkan
-    *
-    * This is a native only feature.
-    */
-    MULTI_DRAW_INDIRECT = 2097152,
-    
-   /**
-    * Allows the user to call [`RenderPass::multi_draw_indirect_count`] and [`RenderPass::multi_draw_indexed_indirect_count`].
-    *
-    * This allows the use of a buffer containing the actual number of draw calls.
-    *
-    * Supported platforms:
-    * - DX12
-    * - Vulkan 1.2+ (or VK_KHR_draw_indirect_count)
-    *
-    * This is a native only feature.
-    */
-    MULTI_DRAW_INDIRECT_COUNT = 4194304,
-
-   /**
-    * Allows the use of push constants: small, fast bits of memory that can be updated
-    * inside a [`RenderPass`].
-    *
-    * Allows the user to call [`RenderPass::set_push_constants`], provide a non-empty array
-    * to [`PipelineLayoutDescriptor`], and provide a non-zero limit to [`Limits::max_push_constant_size`].
-    *
-    * A block of push constants can be declared with `layout(push_constant) uniform Name {..}` in shaders.
-    *
-    * Supported platforms:
-    * - DX12
-    * - Vulkan
-    * - Metal
-    * - DX11 (emulated with uniforms)
-    * - OpenGL (emulated with uniforms)
-    *
-    * This is a native only feature.
-    */
-    PUSH_CONSTANTS = 8388608,
-
-   /**
-    * Allows the use of [`AddressMode::ClampToBorder`].
-    *
-    * Supported platforms:
-    * - DX12
-    * - Vulkan
-    * - Metal (macOS 10.12+ only)
-    * - DX11
-    * - OpenGL
-    *
-    * This is a web and native feature.
-    */
-    ADDRESS_MODE_CLAMP_TO_BORDER = 16777216,
-
-   /**
-    * Allows the user to set a non-fill polygon mode in [`RasterizationStateDescriptor::polygon_mode`]
-    *
-    * This allows drawing polygons/triangles as lines (wireframe) or points instead of filled
-    *
-    * Supported platforms:
-    * - DX12
-    * - Vulkan
-    *
-    * This is a native only feature.
-    */
-    NON_FILL_POLYGON_MODE = 33554432,
-    
-   /**
-    * Features which are part of the upstream WebGPU standard.
-    */
-    ALL_WEBGPU = 65535,
-    
-   /**
-    * Features that are only available when targeting native (not web).
-    */
-    ALL_NATIVE = 18446744073709486080UL
+    None = 0x00000000,
+    MapRead = 0x00000001,
+    MapWrite = 0x00000002,
+    CopySrc = 0x00000004,
+    CopyDst = 0x00000008,
+    Index = 0x00000010,
+    Vertex = 0x00000020,
+    Uniform = 0x00000040,
+    Storage = 0x00000080,
+    Indirect = 0x00000100,
+    QueryResolve = 0x00000200,
+    Force32 = 0x7FFFFFFF
 }
 
+alias WGPUBufferUsageFlags = WGPUFlags;
 
-struct WGPUCAdapterInfo
+enum WGPUColorWriteMask
 {
-   /**
-    * Adapter name
-    */
-    char* name;
-    
-   /**
-    * Length of the adapter name
-    */
-    uintptr_t name_length;
-    
-   /**
-    * Vendor PCI id of the adapter
-    */
-    uintptr_t vendor;
-    
-   /**
-    * PCI id of the adapter
-    */
-    uintptr_t device;
-    
-   /**
-    * Type of device
-    */
-    WGPUCDeviceType device_type;
-    
-   /**
-    * Backend used for device
-    */
-    WGPUBackend backend;
+    None = 0x00000000,
+    Red = 0x00000001,
+    Green = 0x00000002,
+    Blue = 0x00000004,
+    Alpha = 0x00000008,
+    All = 0x0000000F,
+    Force32 = 0x7FFFFFFF
 }
 
-struct WGPUCLimits
+alias WGPUColorWriteMaskFlags = WGPUFlags;
+
+enum WGPUMapMode
 {
-    uint max_bind_groups;
+    Read = 0x00000001,
+    Write = 0x00000002,
+    Force32 = 0x7FFFFFFF
 }
 
-alias WGPUId_Device_Dummy = WGPUNonZeroU64;
-alias WGPUDeviceId = WGPUId_Device_Dummy;
+alias WGPUMapModeFlags = WGPUFlags;
 
-alias WGPUId_BindGroup_Dummy = WGPUNonZeroU64;
-alias WGPUBindGroupId = WGPUId_BindGroup_Dummy;
-
-alias WGPUId_BindGroupLayout_Dummy = WGPUNonZeroU64;
-alias WGPUBindGroupLayoutId = WGPUId_BindGroupLayout_Dummy;
-
-alias WGPUId_Buffer_Dummy = WGPUNonZeroU64;
-alias WGPUBufferId = WGPUId_Buffer_Dummy;
-
-/**
- * Integral type used for buffer offsets.
- */
-alias WGPUBufferAddress = uint64_t;
-
-/**
- * Integral type used for buffer slice sizes.
- */
-alias WGPUBufferSize = uint64_t;
-
-alias WGPUBufferMapCallback = extern(C) void function(WGPUBufferMapAsyncStatus status, ubyte* userdata);
-
-alias WGPUId_CommandBuffer_Dummy = WGPUNonZeroU64;
-alias WGPUCommandBufferId = WGPUId_CommandBuffer_Dummy;
-
-alias WGPUCommandEncoderId = WGPUCommandBufferId;
-
-struct WGPUComputePassDescriptor
+enum WGPUShaderStage
 {
-    uint todo;
+    None = 0x00000000,
+    Vertex = 0x00000001,
+    Fragment = 0x00000002,
+    Compute = 0x00000004,
+    Force32 = 0x7FFFFFFF
 }
 
-alias WGPUId_TextureView_Dummy = WGPUNonZeroU64;
-alias WGPUTextureViewId = WGPUId_TextureView_Dummy;
+alias WGPUShaderStageFlags = WGPUFlags;
 
-alias WGPUOptionRef_TextureViewId = WGPUTextureViewId;
+enum WGPUTextureUsage
+{
+    None = 0x00000000,
+    CopySrc = 0x00000001,
+    CopyDst = 0x00000002,
+    Sampled = 0x00000004,
+    Storage = 0x00000008,
+    RenderAttachment = 0x00000010,
+    Force32 = 0x7FFFFFFF
+}
 
-/**
- * RGBA double precision color.
- *
- * This is not to be used as a generic color type, only for specific wgpu interfaces.
- */
+alias WGPUTextureUsageFlags = WGPUFlags;
+
+struct WGPUChainedStruct
+{
+    const(WGPUChainedStruct)* next;
+    WGPUSType sType;
+}
+
+struct WGPUAdapterProperties
+{
+    const(WGPUChainedStruct)* nextInChain;
+    uint deviceID;
+    uint vendorID;
+    const(char)* name;
+    const(char)* driverDescription;
+    WGPUAdapterType adapterType;
+    WGPUBackendType backendType;
+}
+
+struct WGPUBindGroupEntry
+{
+    uint binding;
+    WGPUBuffer buffer;
+    ulong offset;
+    ulong size;
+    WGPUSampler sampler;
+    WGPUTextureView textureView;
+}
+
+struct WGPUBlendComponent
+{
+    WGPUBlendFactor srcFactor;
+    WGPUBlendFactor dstFactor;
+    WGPUBlendOperation operation;
+}
+
+struct WGPUBufferBindingLayout
+{
+    const(WGPUChainedStruct)* nextInChain;
+    WGPUBufferBindingType type;
+    bool hasDynamicOffset;
+    ulong minBindingSize;
+}
+
+struct WGPUBufferDescriptor
+{
+    const(WGPUChainedStruct)* nextInChain;
+    const(char)* label;
+    WGPUBufferUsageFlags usage;
+    ulong size;
+    bool mappedAtCreation;
+}
+
 struct WGPUColor
 {
     double r;
@@ -1471,933 +582,446 @@ struct WGPUColor
     double a;
 }
 
-enum WGPUColor_TRANSPARENT = WGPUColor(0.0, 0.0, 0.0, 0.0);
-enum WGPUColor_BLACK = WGPUColor(0.0, 0.0, 0.0, 1.0);
-enum WGPUColor_WHITE = WGPUColor(1.0, 1.0, 1.0, 1.0);
-enum WGPUColor_RED = WGPUColor(1.0, 0.0, 0.0, 1.0);
-enum WGPUColor_GREEN = WGPUColor(0.0, 1.0, 0.0, 1.0);
-enum WGPUColor_BLUE = WGPUColor(0.0, 0.0, 1.0, 1.0);
-
-/**
- * Describes an individual channel within a render pass, such as color, depth, or stencil.
- */
-struct WGPUPassChannel_Color
+struct WGPUCommandBufferDescriptor
 {
-   /**
-    * Operation to perform to the output attachment at the start of a renderpass. This must be clear if it
-    * is the first renderpass rendering to a swap chain image.
-    */
-    WGPULoadOp load_op;
-    
-   /**
-    * Operation to perform to the output attachment at the end of a renderpass.
-    */
-    WGPUStoreOp store_op;
-    
-   /**
-    * If load_op is [`LoadOp::Clear`], the attachment will be cleared to this color.
-    */
-    WGPUColor clear_value;
-    
-   /**
-    * If true, the relevant channel is not changed by a renderpass, and the corresponding attachment
-    * can be used inside the pass by other read-only usages.
-    */
-    bool read_only;
+    const(WGPUChainedStruct)* nextInChain;
+    const(char)* label;
 }
 
-/**
- * Describes a color attachment to a render pass.
- */
-struct WGPUColorAttachmentDescriptor
+struct WGPUCommandEncoderDescriptor
 {
-   /**
-    * The view to use as an attachment.
-    */
-    WGPUTextureViewId attachment;
-    
-   /**
-    * The view that will receive the resolved output if multisampling is used.
-    */
-    WGPUOption_TextureViewId resolve_target;
-    
-   /**
-    * What operations will be performed on this color attachment.
-    */
-    WGPUPassChannel_Color channel;
+    const(WGPUChainedStruct)* nextInChain;
+    const(char)* label;
 }
 
-/**
- * Describes an individual channel within a render pass, such as color, depth, or stencil.
- */
-struct WGPUPassChannel_f32
+struct WGPUComputePassDescriptor
 {
-   /**
-    * Operation to perform to the output attachment at the start of a renderpass. This must be clear if it
-    * is the first renderpass rendering to a swap chain image.
-    */
-    WGPULoadOp load_op;
-    
-   /**
-    * Operation to perform to the output attachment at the end of a renderpass.
-    */
-    WGPUStoreOp store_op;
-    
-   /**
-    * If load_op is [`LoadOp::Clear`], the attachment will be cleared to this color.
-    */
-    float clear_value;
-    
-   /**
-    * If true, the relevant channel is not changed by a renderpass, and the corresponding attachment
-    * can be used inside the pass by other read-only usages.
-    */
-    bool read_only;
+    const(WGPUChainedStruct)* nextInChain;
+    const(char)* label;
 }
 
-/**
- * Describes an individual channel within a render pass, such as color, depth, or stencil.
- */
-struct WGPUPassChannel_u32
+struct WGPUDeviceDescriptor
 {
-   /**
-    * Operation to perform to the output attachment at the start of a renderpass. This must be clear if it
-    * is the first renderpass rendering to a swap chain image.
-    */
-    WGPULoadOp load_op;
-    
-   /**
-    * Operation to perform to the output attachment at the end of a renderpass.
-    */
-    WGPUStoreOp store_op;
-    
-   /**
-    * If load_op is [`LoadOp::Clear`], the attachement will be cleared to this color.
-    */
-    uint clear_value;
-    
-   /**
-    * If true, the relevant channel is not changed by a renderpass, and the corresponding attachment
-    * can be used inside the pass by other read-only usages.
-    */
-    bool read_only;
+    const(WGPUChainedStruct)* nextInChain;
 }
 
-/**
- * Describes a depth/stencil attachment to a render pass.
- */
-struct WGPUDepthStencilAttachmentDescriptor
-{
-   /**
-    * The view to use as an attachment.
-    */
-    WGPUTextureViewId attachment;
-    
-   /**
-    * What operations will be performed on the depth part of the attachment.
-    */
-    WGPUPassChannel_f32 depth;
-    
-   /**
-    * What operations will be performed on the stencil part of the attachment.
-    */
-    WGPUPassChannel_u32 stencil;
-}
-
-
-struct WGPURenderPassDescriptor
-{
-    const WGPUColorAttachmentDescriptor* color_attachments;
-    size_t color_attachments_length;
-    const WGPUDepthStencilAttachmentDescriptor* depth_stencil_attachment;
-}
-
-/**
- * Layout of a texture in a buffer's memory.
- */
-struct WGPUTextureDataLayout
-{
-   /**
-    * Offset into the buffer that is the start of the texture. Must be a multiple of texture block size.
-    * For non-compressed textures, this is 1.
-    */
-    WGPUBufferAddress offset;
-    
-   /**
-    * Bytes per "row" of the image. This represents one row of pixels in the x direction. Compressed
-    * textures include multiple rows of pixels in each "row". May be 0 for 1D texture copies.
-    *
-    * Must be a multiple of 256 for [`CommandEncoder::copy_buffer_to_texture`] and [`CommandEncoder::copy_texture_to_buffer`].
-    * [`Queue::write_texture`] does not have this requirement.
-    *
-    * Must be a multiple of the texture block size. For non-compressed textures, this is 1.
-    */
-    uint bytes_per_row;
-    
-   /**
-    * Rows that make up a single "image". Each "image" is one layer in the z direction of a 3D image. May be larger
-    * than `copy_size.y`.
-    *
-    * May be 0 for 2D texture copies.
-    */
-    uint rows_per_image;
-}
-
-struct WGPUBufferCopyView
-{
-    WGPUTextureDataLayout layout;
-    WGPUBufferId buffer;
-}
-
-alias WGPUId_Texture_Dummy = WGPUNonZeroU64;
-alias WGPUTextureId = WGPUId_Texture_Dummy;
-
-/**
- * Origin of a copy to/from a texture.
- */
-struct WGPUOrigin3d
-{
-    uint x;
-    uint y;
-    uint z;
-}
-enum WGPUOrigin3d_ZERO = WGPUOrigin3d(0, 0, 0);
-
-struct WGPUTextureCopyView
-{
-    WGPUTextureId texture;
-    uint mip_level;
-    WGPUOrigin3d origin;
-}
-
-/**
- * Extent of a texture related operation.
- */
-struct WGPUExtent3d
+struct WGPUExtent3D
 {
     uint width;
     uint height;
     uint depth;
 }
 
-/**
- * Describes a [`CommandBuffer`].
- */
-struct WGPUCommandBufferDescriptor
+struct WGPUInstanceDescriptor
 {
-    WGPULabel label;
+    const(WGPUChainedStruct)* nextInChain;
 }
 
-alias WGPURawString = const(char)*;
-
-/**
- * Integral type used for dynamic bind group offsets.
- */
-alias WGPUDynamicOffset = uint;
-
-alias WGPUId_ComputePipeline_Dummy = WGPUNonZeroU64;
-alias WGPUComputePipelineId = WGPUId_ComputePipeline_Dummy;
-
-alias WGPUId_Surface = WGPUNonZeroU64;
-alias WGPUSurfaceId = WGPUId_Surface;
-
-alias WGPULabel = const(char)*;
-
-struct WGPUBindGroupEntry
+struct WGPUMultisampleState
 {
-    uint binding;
-    WGPUOption_BufferId buffer;
-    WGPUBufferAddress offset;
-    WGPUBufferSize size;
-    WGPUOption_SamplerId sampler;
-    WGPUOption_TextureViewId texture_view;
+    const(WGPUChainedStruct)* nextInChain;
+    uint count;
+    uint mask;
+    bool alphaToCoverageEnabled;
 }
 
-struct WGPUBindGroupDescriptor
+struct WGPUOrigin3D
 {
-    WGPULabel label;
-    WGPUBindGroupLayoutId layout;
-    const(WGPUBindGroupEntry)* entries;
-    uintptr_t entries_length;
-}
-
-/**
- * Describes the shader stages that a binding will be visible from.
- *
- * These can be combined so something that is visible from both vertex and fragment shaders can be defined as:
- *
- * `ShaderStage::VERTEX | ShaderStage::FRAGMENT`
- */
-enum WGPUShaderStage: uint
-{
-   /**
-    * Binding is not visible from any shader stage.
-    */
-    NONE = 0,
-    
-   /**
-    * Binding is visible from the vertex shader of a render pipeline.
-    */
-    VERTEX = 1,
-    
-   /**
-    * Binding is visible from the fragment shader of a render pipeline.
-    */
-    FRAGMENT = 2,
-    
-   /**
-    * Binding is visible from the compute shader of a compute pipeline.
-    */
-    COMPUTE = 4
-}
-
-struct WGPUBindGroupLayoutEntry
-{
-    uint binding;
-    WGPUShaderStage visibility;
-    WGPUBindingType ty;
-    bool has_dynamic_offset;
-    uint64_t min_buffer_binding_size;
-    bool multisampled;
-    WGPUTextureViewDimension view_dimension;
-    WGPUTextureComponentType texture_component_type;
-    WGPUTextureFormat storage_texture_format;
-    uint32_t count;
-}
-
-struct WGPUBindGroupLayoutDescriptor
-{
-    WGPULabel label;
-    const(WGPUBindGroupLayoutEntry)* entries;
-    uintptr_t entries_length;
-}
-
-/**
- * Different ways that you can use a buffer.
- *
- * The usages determine what kind of memory the buffer is allocated from and what
- * actions the buffer can partake in.
- */
-enum WGPUBufferUsage: uint
-{
-   /**
-    * Allow a buffer to be mapped for reading using [`Buffer::map_async`] + [`Buffer::get_mapped_range`].
-    * This does not include creating a buffer with [`BufferDescriptor::mapped_at_creation`] set.
-    *
-    * If [`Features::MAPPABLE_PRIMARY_BUFFERS`] isn't enabled, the only other usage a buffer
-    * may have is COPY_DST.
-    */
-    MAP_READ = 1,
-    
-   /**
-    * Allow a buffer to be mapped for writing using [`Buffer::map_async`] + [`Buffer::get_mapped_range_mut`].
-    * This does not include creating a buffer with `mapped_at_creation` set.
-    *
-    * If [`Features::MAPPABLE_PRIMARY_BUFFERS`] feature isn't enabled, the only other usage a buffer
-    * may have is COPY_SRC.
-    */
-    MAP_WRITE = 2,
-    
-   /**
-    * Allow a buffer to be the source buffer for a [`CommandEncoder::copy_buffer_to_buffer`] or [`CommandEncoder::copy_buffer_to_texture`]
-    * operation.
-    */
-    COPY_SRC = 4,
-    
-   /**
-    * Allow a buffer to be the source buffer for a [`CommandEncoder::copy_buffer_to_buffer`], [`CommandEncoder::copy_texture_to_buffer`],
-    * or [`Queue::write_buffer`] operation.
-    */
-    COPY_DST = 8,
-    
-   /**
-    * Allow a buffer to be the index buffer in a draw operation.
-    */
-    INDEX = 16,
-    
-   /**
-    * Allow a buffer to be the vertex buffer in a draw operation.
-    */
-    VERTEX = 32,
-    
-   /**
-    * Allow a buffer to be a [`BindingType::UniformBuffer`] inside a bind group.
-    */
-    UNIFORM = 64,
-    
-   /**
-    * Allow a buffer to be a [`BindingType::StorageBuffer`] inside a bind group.
-    */
-    STORAGE = 128,
-    
-   /**
-    * Allow a buffer to be the indirect buffer in an indirect draw call.
-    */
-    INDIRECT = 256
-}
-
-/**
- * Describes a [`Buffer`].
- */
-struct WGPUBufferDescriptor
-{
-   /**
-    * Debug label of a buffer. This will show up in graphics debuggers for easy identification.
-    */
-    WGPULabel label;
-    
-   /**
-    * Size of a buffer.
-    */
-    WGPUBufferAddress size;
-    
-   /**
-    * Usages of a buffer. If the buffer is used in any way that isn't specified here, the operation
-    * will panic.
-    */
-    WGPUBufferUsage usage;
-    
-   /**
-    * Allows a buffer to be mapped immediately after they are made. It does not have to be [`BufferUsage::MAP_READ`] or
-    * [`BufferUsage::MAP_WRITE`], all buffers are allowed to be mapped at creation.
-    */
-    ubyte mapped_at_creation;
-}
-
-/**
- * Describes a [`CommandEncoder`].
- */
-struct WGPUCommandEncoderDescriptor
-{
-   /**
-    * Debug label for the command encoder. This will show up in graphics debuggers for easy identification.
-    */
-    WGPULabel label;
-}
-
-alias WGPUId_PipelineLayout_Dummy = WGPUNonZeroU64;
-alias WGPUPipelineLayoutId = WGPUId_PipelineLayout_Dummy;
-
-alias WGPUId_ShaderModule_Dummy = WGPUNonZeroU64;
-alias WGPUShaderModuleId = WGPUId_ShaderModule_Dummy;
-
-struct WGPUProgrammableStageDescriptor
-{
-    WGPUShaderModuleId _module;
-    WGPURawString entry_point;
-}
-
-struct WGPUComputePipelineDescriptor
-{
-    WGPULabel label;
-    WGPUOption_PipelineLayoutId layout;
-    WGPUProgrammableStageDescriptor compute_stage;
+    uint x;
+    uint y;
+    uint z;
 }
 
 struct WGPUPipelineLayoutDescriptor
 {
-    WGPULabel label;
-    const(WGPUBindGroupLayoutId)* bind_group_layouts;
-    uintptr_t bind_group_layouts_length;
+    const(WGPUChainedStruct)* nextInChain;
+    const(char)* label;
+    uint bindGroupLayoutCount;
+    const(WGPUBindGroupLayout)* bindGroupLayouts;
 }
 
-alias WGPURenderBundleEncoderId = WGPURenderBundleEncoder*;
+struct WGPUPrimitiveState
+{
+    const(WGPUChainedStruct)* nextInChain;
+    WGPUPrimitiveTopology topology;
+    WGPUIndexFormat stripIndexFormat;
+    WGPUFrontFace frontFace;
+    WGPUCullMode cullMode;
+}
+
+struct WGPUProgrammableStageDescriptor
+{
+    const(WGPUChainedStruct)* nextInChain;
+    WGPUShaderModule modul;
+    const(char)* entryPoint;
+}
+
+struct WGPUQuerySetDescriptor
+{
+    const(WGPUChainedStruct)* nextInChain;
+    const(char)* label;
+    WGPUQueryType type;
+    uint count;
+    const(WGPUPipelineStatisticName)* pipelineStatistics;
+    uint pipelineStatisticsCount;
+}
+
+struct WGPURenderBundleDescriptor
+{
+    const(WGPUChainedStruct)* nextInChain;
+    const(char)* label;
+}
 
 struct WGPURenderBundleEncoderDescriptor
 {
-    WGPULabel label;
-    const(WGPUTextureFormat)* color_formats;
-    uintptr_t color_formats_length;
-    const(WGPUTextureFormat)* depth_stencil_format;
-    uint sample_count;
+    const(WGPUChainedStruct)* nextInChain;
+    const(char)* label;
+    uint colorFormatsCount;
+    const(WGPUTextureFormat)* colorFormats;
+    WGPUTextureFormat depthStencilFormat;
+    uint sampleCount;
 }
 
-alias WGPUId_RenderPipeline_Dummy = WGPUNonZeroU64;
-alias WGPURenderPipelineId = WGPUId_RenderPipeline_Dummy;
-
-/**
- * Describes the state of the rasterizer in a render pipeline.
- */
-struct WGPURasterizationStateDescriptor
+struct WGPURenderPassDepthStencilAttachmentDescriptor
 {
-    WGPUFrontFace front_face;
-    WGPUCullMode cull_mode;
-   /**
-    * Controls the way each polygon is rasterized. Can be either `Fill` (default), `Line` or `Point`
-    *
-    * Setting this to something other than `Fill` requires `Features::NON_FILL_POLYGON_MODE` to be enabled.
-    */
-    WGPUPolygonMode polygon_mode;
-   /**
-    * If enabled polygon depth is clamped to 0-1 range instead of being clipped.
-    *
-    * Requires `Features::DEPTH_CLAMPING` enabled.
-    */
-    bool clamp_depth;
-    int depth_bias;
-    float depth_bias_slope_scale;
-    float depth_bias_clamp;
+    WGPUTextureView attachment;
+    WGPULoadOp depthLoadOp;
+    WGPUStoreOp depthStoreOp;
+    float clearDepth;
+    bool depthReadOnly;
+    WGPULoadOp stencilLoadOp;
+    WGPUStoreOp stencilStoreOp;
+    uint clearStencil;
+    bool stencilReadOnly;
 }
 
-/**
- * Describes the blend state of a pipeline.
- *
- * Alpha blending is very complicated: see the OpenGL or Vulkan spec for more information.
- */
-struct WGPUBlendDescriptor
+struct WGPURequestAdapterOptions
 {
-    WGPUBlendFactor src_factor;
-    WGPUBlendFactor dst_factor;
-    WGPUBlendOperation operation;
+    const(WGPUChainedStruct)* nextInChain;
+    WGPUSurface compatibleSurface;
 }
 
-/**
- * Color write mask. Disabled color channels will not be written to.
- */
-enum WGPUColorWrite: uint
+struct WGPUSamplerBindingLayout
 {
-   /**
-    * Enable red channel writes
-    */
-    RED = 1,
-    
-   /**
-    * Enable green channel writes
-    */
-    GREEN = 2,
-    
-   /**
-    * Enable blue channel writes
-    */
-    BLUE = 4,
-    
-   /**
-    * Enable alpha channel writes
-    */
-    ALPHA = 8,
-    
-   /**
-    * Enable red, green, and blue channel writes
-    */
-    COLOR = 7,
-    
-   /**
-    * Enable writes to all channels.
-    */
-    ALL = 15
-}
-
-/**
- * Describes the color state of a render pipeline.
- */
-struct WGPUColorStateDescriptor
-{
-   /**
-    * The [`TextureFormat`] of the image that this pipeline will render to. Must match the the format
-    * of the corresponding color attachment in [`CommandEncoder::begin_render_pass`].
-    */
-    WGPUTextureFormat format;
-    
-   /**
-    * The alpha blending that is used for this pipeline.
-    */
-    WGPUBlendDescriptor alpha_blend;
-    
-   /**
-    * The color blending that is used for this pipeline.
-    */
-    WGPUBlendDescriptor color_blend;
-    
-   /**
-    * Mask which enables/disables writes to different color/alpha channel.
-    */
-    WGPUColorWrite write_mask;
-}
-
-/**
- * Describes stencil state in a render pipeline.
- *
- * If you are not using stencil state, set this to `WGPUStencilStateFaceDescriptor_Ignore`.
- */
-struct WGPUStencilStateFaceDescriptor
-{
-   /**
-    * Comparison function that determines if the fail_op or pass_op is used on the stencil buffer.
-    */
-    WGPUCompareFunction compare;
-    
-   /**
-    * Operation that is preformed when stencil test fails.
-    */
-    WGPUStencilOperation fail_op;
-    
-   /**
-    * Operation that is performed when depth test fails but stencil test succeeds.
-    */
-    WGPUStencilOperation depth_fail_op;
-    
-   /**
-    * Operation that is performed when stencil test success.
-    */
-    WGPUStencilOperation pass_op;
-}
-
-enum WGPUStencilStateFaceDescriptor WGPUStencilStateFaceDescriptor_Ignore = WGPUStencilStateFaceDescriptor(
-    WGPUCompareFunction.Always,
-    WGPUStencilOperation.Keep,
-    WGPUStencilOperation.Keep,
-    WGPUStencilOperation.Keep
-);
-
-struct WGPUStencilStateDescriptor
-{
-   /**
-    * Front face mode.
-    */
-    WGPUStencilStateFaceDescriptor front;
-    
-   /**
-    * Back face mode.
-    */
-    WGPUStencilStateFaceDescriptor back;
-    
-   /**
-    * Stencil values are AND'd with this mask when reading and writing from the stencil buffer. Only low 8 bits are used.
-    */
-    uint read_mask;
-    
-   /**
-    * Stencil values are AND'd with this mask when writing to the stencil buffer. Only low 8 bits are used.
-    */
-    uint write_mask;
-}
-
-/**
- * Describes the depth/stencil state in a render pipeline.
- */
-struct WGPUDepthStencilStateDescriptor
-{
-   /**
-    * Format of the depth/stencil buffer, must be special depth format. Must match the the format
-    * of the depth/stencil attachment in [`CommandEncoder::begin_render_pass`].
-    */
-    WGPUTextureFormat format;
-    
-   /**
-    * If disabled, depth will not be written to.
-    */
-    ubyte depth_write_enabled;
-    
-   /**
-    * Comparison function used to compare depth values in the depth test.
-    */
-    WGPUCompareFunction depth_compare;
-    
-    WGPUStencilStateDescriptor stencil;
-}
-
-/**
- * Integral type used for binding locations in shaders.
- */
-alias WGPUShaderLocation = uint;
-
-/**
- * Vertex inputs (attributes) to shaders.
- *
- * Arrays of these can be made with the [`vertex_attr_array`] macro. Vertex attributes are assumed to be tightly packed.
- */
-struct WGPUVertexAttributeDescriptor
-{
-   /**
-    * Byte offset of the start of the input
-    */
-    WGPUBufferAddress offset;
-    
-   /**
-    * Format of the input
-    */
-    WGPUVertexFormat format;
-    
-   /**
-    * Location for this input. Must match the location in the shader.
-    */ 
-    WGPUShaderLocation shader_location;
-}
-
-struct WGPUVertexBufferDescriptor
-{
-    WGPUBufferAddress stride;
-    WGPUInputStepMode step_mode;
-    const(WGPUVertexAttributeDescriptor)* attributes;
-    uintptr_t attributes_length;
-}
-
-struct WGPUVertexStateDescriptor
-{
-    WGPUIndexFormat index_format;
-    const(WGPUVertexBufferDescriptor)* vertex_buffers;
-    uintptr_t vertex_buffers_length;
-}
-
-struct WGPURenderPipelineDescriptor
-{
-    WGPULabel label;
-    WGPUOption_PipelineLayoutId layout;
-    WGPUProgrammableStageDescriptor vertex_stage;
-    const(WGPUProgrammableStageDescriptor)* fragment_stage;
-    const(WGPURasterizationStateDescriptor)* rasterization_state;
-    WGPUPrimitiveTopology primitive_topology;
-    const(WGPUColorStateDescriptor)* color_states;
-    uintptr_t color_states_length;
-    const(WGPUDepthStencilStateDescriptor)* depth_stencil_state;
-    WGPUVertexStateDescriptor vertex_state;
-    uint sample_count;
-    uint sample_mask;
-    bool alpha_to_coverage;
-}
-
-alias WGPUId_Sampler_Dummy = WGPUNonZeroU64;
-alias WGPUSamplerId = WGPUId_Sampler_Dummy;
-
-struct WGPUChainedStruct
-{
-    const(WGPUChainedStruct)* next;
-    WGPUSType s_type;
+    const(WGPUChainedStruct)* nextInChain;
+    WGPUSamplerBindingType type;
 }
 
 struct WGPUSamplerDescriptor
 {
-    const(WGPUChainedStruct)* next_in_chain;
-    WGPULabel label;
-    WGPUAddressMode address_mode_u;
-    WGPUAddressMode address_mode_v;
-    WGPUAddressMode address_mode_w;
-    WGPUFilterMode mag_filter;
-    WGPUFilterMode min_filter;
-    WGPUFilterMode mipmap_filter;
-    float lod_min_clamp;
-    float lod_max_clamp;
+    const(WGPUChainedStruct)* nextInChain;
+    const(char)* label;
+    WGPUAddressMode addressModeU;
+    WGPUAddressMode addressModeV;
+    WGPUAddressMode addressModeW;
+    WGPUFilterMode magFilter;
+    WGPUFilterMode minFilter;
+    WGPUFilterMode mipmapFilter;
+    float lodMinClamp;
+    float lodMaxClamp;
     WGPUCompareFunction compare;
-    WGPUSamplerBorderColor border_color;
+    ushort maxAnisotropy;
 }
 
-struct WGPUShaderSource
+struct WGPUShaderModuleDescriptor
 {
-    const(uint)* bytes;
-    uintptr_t length;
+    const(WGPUChainedStruct)* nextInChain;
+    const(char)* label;
 }
 
-alias WGPUId_SwapChain_Dummy = WGPUNonZeroU64;
-alias WGPUSwapChainId = WGPUId_SwapChain_Dummy;
-
-/**
- * Different ways that you can use a texture.
- *
- * The usages determine what kind of memory the texture is allocated from and what
- * actions the texture can partake in.
- */
-enum WGPUTextureUsage: uint
+struct WGPUShaderModuleSPIRVDescriptor
 {
-   /**
-    * Allows a texture to be the source in a [`CommandEncoder::copy_texture_to_buffer`] or
-    * [`CommandEncoder::copy_texture_to_texture`] operation.
-    */
-    COPY_SRC = 1,
-    
-   /**
-    * Allows a texture to be the destination in a  [`CommandEncoder::copy_texture_to_buffer`],
-    * [`CommandEncoder::copy_texture_to_texture`], or [`Queue::write_texture`] operation.
-    */
-    COPY_DST = 2,
-    
-   /**
-    * Allows a texture to be a [`BindingType::SampledTexture`] in a bind group.
-    */
-    SAMPLED = 4,
-    
-   /**
-    * Allows a texture to be a [`BindingType::StorageTexture`] in a bind group.
-    */
-    STORAGE = 8,
-    
-   /**
-    * Allows a texture to be an output attachment of a renderpass.
-    */
-    RENDER_ATTACHMENT = 16
+    WGPUChainedStruct chain;
+    uint codeSize;
+    const(uint)* code;
 }
 
-/**
- * Describes a [`SwapChain`].
- */
+struct WGPUShaderModuleWGSLDescriptor
+{
+    WGPUChainedStruct chain;
+    const(char)* source;
+}
+
+struct WGPUStencilFaceState
+{
+    WGPUCompareFunction compare;
+    WGPUStencilOperation failOp;
+    WGPUStencilOperation depthFailOp;
+    WGPUStencilOperation passOp;
+}
+
+struct WGPUStorageTextureBindingLayout
+{
+    const(WGPUChainedStruct)* nextInChain;
+    WGPUStorageTextureAccess access;
+    WGPUTextureFormat format;
+    WGPUTextureViewDimension viewDimension;
+}
+
+struct WGPUSurfaceDescriptor
+{
+    const(WGPUChainedStruct)* nextInChain;
+    const(char)* label;
+}
+
+struct WGPUSurfaceDescriptorFromCanvasHTMLSelector
+{
+    WGPUChainedStruct chain;
+    const(char)* selector;
+}
+
+struct WGPUSurfaceDescriptorFromMetalLayer
+{
+    WGPUChainedStruct chain;
+    void* layer;
+}
+
+struct WGPUSurfaceDescriptorFromWindowsHWND
+{
+    WGPUChainedStruct chain;
+    void* hinstance;
+    void* hwnd;
+}
+
+struct WGPUSurfaceDescriptorFromXlib
+{
+    WGPUChainedStruct chain;
+    void* display;
+    uint window;
+}
+
 struct WGPUSwapChainDescriptor
 {
-   /**
-    * The usage of the swap chain. The only supported usage is OUTPUT_ATTACHMENT
-    */
-    WGPUTextureUsage usage;
-    
-   /**
-    * The texture format of the swap chain. The only formats that are guaranteed are
-    * `Bgra8Unorm` and `Bgra8UnormSrgb`
-    */
+    const(WGPUChainedStruct)* nextInChain;
+    const(char)* label;
+    WGPUTextureUsageFlags usage;
     WGPUTextureFormat format;
-    
-   /**
-    * Width of the swap chain. Must be the same size as the surface.
-    */
     uint width;
-    
-   /**
-    * Height of the swap chain. Must be the same size as the surface.
-    */
     uint height;
-    
-   /**
-    * Presentation mode of the swap chain. FIFO is the only guaranteed to be supported, though
-    * other formats will automatically fall back to FIFO.
-    */
-    WGPUPresentMode present_mode;
+    WGPUPresentMode presentMode;
 }
 
-/**
- * Describes a [`Texture`].
- */
-struct WGPUTextureDescriptor
+struct WGPUTextureBindingLayout
 {
-   /**
-    * Debug label of the texture. This will show up in graphics debuggers for easy identification.
-    */
-    WGPULabel label;
-    
-   /**
-    * Size of the texture. For a regular 1D/2D texture, the unused sizes will be 1. For 2DArray textures, Z is the
-    * number of 2D textures in that array.
-    */
-    WGPUExtent3d size;
-    
-   /**
-    * Mip count of texture. For a texture with no extra mips, this must be 1.
-    */
-    uint mip_level_count;
-    
-   /**
-    * Sample count of texture. If this is not 1, texture must have [`BindingType::SampledTexture::multisampled`] set to true.
-    */
-    uint sample_count;
-    
-   /**
-    * Dimensions of the texture.
-    */
-    WGPUTextureDimension dimension;
-    
-   /**
-    * Format of the texture.
-    */
-    WGPUTextureFormat format;
-    
-   /**
-    * Allowed usages of the texture. If used in other ways, the operation will panic.
-    */
-    WGPUTextureUsage usage;
+    const(WGPUChainedStruct)* nextInChain;
+    WGPUTextureSampleType sampleType;
+    WGPUTextureViewDimension viewDimension;
+    bool multisampled;
 }
 
-alias WGPUQueueId = WGPUDeviceId;
-
-alias WGPUId_RenderBundle_Dummy = WGPUNonZeroU64;
-alias WGPURenderBundleId = WGPUId_RenderBundle_Dummy;
-
-/**
- * Describes a [`RenderBundle`].
- */
-struct WGPURenderBundleDescriptor_Label
+struct WGPUTextureDataLayout
 {
-   /**
-    * Debug label of the render bundle encoder. This will show up in graphics debuggers for easy identification.
-    */
-    WGPULabel label;
+    const(WGPUChainedStruct)* nextInChain;
+    ulong offset;
+    uint bytesPerRow;
+    uint rowsPerImage;
 }
 
-/**
- * Options for requesting adapter.
- */
-struct WGPURequestAdapterOptions
-{
-   /**
-    * Power preference for the adapter.
-    */
-    WGPUPowerPreference power_preference;
-   /**
-    * Surface that is required to be presentable with the requested adapter. This does not
-    * create the surface, only guarantees that the adapter can present to said surface.
-    */
-    WGPUOption_SurfaceId compatible_surface;
-}
-
-/**
- * Represents the backends that wgpu will use.
- */
-alias WGPUBackendBit = uint;
-
-alias WGPURequestAdapterCallback = extern(C) void function(WGPUOption_AdapterId id, void* userdata);
-
-alias WGPULogCallback = extern(C) void function(int level, const(char)* msg);
-
-struct WGPUSwapChainOutput
-{
-    WGPUSwapChainStatus status;
-    WGPUOption_TextureViewId view_id;
-}
-
-/**
- * Describes a [`TextureView`].
- */
 struct WGPUTextureViewDescriptor
 {
-   /**
-    * Debug label of the texture view. This will show up in graphics debuggers for easy identification.
-    */
-    WGPULabel label;
-    
-   /**
-    * Format of the texture view. At this time, it must be the same as the underlying format of the texture.
-    */
+    const(WGPUChainedStruct)* nextInChain;
+    const(char)* label;
     WGPUTextureFormat format;
-    
-   /**
-    * The dimension of the texture view. For 1D textures, this must be `1D`. For 2D textures it must be one of
-    * `D2`, `D2Array`, `Cube`, and `CubeArray`. For 3D textures it must be `3D`
-    */
     WGPUTextureViewDimension dimension;
-    
-   /**
-    * Aspect of the texture. Color textures must be [`TextureAspect::All`].
-    */
+    uint baseMipLevel;
+    uint mipLevelCount;
+    uint baseArrayLayer;
+    uint arrayLayerCount;
     WGPUTextureAspect aspect;
-    
-   /**
-    * Base mip level.
-    */
-    uint base_mip_level;
-    
-   /**
-    * Mip level count. Must be at least one. base_mip_level + level_count must be less or equal to underlying texture mip count.
-    */
-    uint level_count;
-    
-   /**
-    * Base array layer.
-    */
-    uint base_array_layer;
-    
-   /**
-    * Layer count. Must be at least one. base_array_layer + array_layer_count must be less or equal to the underlying array count.
-    */
-    uint array_layer_count;
 }
 
-struct WGPUAnisotropicSamplerDescriptorExt
+struct WGPUVertexAttribute
 {
-    const(WGPUChainedStruct)* next_in_chain;
-    WGPUSType s_type;
-    ubyte anisotropic_clamp;
+    WGPUVertexFormat format;
+    ulong offset;
+    uint shaderLocation;
 }
+
+struct WGPUBindGroupDescriptor
+{
+    const(WGPUChainedStruct)* nextInChain;
+    const(char)* label;
+    WGPUBindGroupLayout layout;
+    uint entryCount;
+    const(WGPUBindGroupEntry)* entries;
+}
+
+struct WGPUBindGroupLayoutEntry
+{
+    const(WGPUChainedStruct)* nextInChain;
+    uint binding;
+    WGPUShaderStageFlags visibility;
+    WGPUBufferBindingLayout buffer;
+    WGPUSamplerBindingLayout sampler;
+    WGPUTextureBindingLayout texture;
+    WGPUStorageTextureBindingLayout storageTexture;
+}
+
+struct WGPUBlendState
+{
+    WGPUBlendComponent color;
+    WGPUBlendComponent alpha;
+}
+
+struct WGPUComputePipelineDescriptor
+{
+    const(WGPUChainedStruct)* nextInChain;
+    const(char)* label;
+    WGPUPipelineLayout layout;
+    WGPUProgrammableStageDescriptor computeStage;
+}
+
+struct WGPUDepthStencilState
+{
+    const(WGPUChainedStruct)* nextInChain;
+    WGPUTextureFormat format;
+    bool depthWriteEnabled;
+    WGPUCompareFunction depthCompare;
+    WGPUStencilFaceState stencilFront;
+    WGPUStencilFaceState stencilBack;
+    uint stencilReadMask;
+    uint stencilWriteMask;
+    int depthBias;
+    float depthBiasSlopeScale;
+    float depthBiasClamp;
+}
+
+struct WGPUImageCopyBuffer
+{
+    const(WGPUChainedStruct)* nextInChain;
+    WGPUTextureDataLayout layout;
+    WGPUBuffer buffer;
+}
+
+struct WGPUImageCopyTexture
+{
+    const(WGPUChainedStruct)* nextInChain;
+    WGPUTexture texture;
+    uint mipLevel;
+    WGPUOrigin3D origin;
+    WGPUTextureAspect aspect;
+}
+
+struct WGPURenderPassColorAttachmentDescriptor
+{
+    WGPUTextureView attachment;
+    WGPUTextureView resolveTarget;
+    WGPULoadOp loadOp;
+    WGPUStoreOp storeOp;
+    WGPUColor clearColor;
+}
+
+struct WGPUTextureDescriptor
+{
+    const(WGPUChainedStruct)* nextInChain;
+    const(char)* label;
+    WGPUTextureUsageFlags usage;
+    WGPUTextureDimension dimension;
+    WGPUExtent3D size;
+    WGPUTextureFormat format;
+    uint mipLevelCount;
+    uint sampleCount;
+}
+
+struct WGPUVertexBufferLayout
+{
+    ulong arrayStride;
+    WGPUInputStepMode stepMode;
+    uint attributeCount;
+    const(WGPUVertexAttribute)* attributes;
+}
+
+struct WGPUBindGroupLayoutDescriptor
+{
+    const(WGPUChainedStruct)* nextInChain;
+    const(char)* label;
+    uint entryCount;
+    const(WGPUBindGroupLayoutEntry)* entries;
+}
+
+struct WGPUColorTargetState
+{
+    const(WGPUChainedStruct)* nextInChain;
+    WGPUTextureFormat format;
+    const(WGPUBlendState)* blend;
+    WGPUColorWriteMaskFlags writeMask;
+}
+
+struct WGPURenderPassDescriptor
+{
+    const(WGPUChainedStruct)* nextInChain;
+    const(char)* label;
+    uint colorAttachmentCount;
+    const(WGPURenderPassColorAttachmentDescriptor)* colorAttachments;
+    const(WGPURenderPassDepthStencilAttachmentDescriptor)* depthStencilAttachment;
+    WGPUQuerySet occlusionQuerySet;
+}
+
+struct WGPUVertexState
+{
+    const(WGPUChainedStruct)* nextInChain;
+    WGPUShaderModule modul;
+    const(char)* entryPoint;
+    uint bufferCount;
+    const(WGPUVertexBufferLayout)* buffers;
+}
+
+struct WGPUFragmentState
+{
+    const(WGPUChainedStruct)* nextInChain;
+    WGPUShaderModule modul;
+    const(char)* entryPoint;
+    uint targetCount;
+    const(WGPUColorTargetState)* targets;
+}
+
+struct WGPURenderPipelineDescriptor
+{
+    const(WGPUChainedStruct)* nextInChain;
+    const(char)* label;
+    WGPUPipelineLayout layout;
+    WGPUVertexState vertex;
+    WGPUPrimitiveState primitive;
+    const(WGPUDepthStencilState)* depthStencil;
+    WGPUMultisampleState multisample;
+    const(WGPUFragmentState)* fragment;
+}
+
+alias WGPUBufferMapCallback = extern(C) void function(WGPUBufferMapAsyncStatus status, void* userdata);
+alias WGPUCreateComputePipelineAsyncCallback = extern(C) void function(WGPUCreatePipelineAsyncStatus status, WGPUComputePipeline pipeline, const(char)* message, void* userdata);
+alias WGPUCreateRenderPipelineAsyncCallback = extern(C) void function(WGPUCreatePipelineAsyncStatus status, WGPURenderPipeline pipeline, const(char)* message, void* userdata);
+alias WGPUDeviceLostCallback = extern(C) void function(const(char)* message, void* userdata);
+alias WGPUErrorCallback = extern(C) void function(WGPUErrorType type, const(char)* message, void* userdata);
+alias WGPUQueueWorkDoneCallback = extern(C) void function(WGPUQueueWorkDoneStatus status, void* userdata);
+alias WGPURequestAdapterCallback = extern(C) void function(WGPUAdapter result, void* userdata);
+alias WGPURequestDeviceCallback = extern(C) void function(WGPUDevice result, void* userdata);
+alias WGPUSurfaceGetPreferredFormatCallback = extern(C) void function(WGPUTextureFormat format, void* userdata);
+alias WGPUProc = extern(C) void function();
+
+enum WGPUNativeSType
+{
+    // Start at 6 to prevent collisions with webgpu STypes
+    DeviceExtras = 0x60000001,
+    Force32 = 0x7FFFFFFF
+}
+
+struct WGPUDeviceExtras
+{
+    WGPUChainedStruct chain;
+    uint maxBindGroups;
+    const(char)* label;
+    const(char)* tracePath;
+}
+
+enum WGPULogLevel
+{
+    Off = 0x00000000,
+    Error = 0x00000001,
+    Warn = 0x00000002,
+    Info = 0x00000003,
+    Debug = 0x00000004,
+    Trace = 0x00000005,
+    Force32 = 0x7FFFFFFF
+}
+
+alias WGPULogCallback = extern(C) void function(WGPULogLevel level, const(char)* msg);

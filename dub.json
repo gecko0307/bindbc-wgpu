@@ -31,6 +31,20 @@
             "copyFiles-linux-x86": ["lib/x86-debug/*.so"],
             "copyFiles-linux-x86_64": ["lib/x64-debug/*.so"],
             "copyFiles-osx": ["lib/x64-debug/*.dylib"]
+        },
+        {
+            "name": "application",
+            "targetName": "demo",
+            "targetType": "executable",
+            "mainSourceFile": "demo/main.d",
+            "dependencies": {
+                "bindbc-sdl": "~>0.19.1"
+            },
+            "versions": [
+                "SDL_2010"
+            ],
+            "copyFiles-windows-x86": ["demo/lib/x86/*.dll"],
+            "copyFiles-windows-x86_64": ["demo/lib/x64/*.dll"]
         }
     ],
     

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2019-2020 Timur Gafarov.
+Copyright (c) 2019-2021 Timur Gafarov.
 
 Boost Software License - Version 1.0 - August 17th, 2003
 
@@ -35,7 +35,7 @@ import bindbc.wgpu.funcs;
 enum WGPUSupport {
     noLibrary,
     badLibrary,
-    wgpu06
+    wgpu07
 }
 
 private
@@ -80,7 +80,7 @@ WGPUSupport loadWGPU()
         ];
     }
     else static assert(0, "wgpu_native is not yet supported on this platform.");
-
+    
     WGPUSupport ret;
     foreach(name; libNames)
     {
@@ -98,23 +98,23 @@ WGPUSupport loadWGPU(const(char)* libName)
     {
         return WGPUSupport.noLibrary;
     }
-
+    
     auto errCount = errorCount();
     loadedVersion = WGPUSupport.badLibrary;
     
     import std.algorithm.searching: startsWith;
-	static foreach(m; __traits(allMembers, bindbc.wgpu.funcs))
-	{
-		static if (m.startsWith("da_"))
-			lib.bindSymbol(
-                cast(void**)&__traits(getMember, bindbc.wgpu.funcs, m[3..$]), 
+    static foreach(m; __traits(allMembers, bindbc.wgpu.funcs))
+    {
+        static if (m.startsWith("da_"))
+            lib.bindSymbol(
+                cast(void**)&__traits(getMember, bindbc.wgpu.funcs, m[3..$]),
                 __traits(getMember, bindbc.wgpu.funcs, m[3..$]).stringof);
-	}
+    }
     
-    loadedVersion = WGPUSupport.wgpu06;
-
+    loadedVersion = WGPUSupport.wgpu07;
+    
     if (errorCount() != errCount)
         return WGPUSupport.badLibrary;
-
+    
     return loadedVersion;
 }
