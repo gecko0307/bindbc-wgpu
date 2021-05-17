@@ -169,14 +169,18 @@ void main(string[] args)
     WGPURenderPipeline pipeline = wgpuDeviceCreateRenderPipeline(device, &rpDesc);
     writeln("Render pipeline OK");
     
-    WGPUSwapChainDescriptor swcDesc = {
-        usage: WGPUTextureUsage.RenderAttachment,
-        format: WGPUTextureFormat.BGRA8Unorm,
-        width: winWidth,
-        height: winHeight,
-        presentMode: WGPUPresentMode.Fifo
-    };
-    WGPUSwapChain swapChain = wgpuDeviceCreateSwapChain(device, surface, &swcDesc);
+    WGPUSwapChain createSwapChain(uint w, uint h) {
+        WGPUSwapChainDescriptor swcDesc = {
+            usage: WGPUTextureUsage.RenderAttachment,
+            format: WGPUTextureFormat.BGRA8Unorm,
+            width: w,
+            height: h,
+            presentMode: WGPUPresentMode.Fifo
+        };
+        return wgpuDeviceCreateSwapChain(device, surface, &swcDesc);
+    }
+
+    WGPUSwapChain swapChain = createSwapChain(winWidth, winHeight);
     
     bool running = true;
     while(running)
@@ -191,14 +195,7 @@ void main(string[] args)
                     {
                         winWidth = event.window.data1;
                         winHeight = event.window.data2;
-                        WGPUSwapChainDescriptor swcDescNew = {
-                            usage: WGPUTextureUsage.RenderAttachment,
-                            format: WGPUTextureFormat.BGRA8Unorm,
-                            width: winWidth,
-                            height: winHeight,
-                            presentMode: WGPUPresentMode.Fifo
-                        };
-                        swapChain = wgpuDeviceCreateSwapChain(device, surface, &swcDescNew);
+                        swapChain = createSwapChain(winWidth, winHeight);
                     }
                     break;
                 case SDL_KEYUP:
