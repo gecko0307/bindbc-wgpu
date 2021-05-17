@@ -290,7 +290,53 @@ WGPUSurface createSurface(SDL_SysWMinfo wmInfo)
              quit("Unsupported subsystem, sorry");
         }
     }
-    // TODO: other systems
+    else version(linux)
+    {
+        // Needs test!
+        if (wmInfo.subsystem == SDL_SYSWM_X11)
+        {
+            auto x11_display = wmInfo.info.x11.display;
+            auto x11_window = wmInfo.info.x11.window;
+            WGPUSurfaceDescriptorFromXlib sfdX11 = {
+                chain: {
+                    next: null,
+                    sType: WGPUSType.SurfaceDescriptorFromXlib
+                },
+                display: x11_display,
+                window: x11_window
+            };
+            WGPUSurfaceDescriptor sfd = {
+                label: null,
+                nextInChain: cast(const(WGPUChainedStruct)*)&sfdX11
+            };
+            surface = wgpuInstanceCreateSurface(null, &sfd);
+        }
+        else
+        {
+            quit("Unsupported subsystem, sorry");
+        }
+    }
+    else version(OSX)
+    {
+        // Needs test!
+        SDL_Renderer* renderer = SDL_CreateRenderer(window.sdlWindow, -1, SDL_RENDERER_PRESENTVSYNC);
+        auto m_layer = SDL_RenderGetMetalLayer(renderer);
+        
+        WGPUSurfaceDescriptorFromMetalLayer sfdMetal = {
+            chain: {
+                next: null,
+                sType: WGPUSType.SurfaceDescriptorFromMetalLayer
+            },
+            layer: m_layer
+        };
+        WGPUSurfaceDescriptor sfd = {
+            label: null,
+            nextInChain: cast(const(WGPUChainedStruct)*)&sfdMetal
+        };
+        surface = wgpuInstanceCreateSurface(null, &sfd);
+        
+        SDL_DestroyRenderer(renderer);
+    }
     return surface;
 }
 
