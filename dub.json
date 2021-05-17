@@ -25,12 +25,7 @@
         },
         {
             "name": "debug",
-            "targetType": "library",
-            "copyFiles-windows-x86": ["lib/x86-debug/*.dll"],
-            "copyFiles-windows-x86_64": ["lib/x64-debug/*.dll"],
-            "copyFiles-linux-x86": ["lib/x86-debug/*.so"],
-            "copyFiles-linux-x86_64": ["lib/x64-debug/*.so"],
-            "copyFiles-osx": ["lib/x64-debug/*.dylib"]
+            "targetType": "library"
         },
         {
             "name": "application",
