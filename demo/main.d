@@ -202,7 +202,7 @@ void main(string[] args)
                     }
                     break;
                 case SDL_KEYUP:
-                    auto key = event.key.keysym.scancode;
+                    const key = event.key.keysym.scancode;
                     if (key == 41) // Esc
                     {
                         running = false;
@@ -233,7 +233,7 @@ void main(string[] args)
             resolveTarget: null,
             loadOp: WGPULoadOp.Clear,
             storeOp: WGPUStoreOp.Store,
-            clearColor: { r: 0.5, g: 0.5, b: 0.5, a: 1.0 }
+            clearColor: WGPUColor(0.5, 0.5, 0.5, 1.0)
         };
         WGPURenderPassDescriptor passDesc = {
             colorAttachments: &caDesc,
