@@ -120,6 +120,10 @@ void main(string[] args)
     WGPUPipelineLayout pipelineLayout = wgpuDeviceCreatePipelineLayout(device, &plDesc);
     writeln("Pipeline layout OK");
     
+    WGPUTextureFormat swapChainFormat;
+    wgpuSurfaceGetPreferredFormat(surface, adapter, &preferredTextureCallback, &swapChainFormat);
+    writeln(swapChainFormat);
+    
     WGPUBlendState blend = {
         color: {
             srcFactor: WGPUBlendFactor.One,
@@ -133,7 +137,7 @@ void main(string[] args)
         }
     };
     WGPUColorTargetState cts = {
-        format: WGPUTextureFormat.BGRA8Unorm,
+        format: swapChainFormat,
         blend: &blend,
         writeMask: WGPUColorWriteMask.All
     };
@@ -172,7 +176,7 @@ void main(string[] args)
     WGPUSwapChain createSwapChain(uint w, uint h) {
         WGPUSwapChainDescriptor swcDesc = {
             usage: WGPUTextureUsage.RenderAttachment,
-            format: WGPUTextureFormat.BGRA8Unorm,
+            format: swapChainFormat,
             width: w,
             height: h,
             presentMode: WGPUPresentMode.Fifo
@@ -195,6 +199,7 @@ void main(string[] args)
                     {
                         winWidth = event.window.data1;
                         winHeight = event.window.data2;
+                        writeln(winWidth, "x", winHeight);
                         swapChain = createSwapChain(winWidth, winHeight);
                     }
                     break;
@@ -215,10 +220,7 @@ void main(string[] args)
         
         WGPUTextureView nextTexture = wgpuSwapChainGetCurrentTextureView(swapChain);
         if (!nextTexture)
-        {
-            writeln("Cannot acquire next swap chain texture");
-            break;
-        }
+            continue;
         
         WGPUCommandEncoderDescriptor ceDesc = {
             label: "Command Encoder"
@@ -342,5 +344,10 @@ extern(C)
     extern(C) void requestDeviceCallback(WGPUDevice result, void* userdata)
     {
         *cast(WGPUDevice*)userdata = result;
+    }
+    
+    extern(C) void preferredTextureCallback(WGPUTextureFormat format, void* userdata)
+    {
+        *cast(WGPUTextureFormat*)userdata = format;
     }
 }
