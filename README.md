@@ -11,3 +11,5 @@ Usage:
     "bindbc-wgpu": "0.8.0"
 }
 ```
+
+This repository also includes a simple triangle demo that can be compiled by running `dub build --config=application`.
