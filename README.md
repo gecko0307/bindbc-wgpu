@@ -12,4 +12,6 @@ Usage:
 }
 ```
 
-This repository also includes a simple triangle demo that can be compiled by running `dub build --config=application`.
+This repository also includes a simple triangle demo that can be compiled by running 
+
+`dub build --config=application`
