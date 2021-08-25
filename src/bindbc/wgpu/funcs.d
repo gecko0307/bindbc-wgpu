@@ -325,8 +325,8 @@ __gshared
     alias da_wgpuRenderPassEncoderSetBindGroup = void function(WGPURenderPassEncoder renderPassEncoder, uint groupIndex, WGPUBindGroup group, uint dynamicOffsetCount, const(uint)* dynamicOffsets);
     da_wgpuRenderPassEncoderSetBindGroup wgpuRenderPassEncoderSetBindGroup;
     
-    alias da_wgpuRenderPassEncoderSetBlendColor = void function(WGPURenderPassEncoder renderPassEncoder, const(WGPUColor)* color);
-    da_wgpuRenderPassEncoderSetBlendColor wgpuRenderPassEncoderSetBlendColor;
+    alias da_wgpuRenderPassEncoderSetBlendConstant = void function(WGPURenderPassEncoder renderPassEncoder, const(WGPUColor)* color);
+    da_wgpuRenderPassEncoderSetBlendConstant wgpuRenderPassEncoderSetBlendConstant;
     
     alias da_wgpuRenderPassEncoderSetIndexBuffer = void function(WGPURenderPassEncoder renderPassEncoder, WGPUBuffer buffer, WGPUIndexFormat format, ulong offset, ulong size);
     da_wgpuRenderPassEncoderSetIndexBuffer wgpuRenderPassEncoderSetIndexBuffer;

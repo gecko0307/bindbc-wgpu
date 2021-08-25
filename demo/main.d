@@ -218,8 +218,8 @@ void main(string[] args)
             }
         }
         
-        WGPUTextureView nextTexture = wgpuSwapChainGetCurrentTextureView(swapChain);
-        if (!nextTexture)
+        WGPUTextureView nextTextureView = wgpuSwapChainGetCurrentTextureView(swapChain);
+        if (!nextTextureView)
             continue;
         
         WGPUCommandEncoderDescriptor ceDesc = {
@@ -227,15 +227,15 @@ void main(string[] args)
         };
         WGPUCommandEncoder encoder = wgpuDeviceCreateCommandEncoder(device, &ceDesc);
         
-        WGPURenderPassColorAttachmentDescriptor caDesc = {
-            attachment: nextTexture,
+        WGPURenderPassColorAttachment colorAttachment = {
+            view: nextTextureView,
             resolveTarget: null,
             loadOp: WGPULoadOp.Clear,
             storeOp: WGPUStoreOp.Store,
             clearColor: WGPUColor(0.5, 0.5, 0.5, 1.0)
         };
         WGPURenderPassDescriptor passDesc = {
-            colorAttachments: &caDesc,
+            colorAttachments: &colorAttachment,
             colorAttachmentCount: 1,
             depthStencilAttachment: null
         };

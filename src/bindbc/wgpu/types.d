@@ -91,17 +91,17 @@ enum WGPUBlendFactor
 {
     Zero = 0x00000000,
     One = 0x00000001,
-    SrcColor = 0x00000002,
-    OneMinusSrcColor = 0x00000003,
+    Src = 0x00000002,
+    OneMinusSrc = 0x00000003,
     SrcAlpha = 0x00000004,
     OneMinusSrcAlpha = 0x00000005,
-    DstColor = 0x00000006,
-    OneMinusDstColor = 0x00000007,
+    Dst = 0x00000006,
+    OneMinusDst = 0x00000007,
     DstAlpha = 0x00000008,
     OneMinusDstAlpha = 0x00000009,
     SrcAlphaSaturated = 0x0000000A,
-    BlendColor = 0x0000000B,
-    OneMinusBlendColor = 0x0000000C,
+    Constant = 0x0000000B,
+    OneMinusConstant = 0x0000000C,
     Force32 = 0x7FFFFFFF
 }
 
@@ -275,6 +275,7 @@ enum WGPUSType
     SurfaceDescriptorFromCanvasHTMLSelector = 0x00000004,
     ShaderModuleSPIRVDescriptor = 0x00000005,
     ShaderModuleWGSLDescriptor = 0x00000006,
+    PrimitiveDepthClampingState = 0x00000007,
     Force32 = 0x7FFFFFFF
 }
 
@@ -609,7 +610,7 @@ struct WGPUExtent3D
 {
     uint width;
     uint height;
-    uint depth;
+    uint depthOrArrayLayers;
 }
 
 struct WGPUInstanceDescriptor
@@ -638,6 +639,12 @@ struct WGPUPipelineLayoutDescriptor
     const(char)* label;
     uint bindGroupLayoutCount;
     const(WGPUBindGroupLayout)* bindGroupLayouts;
+}
+
+struct WGPUPrimitiveDepthClampingState
+{
+    WGPUChainedStruct chain;
+    bool clampDepth;
 }
 
 struct WGPUPrimitiveState
@@ -682,9 +689,9 @@ struct WGPURenderBundleEncoderDescriptor
     uint sampleCount;
 }
 
-struct WGPURenderPassDepthStencilAttachmentDescriptor
+struct WGPURenderPassDepthStencilAttachment
 {
-    WGPUTextureView attachment;
+    WGPUTextureView view;
     WGPULoadOp depthLoadOp;
     WGPUStoreOp depthStoreOp;
     float clearDepth;
@@ -902,9 +909,9 @@ struct WGPUImageCopyTexture
     WGPUTextureAspect aspect;
 }
 
-struct WGPURenderPassColorAttachmentDescriptor
+struct WGPURenderPassColorAttachment
 {
-    WGPUTextureView attachment;
+    WGPUTextureView view;
     WGPUTextureView resolveTarget;
     WGPULoadOp loadOp;
     WGPUStoreOp storeOp;
@@ -952,8 +959,8 @@ struct WGPURenderPassDescriptor
     const(WGPUChainedStruct)* nextInChain;
     const(char)* label;
     uint colorAttachmentCount;
-    const(WGPURenderPassColorAttachmentDescriptor)* colorAttachments;
-    const(WGPURenderPassDepthStencilAttachmentDescriptor)* depthStencilAttachment;
+    const(WGPURenderPassColorAttachment)* colorAttachments;
+    const(WGPURenderPassDepthStencilAttachment)* depthStencilAttachment;
     WGPUQuerySet occlusionQuerySet;
 }
 
@@ -1002,15 +1009,13 @@ enum WGPUNativeSType
 {
     // Start at 6 to prevent collisions with webgpu STypes
     DeviceExtras = 0x60000001,
+    AdapterExtras = 0x60000002,
     Force32 = 0x7FFFFFFF
 }
 
-struct WGPUDeviceExtras
+enum WGPUNativeFeature
 {
-    WGPUChainedStruct chain;
-    uint maxBindGroups;
-    const(char)* label;
-    const(char)* tracePath;
+    TEXTURE_ADAPTER_SPECIFIC_FORMAT_FEATURES = 0x10000000
 }
 
 enum WGPULogLevel
@@ -1022,6 +1027,28 @@ enum WGPULogLevel
     Debug = 0x00000004,
     Trace = 0x00000005,
     Force32 = 0x7FFFFFFF
+}
+
+struct WGPUAdapterExtras
+{
+    WGPUChainedStruct chain;
+    WGPUBackendType backend;
+}
+
+struct WGPUDeviceExtras
+{
+    WGPUChainedStruct chain;
+    uint maxTextureDimension1D;
+    uint maxTextureDimension2D;
+    uint maxTextureDimension3D;
+    uint maxTextureArrayLayers;
+    uint maxBindGroups;
+    uint maxDynamicStorageBuffersPerPipelineLayout;
+    uint maxStorageBuffersPerShaderStage;
+    uint maxStorageBufferBindingSize;
+    WGPUNativeFeature nativeFeatures;
+    const(char)* label;
+    const(char)* tracePath;
 }
 
 alias WGPULogCallback = extern(C) void function(WGPULogLevel level, const(char)* msg);
