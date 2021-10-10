@@ -61,25 +61,25 @@ WGPUSupport loadWGPU()
     {
         const(char)[][1] libNames =
         [
-            "wgpu_native.dll"
+            "libwgpu.dll"
         ];
     }
     else version(OSX)
     {
         const(char)[][1] libNames =
         [
-            "wgpu_native.dylib"
+            "libwgpu.dylib"
         ];
     }
     else version(Posix)
     {
         const(char)[][2] libNames =
         [
-            "libwgpu_native.so",
-            "/usr/local/lib/libwgpu_native.so",
+            "libwgpu.so",
+            "/usr/local/lib/libwgpu.so",
         ];
     }
-    else static assert(0, "wgpu_native is not yet supported on this platform.");
+    else static assert(0, "libwgpu is not yet supported on this platform.");
     
     WGPUSupport ret;
     foreach(name; libNames)

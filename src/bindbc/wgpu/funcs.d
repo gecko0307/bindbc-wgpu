@@ -60,8 +60,14 @@ __gshared
     da_wgpuGetProcAddress wgpuGetProcAddress;
     
     // Methods of Adapter
+    alias da_wgpuAdapterGetLimits = bool function(WGPUAdapter adapter, WGPUSupportedLimits* limits);
+    da_wgpuAdapterGetLimits wgpuAdapterGetLimits;
+    
     alias da_wgpuAdapterGetProperties = void function(WGPUAdapter adapter, WGPUAdapterProperties* properties);
     da_wgpuAdapterGetProperties wgpuAdapterGetProperties;
+    
+    alias da_wgpuAdapterHasFeature = bool function(WGPUAdapter adapter, WGPUFeatureName feature);
+    da_wgpuAdapterHasFeature wgpuAdapterHasFeature;
     
     alias da_wgpuAdapterRequestDevice = void function(WGPUAdapter adapter, const(WGPUDeviceDescriptor)* descriptor, WGPURequestDeviceCallback callback, void* userdata);
     da_wgpuAdapterRequestDevice wgpuAdapterRequestDevice;
@@ -157,6 +163,9 @@ __gshared
     alias da_wgpuComputePipelineGetBindGroupLayout = WGPUBindGroupLayout function(WGPUComputePipeline computePipeline, uint groupIndex);
     da_wgpuComputePipelineGetBindGroupLayout wgpuComputePipelineGetBindGroupLayout;
     
+    alias da_wgpuComputePipelineSetLabel = void function(WGPUComputePipeline computePipeline, const(char)* label);
+    da_wgpuComputePipelineSetLabel wgpuComputePipelineSetLabel;
+    
     // Methods of Device
     alias da_wgpuDeviceCreateBindGroup = WGPUBindGroup function(WGPUDevice device, const(WGPUBindGroupDescriptor)* descriptor);
     da_wgpuDeviceCreateBindGroup wgpuDeviceCreateBindGroup;
@@ -202,6 +211,12 @@ __gshared
     
     alias da_wgpuDeviceCreateTexture = WGPUTexture function(WGPUDevice device, const(WGPUTextureDescriptor)* descriptor);
     da_wgpuDeviceCreateTexture wgpuDeviceCreateTexture;
+    
+    alias da_wgpuDeviceDestroy = void function(WGPUDevice device);
+    da_wgpuDeviceDestroy wgpuDeviceDestroy;
+    
+    alias da_wgpuDeviceGetLimits = void function(WGPUDevice device, WGPUSupportedLimits* limits);
+    da_wgpuDeviceGetLimits wgpuDeviceGetLimits;
     
     alias da_wgpuDeviceGetQueue = WGPUQueue function(WGPUDevice device);
     da_wgpuDeviceGetQueue wgpuDeviceGetQueue;
@@ -353,8 +368,15 @@ __gshared
     alias da_wgpuRenderPipelineGetBindGroupLayout = WGPUBindGroupLayout function(WGPURenderPipeline renderPipeline, uint groupIndex);
     da_wgpuRenderPipelineGetBindGroupLayout wgpuRenderPipelineGetBindGroupLayout;
     
+    alias da_wgpuRenderPipelineSetLabel = void function(WGPURenderPipeline renderPipeline, const(char)* label);
+    da_wgpuRenderPipelineSetLabel wgpuRenderPipelineSetLabel;
+    
+    // Methods of ShaderModule
+    alias da_wgpuShaderModuleSetLabel = void function(WGPUShaderModule shaderModule, const(char)* label);
+    da_wgpuShaderModuleSetLabel wgpuShaderModuleSetLabel;
+    
     // Methods of Surface
-    alias da_wgpuSurfaceGetPreferredFormat = void function(WGPUSurface surface, WGPUAdapter adapter, WGPUSurfaceGetPreferredFormatCallback callback, void* userdata);
+    alias da_wgpuSurfaceGetPreferredFormat = WGPUTextureFormat function(WGPUSurface surface, WGPUAdapter adapter);
     da_wgpuSurfaceGetPreferredFormat wgpuSurfaceGetPreferredFormat;
     
     // Methods of SwapChain
@@ -386,4 +408,49 @@ __gshared
     
     alias da_wgpuRenderPassEncoderSetPushConstants = void function(WGPURenderPassEncoder encoder, WGPUShaderStage stages, uint offset, uint sizeBytes, const(void)* data);
     da_wgpuRenderPassEncoderSetPushConstants wgpuRenderPassEncoderSetPushConstants;
+    
+    alias da_wgpuBufferDrop = void function(WGPUBuffer buffer);
+    da_wgpuBufferDrop wgpuBufferDrop;
+    
+    alias da_wgpuCommandEncoderDrop = void function(WGPUCommandEncoder commandEncoder);
+    da_wgpuCommandEncoderDrop wgpuCommandEncoderDrop;
+    
+    alias da_wgpuDeviceDrop = void function(WGPUDevice device);
+    da_wgpuDeviceDrop wgpuDeviceDrop;
+    
+    alias da_wgpuQuerySetDrop = void function(WGPUQuerySet querySet);
+    da_wgpuQuerySetDrop wgpuQuerySetDrop;
+    
+    alias da_wgpuRenderPipelineDrop = void function(WGPURenderPipeline renderPipeline);
+    da_wgpuRenderPipelineDrop wgpuRenderPipelineDrop;
+    
+    alias da_wgpuTextureDrop = void function(WGPUTexture texture);
+    da_wgpuTextureDrop wgpuTextureDrop;
+    
+    alias da_wgpuTextureViewDrop = void function(WGPUTextureView textureView);
+    da_wgpuTextureViewDrop wgpuTextureViewDrop;
+    
+    alias da_wgpuSamplerDrop = void function(WGPUSampler sampler);
+    da_wgpuSamplerDrop wgpuSamplerDrop;
+    
+    alias da_wgpuBindGroupLayoutDrop = void function(WGPUBindGroupLayout bindGroupLayout);
+    da_wgpuBindGroupLayoutDrop wgpuBindGroupLayoutDrop;
+    
+    alias da_wgpuPipelineLayoutDrop = void function(WGPUPipelineLayout pipelineLayout);
+    da_wgpuPipelineLayoutDrop wgpuPipelineLayoutDrop;
+    
+    alias da_wgpuBindGroupDrop = void function(WGPUBindGroup bindGroup);
+    da_wgpuBindGroupDrop wgpuBindGroupDrop;
+    
+    alias da_wgpuShaderModuleDrop = void function(WGPUShaderModule shaderModule);
+    da_wgpuShaderModuleDrop wgpuShaderModuleDrop;
+    
+    alias da_wgpuCommandBufferDrop = void function(WGPUCommandBuffer commandBuffer);
+    da_wgpuCommandBufferDrop wgpuCommandBufferDrop;
+    
+    alias da_wgpuRenderBundleDrop = void function(WGPURenderBundle renderBundle);
+    da_wgpuRenderBundleDrop wgpuRenderBundleDrop;
+    
+    alias da_wgpuComputePipelineDrop = void function(WGPUComputePipeline computePipeline);
+    da_wgpuComputePipelineDrop wgpuComputePipelineDrop;
 }

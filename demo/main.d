@@ -72,13 +72,23 @@ void main(string[] args)
             next: null,
             sType: cast(WGPUSType)WGPUNativeSType.DeviceExtras
         },
-        maxBindGroups: 1,
+        nativeFeatures: WGPUNativeFeature.TEXTURE_ADAPTER_SPECIFIC_FORMAT_FEATURES,
         label: "Device",
         tracePath: null,
     };
+    WGPURequiredLimits limits = {
+        nextInChain: null,
+        limits: {
+            maxBindGroups: 1
+        }
+    };
     WGPUDeviceDescriptor deviceDesc = {
         nextInChain: cast(const(WGPUChainedStruct)*)&deviceExtras,
+        requiredFeaturesCount: 0,
+        requiredFeatures: null,
+        requiredLimits: &limits
     };
+    
     wgpuAdapterRequestDevice(adapter, &deviceDesc, &requestDeviceCallback, cast(void*)&device);
     writeln("Device OK");
     
@@ -120,8 +130,7 @@ void main(string[] args)
     WGPUPipelineLayout pipelineLayout = wgpuDeviceCreatePipelineLayout(device, &plDesc);
     writeln("Pipeline layout OK");
     
-    WGPUTextureFormat swapChainFormat;
-    wgpuSurfaceGetPreferredFormat(surface, adapter, &preferredTextureCallback, &swapChainFormat);
+    WGPUTextureFormat swapChainFormat = wgpuSurfaceGetPreferredFormat(surface, adapter);
     writeln(swapChainFormat);
     
     WGPUBlendState blend = {
@@ -336,18 +345,25 @@ WGPUSurface createSurface(SDL_SysWMinfo wmInfo)
 
 extern(C)
 {
-    void requestAdapterCallback(WGPUAdapter result, void* userdata)
+    void requestAdapterCallback(WGPURequestAdapterStatus status, WGPUAdapter adapter, const(char)* message, void* userdata)
     {
-        *cast(WGPUAdapter*)userdata = result;
+        if (status == WGPURequestAdapterStatus.Success)
+            *cast(WGPUAdapter*)userdata = adapter;
+        else
+        {
+            writeln(status);
+            writeln(to!string(message));
+        }
     }
 
-    extern(C) void requestDeviceCallback(WGPUDevice result, void* userdata)
+    extern(C) void requestDeviceCallback(WGPURequestDeviceStatus status, WGPUDevice device, const(char)* message, void* userdata)
     {
-        *cast(WGPUDevice*)userdata = result;
-    }
-    
-    extern(C) void preferredTextureCallback(WGPUTextureFormat format, void* userdata)
-    {
-        *cast(WGPUTextureFormat*)userdata = format;
+        if (status == WGPURequestDeviceStatus.Success)
+            *cast(WGPUDevice*)userdata = device;
+        else
+        {
+            writeln(status);
+            writeln(to!string(message));
+        }
     }
 }
