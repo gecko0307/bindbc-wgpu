@@ -12,6 +12,8 @@ Usage:
 }
 ```
 
+Since 0.8.0, major and minor version numbers of the bindbc-wgpu package is in sync with wgpu-native versioning. Patch number can be different.
+
 This repository also includes a simple triangle demo that can be compiled by running 
 
 `dub build --config=demo`
