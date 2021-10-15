@@ -19,7 +19,7 @@ This repository also includes a simple triangle demo that can be compiled by run
 ## What is WebGPU?
 It is a new low-level graphics and compute API for the Web that works on top of Vulkan, DirectX 12, or Metal. It exposes the generic computational facilities available in today's GPUs in a cross-platform way. 
 
-[wgpu](https://github.com/gfx-rs/wgpu-core) is a native WebGPU implementation written in Rust that can be compiled to a library to use with any language. Its API is based on the [W3C spec](https://www.w3.org/TR/webgpu/). It serves as the core of the WebGPU integration in Firefox, Servo, and Deno.
+[wgpu](https://github.com/gfx-rs/wgpu) is a native WebGPU implementation written in Rust that can be compiled to a library to use with any language. Its API is based on the [W3C spec](https://www.w3.org/TR/webgpu/). It serves as the core of the WebGPU integration in Firefox, Servo, and Deno.
 
 Some useful links:
 * [WebGPU specification](https://www.w3.org/TR/webgpu/)
