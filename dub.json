@@ -28,7 +28,7 @@
             "targetType": "library"
         },
         {
-            "name": "application",
+            "name": "demo",
             "targetName": "demo",
             "targetType": "executable",
             "mainSourceFile": "demo/main.d",

@@ -32,10 +32,11 @@ import bindbc.loader;
 import bindbc.wgpu.types;
 import bindbc.wgpu.funcs;
 
-enum WGPUSupport {
+enum WGPUSupport
+{
     noLibrary,
     badLibrary,
-    wgpu08
+    wgpu010
 }
 
 private
@@ -52,8 +53,15 @@ void unloadWGPU()
     }
 }
 
-WGPUSupport loadedWGPUVersion() { return loadedVersion; }
-bool isWGPULoaded() { return lib != invalidHandle; }
+WGPUSupport loadedWGPUVersion()
+{
+    return loadedVersion;
+}
+
+bool isWGPULoaded()
+{
+    return lib != invalidHandle;
+}
 
 WGPUSupport loadWGPU()
 {
@@ -111,7 +119,7 @@ WGPUSupport loadWGPU(const(char)* libName)
                 __traits(getMember, bindbc.wgpu.funcs, m[3..$]).stringof);
     }
     
-    loadedVersion = WGPUSupport.wgpu08;
+    loadedVersion = WGPUSupport.wgpu010;
     
     if (errorCount() != errCount)
         return WGPUSupport.badLibrary;

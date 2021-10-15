@@ -239,15 +239,6 @@ enum WGPUIndexFormat
     Force32 = 0x7FFFFFFF
 }
 
-/*
-enum WGPUInputStepMode
-{
-    Vertex = 0x00000000,
-    Instance = 0x00000001,
-    Force32 = 0x7FFFFFFF
-}
-*/
-
 enum WGPULoadOp
 {
     Clear = 0x00000000,

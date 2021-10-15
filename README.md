@@ -14,4 +14,9 @@ Usage:
 
 This repository also includes a simple triangle demo that can be compiled by running 
 
-`dub build --config=application`
+`dub build --config=demo`
+
+## What is WebGPU?
+It is a new low-level graphics and compute API for the Web that works on top of Vulkan, DirectX 12, or Metal. It exposes the generic computational facilities available in today's GPUs in a cross-platform way. 
+
+[wgpu-native](https://github.com/gfx-rs/wgpu) is a native WebGPU implementation written in Rust that compiles to a library with C API, which can be used in any language.

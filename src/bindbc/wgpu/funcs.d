@@ -43,7 +43,8 @@ version(Posix)
     else version (OSX) private enum have_xorg = false;
     else version (iOS) private enum have_xorg = false;
     else private enum have_xorg = true;
-} else private enum have_xorg = false;
+}
+else private enum have_xorg = false;
 
 version (OSX) private enum have_metal = true;
 else version (iOS) private enum have_metal = true;
