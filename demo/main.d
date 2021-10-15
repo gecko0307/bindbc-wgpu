@@ -356,7 +356,7 @@ extern(C)
         }
     }
 
-    extern(C) void requestDeviceCallback(WGPURequestDeviceStatus status, WGPUDevice device, const(char)* message, void* userdata)
+    void requestDeviceCallback(WGPURequestDeviceStatus status, WGPUDevice device, const(char)* message, void* userdata)
     {
         if (status == WGPURequestDeviceStatus.Success)
             *cast(WGPUDevice*)userdata = device;
