@@ -227,6 +227,12 @@ void main(string[] args)
             }
         }
         
+        // wgpu crashes when rendering to minimized window
+        auto winFlags = SDL_GetWindowFlags(sdlWindow);
+        auto isMinimized = winFlags & SDL_WINDOW_MINIMIZED;
+        if (isMinimized)
+            continue;
+        
         WGPUTextureView nextTextureView = wgpuSwapChainGetCurrentTextureView(swapChain);
         if (!nextTextureView)
             continue;
