@@ -98,7 +98,7 @@ void main(string[] args)
             next: null,
             sType: WGPUSType.ShaderModuleWGSLDescriptor
         },
-        source: shaderText
+        code: shaderText
     };
     WGPUShaderModuleDescriptor shaderSource = {
         nextInChain: cast(const(WGPUChainedStruct)*)&wgslDescriptor,

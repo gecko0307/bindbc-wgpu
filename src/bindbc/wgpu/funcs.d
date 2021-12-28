@@ -61,6 +61,9 @@ __gshared
     da_wgpuGetProcAddress wgpuGetProcAddress;
     
     // Methods of Adapter
+    alias da_wgpuAdapterEnumerateFeatures = uint function(WGPUAdapter adapter, WGPUFeatureName* features);
+    da_wgpuAdapterEnumerateFeatures wgpuAdapterEnumerateFeatures;
+    
     alias da_wgpuAdapterGetLimits = bool function(WGPUAdapter adapter, WGPUSupportedLimits* limits);
     da_wgpuAdapterGetLimits wgpuAdapterGetLimits;
     
@@ -107,6 +110,9 @@ __gshared
     
     alias da_wgpuCommandEncoderCopyTextureToTexture = void function(WGPUCommandEncoder commandEncoder, const(WGPUImageCopyTexture)* source, const(WGPUImageCopyTexture)* destination, const(WGPUExtent3D)* copySize);
     da_wgpuCommandEncoderCopyTextureToTexture wgpuCommandEncoderCopyTextureToTexture;
+    
+    alias da_wgpuCommandEncoderFillBuffer = void function(WGPUCommandEncoder commandEncoder, WGPUBuffer destination, ulong destinationOffset, ulong size, ubyte value);
+    da_wgpuCommandEncoderFillBuffer wgpuCommandEncoderFillBuffer;
     
     alias da_wgpuCommandEncoderFinish = WGPUCommandBuffer function(WGPUCommandEncoder commandEncoder, const(WGPUCommandBufferDescriptor)* descriptor);
     da_wgpuCommandEncoderFinish wgpuCommandEncoderFinish;
@@ -157,8 +163,8 @@ __gshared
     alias da_wgpuComputePassEncoderSetPipeline = void function(WGPUComputePassEncoder computePassEncoder, WGPUComputePipeline pipeline);
     da_wgpuComputePassEncoderSetPipeline wgpuComputePassEncoderSetPipeline;
     
-    alias da_wgpuComputePassEncoderWriteTimestamp = void function(WGPUComputePassEncoder computePassEncoder, WGPUQuerySet querySet, uint queryIndex);
-    da_wgpuComputePassEncoderWriteTimestamp wgpuComputePassEncoderWriteTimestamp;
+    //alias da_wgpuComputePassEncoderWriteTimestamp = void function(WGPUComputePassEncoder computePassEncoder, WGPUQuerySet querySet, uint queryIndex);
+    //da_wgpuComputePassEncoderWriteTimestamp wgpuComputePassEncoderWriteTimestamp;
     
     // Methods of ComputePipeline
     alias da_wgpuComputePipelineGetBindGroupLayout = WGPUBindGroupLayout function(WGPUComputePipeline computePipeline, uint groupIndex);
@@ -216,11 +222,17 @@ __gshared
     alias da_wgpuDeviceDestroy = void function(WGPUDevice device);
     da_wgpuDeviceDestroy wgpuDeviceDestroy;
     
+    alias da_wgpuDeviceEnumerateFeatures = uint function(WGPUDevice device, WGPUFeatureName* features);
+    da_wgpuDeviceEnumerateFeatures wgpuDeviceEnumerateFeatures;
+    
     alias da_wgpuDeviceGetLimits = void function(WGPUDevice device, WGPUSupportedLimits* limits);
     da_wgpuDeviceGetLimits wgpuDeviceGetLimits;
     
     alias da_wgpuDeviceGetQueue = WGPUQueue function(WGPUDevice device);
     da_wgpuDeviceGetQueue wgpuDeviceGetQueue;
+    
+    alias da_wgpuDeviceHasFeature = bool function(WGPUDevice device, WGPUFeatureName feature);
+    da_wgpuDeviceHasFeature wgpuDeviceHasFeature;
     
     alias da_wgpuDevicePopErrorScope = bool function(WGPUDevice device, WGPUErrorCallback callback, void* userdata);
     da_wgpuDevicePopErrorScope wgpuDevicePopErrorScope;
@@ -362,8 +374,8 @@ __gshared
     alias da_wgpuRenderPassEncoderSetViewport = void function(WGPURenderPassEncoder renderPassEncoder, float x, float y, float width, float height, float minDepth, float maxDepth);
     da_wgpuRenderPassEncoderSetViewport wgpuRenderPassEncoderSetViewport;
     
-    alias da_wgpuRenderPassEncoderWriteTimestamp = void function(WGPURenderPassEncoder renderPassEncoder, WGPUQuerySet querySet, uint queryIndex);
-    da_wgpuRenderPassEncoderWriteTimestamp wgpuRenderPassEncoderWriteTimestamp;
+    //alias da_wgpuRenderPassEncoderWriteTimestamp = void function(WGPURenderPassEncoder renderPassEncoder, WGPUQuerySet querySet, uint queryIndex);
+    //da_wgpuRenderPassEncoderWriteTimestamp wgpuRenderPassEncoderWriteTimestamp;
     
     // Methods of RenderPipeline
     alias da_wgpuRenderPipelineGetBindGroupLayout = WGPUBindGroupLayout function(WGPURenderPipeline renderPipeline, uint groupIndex);
@@ -373,6 +385,9 @@ __gshared
     da_wgpuRenderPipelineSetLabel wgpuRenderPipelineSetLabel;
     
     // Methods of ShaderModule
+    alias da_wgpuShaderModuleGetCompilationInfo = void function(WGPUShaderModule shaderModule, WGPUCompilationInfoCallback callback, void* userdata);
+    da_wgpuShaderModuleGetCompilationInfo wgpuShaderModuleGetCompilationInfo;
+    
     alias da_wgpuShaderModuleSetLabel = void function(WGPUShaderModule shaderModule, const(char)* label);
     da_wgpuShaderModuleSetLabel wgpuShaderModuleSetLabel;
     
