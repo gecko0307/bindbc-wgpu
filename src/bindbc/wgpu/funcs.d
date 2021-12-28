@@ -29,26 +29,11 @@ module bindbc.wgpu.funcs;
 
 import core.stdc.stdint;
 import bindbc.wgpu.types;
+import bindbc.wgpu.types2;
 
-// this matches the test in wgpu sources guarding x11/wayland fns, which is:
-// #[cfg(all(
-//     unix,
-//     not(target_os = "android"),
-//     not(target_os = "ios"),
-//     not(target_os = "macos")
-// ))]
-version(Posix)
-{
-    version (Android) private enum have_xorg = false;
-    else version (OSX) private enum have_xorg = false;
-    else version (iOS) private enum have_xorg = false;
-    else private enum have_xorg = true;
-}
-else private enum have_xorg = false;
-
-version (OSX) private enum have_metal = true;
-else version (iOS) private enum have_metal = true;
-else private enum have_metal = false;
+/*
+ * Function definitions from webgpu.h
+ */
 
 __gshared
 {
@@ -162,9 +147,6 @@ __gshared
     
     alias da_wgpuComputePassEncoderSetPipeline = void function(WGPUComputePassEncoder computePassEncoder, WGPUComputePipeline pipeline);
     da_wgpuComputePassEncoderSetPipeline wgpuComputePassEncoderSetPipeline;
-    
-    //alias da_wgpuComputePassEncoderWriteTimestamp = void function(WGPUComputePassEncoder computePassEncoder, WGPUQuerySet querySet, uint queryIndex);
-    //da_wgpuComputePassEncoderWriteTimestamp wgpuComputePassEncoderWriteTimestamp;
     
     // Methods of ComputePipeline
     alias da_wgpuComputePipelineGetBindGroupLayout = WGPUBindGroupLayout function(WGPUComputePipeline computePipeline, uint groupIndex);
@@ -373,9 +355,6 @@ __gshared
     
     alias da_wgpuRenderPassEncoderSetViewport = void function(WGPURenderPassEncoder renderPassEncoder, float x, float y, float width, float height, float minDepth, float maxDepth);
     da_wgpuRenderPassEncoderSetViewport wgpuRenderPassEncoderSetViewport;
-    
-    //alias da_wgpuRenderPassEncoderWriteTimestamp = void function(WGPURenderPassEncoder renderPassEncoder, WGPUQuerySet querySet, uint queryIndex);
-    //da_wgpuRenderPassEncoderWriteTimestamp wgpuRenderPassEncoderWriteTimestamp;
     
     // Methods of RenderPipeline
     alias da_wgpuRenderPipelineGetBindGroupLayout = WGPUBindGroupLayout function(WGPURenderPipeline renderPipeline, uint groupIndex);

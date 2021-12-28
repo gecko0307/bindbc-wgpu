@@ -29,6 +29,10 @@ module bindbc.wgpu.types;
 
 import core.stdc.stdint;
 
+/*
+ * Type definitions from webgpu.h
+ */
+
 enum ulong WGPU_WHOLE_SIZE = 0xffffffffffffffffUL;
 enum ulong WGPU_WHOLE_MAP_SIZE = SIZE_MAX;
 enum ulong WGPU_COPY_STRIDE_UNDEFINED = 0xffffffffUL;
@@ -1240,54 +1244,3 @@ struct WGPURenderPipelineDescriptor
     WGPUMultisampleState multisample;
     const(WGPUFragmentState)* fragment;
 }
-
-alias WGPUBufferMapCallback = extern(C) void function(WGPUBufferMapAsyncStatus status, void* userdata);
-alias WGPUCompilationInfoCallback = extern(C) void function(WGPUCompilationInfoRequestStatus status, const(WGPUCompilationInfo)* compilationInfo, void* userdata);
-alias WGPUCreateComputePipelineAsyncCallback = extern(C) void function(WGPUCreatePipelineAsyncStatus status, WGPUComputePipeline pipeline, const(char)* message, void* userdata);
-alias WGPUCreateRenderPipelineAsyncCallback = extern(C) void function(WGPUCreatePipelineAsyncStatus status, WGPURenderPipeline pipeline, const(char)* message, void* userdata);
-alias WGPUDeviceLostCallback = extern(C) void function(WGPUDeviceLostReason reason, const(char)* message, void* userdata);
-alias WGPUErrorCallback = extern(C) void function(WGPUErrorType type, const(char)* message, void* userdata);
-alias WGPUQueueWorkDoneCallback = extern(C) void function(WGPUQueueWorkDoneStatus status, void* userdata);
-alias WGPURequestAdapterCallback = extern(C) void function(WGPURequestAdapterStatus status, WGPUAdapter adapter, const(char)* message, void* userdata);
-alias WGPURequestDeviceCallback = extern(C) void function(WGPURequestDeviceStatus status, WGPUDevice device, const(char)* message, void* userdata);
-alias WGPUProc = extern(C) void function();
-
-enum WGPUNativeSType
-{
-    // Start at 6 to prevent collisions with webgpu STypes
-    DeviceExtras = 0x60000001,
-    AdapterExtras = 0x60000002,
-    Force32 = 0x7FFFFFFF
-}
-
-enum WGPUNativeFeature
-{
-    TEXTURE_ADAPTER_SPECIFIC_FORMAT_FEATURES = 0x10000000
-}
-
-enum WGPULogLevel
-{
-    Off = 0x00000000,
-    Error = 0x00000001,
-    Warn = 0x00000002,
-    Info = 0x00000003,
-    Debug = 0x00000004,
-    Trace = 0x00000005,
-    Force32 = 0x7FFFFFFF
-}
-
-struct WGPUAdapterExtras
-{
-    WGPUChainedStruct chain;
-    WGPUBackendType backend;
-}
-
-struct WGPUDeviceExtras
-{
-    WGPUChainedStruct chain;
-    WGPUNativeFeature nativeFeatures;
-    const(char)* label;
-    const(char)* tracePath;
-}
-
-alias WGPULogCallback = extern(C) void function(WGPULogLevel level, const(char)* msg);
