@@ -39,10 +39,10 @@ alias WGPUCreateComputePipelineAsyncCallback = extern(C) void function(WGPUCreat
 alias WGPUCreateRenderPipelineAsyncCallback = extern(C) void function(WGPUCreatePipelineAsyncStatus status, WGPURenderPipeline pipeline, const(char)* message, void* userdata);
 alias WGPUDeviceLostCallback = extern(C) void function(WGPUDeviceLostReason reason, const(char)* message, void* userdata);
 alias WGPUErrorCallback = extern(C) void function(WGPUErrorType type, const(char)* message, void* userdata);
+alias WGPUProc = extern(C) void function();
 alias WGPUQueueWorkDoneCallback = extern(C) void function(WGPUQueueWorkDoneStatus status, void* userdata);
 alias WGPURequestAdapterCallback = extern(C) void function(WGPURequestAdapterStatus status, WGPUAdapter adapter, const(char)* message, void* userdata);
 alias WGPURequestDeviceCallback = extern(C) void function(WGPURequestDeviceStatus status, WGPUDevice device, const(char)* message, void* userdata);
-alias WGPUProc = extern(C) void function();
 
 enum WGPUNativeSType
 {

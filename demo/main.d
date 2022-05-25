@@ -247,7 +247,7 @@ void main(string[] args)
             resolveTarget: null,
             loadOp: WGPULoadOp.Clear,
             storeOp: WGPUStoreOp.Store,
-            clearColor: WGPUColor(0.5, 0.5, 0.5, 1.0)
+            clearValue: WGPUColor(0.5, 0.5, 0.5, 1.0)
         };
         WGPURenderPassDescriptor passDesc = {
             colorAttachments: &colorAttachment,
@@ -259,7 +259,7 @@ void main(string[] args)
         wgpuRenderPassEncoderSetPipeline(renderPass, pipeline);
         wgpuRenderPassEncoderSetBindGroup(renderPass, 0, bindGroup, 0, null);
         wgpuRenderPassEncoderDraw(renderPass, 3, 1, 0, 0);
-        wgpuRenderPassEncoderEndPass(renderPass);
+        wgpuRenderPassEncoderEnd(renderPass);
         
         WGPUQueue queue = wgpuDeviceGetQueue(device);
         WGPUCommandBufferDescriptor cmdbufDesc = { label: null };

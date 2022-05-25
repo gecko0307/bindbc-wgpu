@@ -46,7 +46,7 @@ __gshared
     da_wgpuGetProcAddress wgpuGetProcAddress;
     
     // Methods of Adapter
-    alias da_wgpuAdapterEnumerateFeatures = uint function(WGPUAdapter adapter, WGPUFeatureName* features);
+    alias da_wgpuAdapterEnumerateFeatures = size_t function(WGPUAdapter adapter, WGPUFeatureName* features);
     da_wgpuAdapterEnumerateFeatures wgpuAdapterEnumerateFeatures;
     
     alias da_wgpuAdapterGetLimits = bool function(WGPUAdapter adapter, WGPUSupportedLimits* limits);
@@ -84,6 +84,9 @@ __gshared
     alias da_wgpuCommandEncoderBeginRenderPass = WGPURenderPassEncoder function(WGPUCommandEncoder commandEncoder, const(WGPURenderPassDescriptor)* descriptor);
     da_wgpuCommandEncoderBeginRenderPass wgpuCommandEncoderBeginRenderPass;
     
+    alias da_wgpuCommandEncoderClearBuffer = void function(WGPUCommandEncoder commandEncoder, WGPUBuffer buffer, ulong offset, ulong size);
+    da_wgpuCommandEncoderClearBuffer wgpuCommandEncoderClearBuffer;
+    
     alias da_wgpuCommandEncoderCopyBufferToBuffer = void function(WGPUCommandEncoder commandEncoder, WGPUBuffer source, ulong sourceOffset, WGPUBuffer destination, ulong destinationOffset, ulong size);
     da_wgpuCommandEncoderCopyBufferToBuffer wgpuCommandEncoderCopyBufferToBuffer;
     
@@ -96,8 +99,8 @@ __gshared
     alias da_wgpuCommandEncoderCopyTextureToTexture = void function(WGPUCommandEncoder commandEncoder, const(WGPUImageCopyTexture)* source, const(WGPUImageCopyTexture)* destination, const(WGPUExtent3D)* copySize);
     da_wgpuCommandEncoderCopyTextureToTexture wgpuCommandEncoderCopyTextureToTexture;
     
-    alias da_wgpuCommandEncoderFillBuffer = void function(WGPUCommandEncoder commandEncoder, WGPUBuffer destination, ulong destinationOffset, ulong size, ubyte value);
-    da_wgpuCommandEncoderFillBuffer wgpuCommandEncoderFillBuffer;
+    //alias da_wgpuCommandEncoderFillBuffer = void function(WGPUCommandEncoder commandEncoder, WGPUBuffer destination, ulong destinationOffset, ulong size, ubyte value);
+    //da_wgpuCommandEncoderFillBuffer wgpuCommandEncoderFillBuffer;
     
     alias da_wgpuCommandEncoderFinish = WGPUCommandBuffer function(WGPUCommandEncoder commandEncoder, const(WGPUCommandBufferDescriptor)* descriptor);
     da_wgpuCommandEncoderFinish wgpuCommandEncoderFinish;
@@ -121,14 +124,14 @@ __gshared
     alias da_wgpuComputePassEncoderBeginPipelineStatisticsQuery = void function(WGPUComputePassEncoder computePassEncoder, WGPUQuerySet querySet, uint queryIndex);
     da_wgpuComputePassEncoderBeginPipelineStatisticsQuery wgpuComputePassEncoderBeginPipelineStatisticsQuery;
     
-    alias da_wgpuComputePassEncoderDispatch = void function(WGPUComputePassEncoder computePassEncoder, uint x, uint y, uint z);
+    alias da_wgpuComputePassEncoderDispatch = void function(WGPUComputePassEncoder computePassEncoder, uint workgroupCountX, uint workgroupCountY, uint workgroupCountZ);
     da_wgpuComputePassEncoderDispatch wgpuComputePassEncoderDispatch;
     
     alias da_wgpuComputePassEncoderDispatchIndirect = void function(WGPUComputePassEncoder computePassEncoder, WGPUBuffer indirectBuffer, ulong indirectOffset);
     da_wgpuComputePassEncoderDispatchIndirect wgpuComputePassEncoderDispatchIndirect;
     
-    alias da_wgpuComputePassEncoderEndPass = void function(WGPUComputePassEncoder computePassEncoder);
-    da_wgpuComputePassEncoderEndPass wgpuComputePassEncoderEndPass;
+    alias da_wgpuComputePassEncoderEnd = void function(WGPUComputePassEncoder computePassEncoder);
+    da_wgpuComputePassEncoderEnd wgpuComputePassEncoderEnd;
     
     alias da_wgpuComputePassEncoderEndPipelineStatisticsQuery = void function(WGPUComputePassEncoder computePassEncoder);
     da_wgpuComputePassEncoderEndPipelineStatisticsQuery wgpuComputePassEncoderEndPipelineStatisticsQuery;
@@ -204,7 +207,7 @@ __gshared
     alias da_wgpuDeviceDestroy = void function(WGPUDevice device);
     da_wgpuDeviceDestroy wgpuDeviceDestroy;
     
-    alias da_wgpuDeviceEnumerateFeatures = uint function(WGPUDevice device, WGPUFeatureName* features);
+    alias da_wgpuDeviceEnumerateFeatures = size_t function(WGPUDevice device, WGPUFeatureName* features);
     da_wgpuDeviceEnumerateFeatures wgpuDeviceEnumerateFeatures;
     
     alias da_wgpuDeviceGetLimits = void function(WGPUDevice device, WGPUSupportedLimits* limits);
@@ -243,7 +246,7 @@ __gshared
     da_wgpuQuerySetDestroy wgpuQuerySetDestroy;
     
     // Methods of Queue
-    alias da_wgpuQueueOnSubmittedWorkDone = void function(WGPUQueue queue, ulong signalValue, WGPUQueueWorkDoneCallback callback, void* userdata);
+    alias da_wgpuQueueOnSubmittedWorkDone = void function(WGPUQueue queue, WGPUQueueWorkDoneCallback callback, void* userdata);
     da_wgpuQueueOnSubmittedWorkDone wgpuQueueOnSubmittedWorkDone;
     
     alias da_wgpuQueueSubmit = void function(WGPUQueue queue, uint commandCount, const(WGPUCommandBuffer)* commands);
@@ -311,11 +314,11 @@ __gshared
     alias da_wgpuRenderPassEncoderDrawIndirect = void function(WGPURenderPassEncoder renderPassEncoder, WGPUBuffer indirectBuffer, ulong indirectOffset);
     da_wgpuRenderPassEncoderDrawIndirect wgpuRenderPassEncoderDrawIndirect;
     
+    alias da_wgpuRenderPassEncoderEnd = void function(WGPURenderPassEncoder renderPassEncoder);
+    da_wgpuRenderPassEncoderEnd wgpuRenderPassEncoderEnd;
+    
     alias da_wgpuRenderPassEncoderEndOcclusionQuery = void function(WGPURenderPassEncoder renderPassEncoder);
     da_wgpuRenderPassEncoderEndOcclusionQuery wgpuRenderPassEncoderEndOcclusionQuery;
-    
-    alias da_wgpuRenderPassEncoderEndPass = void function(WGPURenderPassEncoder renderPassEncoder);
-    da_wgpuRenderPassEncoderEndPass wgpuRenderPassEncoderEndPass;
     
     alias da_wgpuRenderPassEncoderEndPipelineStatisticsQuery = void function(WGPURenderPassEncoder renderPassEncoder);
     da_wgpuRenderPassEncoderEndPipelineStatisticsQuery wgpuRenderPassEncoderEndPipelineStatisticsQuery;
@@ -401,7 +404,7 @@ __gshared
     alias da_wgpuGetVersion = uint function();
     da_wgpuGetVersion wgpuGetVersion;
     
-    alias da_wgpuRenderPassEncoderSetPushConstants = void function(WGPURenderPassEncoder encoder, WGPUShaderStage stages, uint offset, uint sizeBytes, const(void)* data);
+    alias da_wgpuRenderPassEncoderSetPushConstants = void function(WGPURenderPassEncoder encoder, WGPUShaderStageFlags stages, uint offset, uint sizeBytes, const(void)* data);
     da_wgpuRenderPassEncoderSetPushConstants wgpuRenderPassEncoderSetPushConstants;
     
     alias da_wgpuBufferDrop = void function(WGPUBuffer buffer);

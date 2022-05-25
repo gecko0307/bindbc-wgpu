@@ -210,9 +210,8 @@ enum WGPUDeviceLostReason
 
 enum WGPUErrorFilter
 {
-    None = 0x00000000,
-    Validation = 0x00000001,
-    OutOfMemory = 0x00000002,
+    Validation = 0x00000000,
+    OutOfMemory = 0x00000001,
     Force32 = 0x7FFFFFFF
 }
 
@@ -265,8 +264,16 @@ enum WGPUIndexFormat
 
 enum WGPULoadOp
 {
-    Clear = 0x00000000,
-    Load = 0x00000001,
+    Undefined = 0x00000000,
+    Clear = 0x00000001,
+    Load = 0x00000002,
+    Force32 = 0x7FFFFFFF
+}
+
+enum WGPUMipmapFilterMode
+{
+    Nearest = 0x00000000,
+    Linear = 0x00000001,
     Force32 = 0x7FFFFFFF
 }
 
@@ -285,6 +292,13 @@ enum WGPUPowerPreference
     Undefined = 0x00000000,
     LowPower = 0x00000001,
     HighPerformance = 0x00000002,
+    Force32 = 0x7FFFFFFF
+}
+
+enum WGPUPredefinedColorSpace
+{
+    Undefined = 0x00000000,
+    Srgb = 0x00000001,
     Force32 = 0x7FFFFFFF
 }
 
@@ -352,11 +366,14 @@ enum WGPUSType
     Invalid = 0x00000000,
     SurfaceDescriptorFromMetalLayer = 0x00000001,
     SurfaceDescriptorFromWindowsHWND = 0x00000002,
-    SurfaceDescriptorFromXlib = 0x00000003,
+    SurfaceDescriptorFromXlibWindow = 0x00000003,
     SurfaceDescriptorFromCanvasHTMLSelector = 0x00000004,
     ShaderModuleSPIRVDescriptor = 0x00000005,
     ShaderModuleWGSLDescriptor = 0x00000006,
     PrimitiveDepthClipControl = 0x00000007,
+    SurfaceDescriptorFromWaylandSurface = 0x00000008,
+    SurfaceDescriptorFromAndroidNativeWindow = 0x00000009,
+    SurfaceDescriptorFromXcbWindow = 0x0000000A,
     Force32 = 0x7FFFFFFF
 }
 
@@ -391,8 +408,9 @@ enum WGPUStorageTextureAccess
 
 enum WGPUStoreOp
 {
-    Store = 0x00000000,
-    Discard = 0x00000001,
+    Undefined = 0x00000000,
+    Store = 0x00000001,
+    Discard = 0x00000002,
     Force32 = 0x7FFFFFFF
 }
 
@@ -742,14 +760,6 @@ struct WGPUCompilationMessage
     ulong length;
 }
 
-/*
-struct WGPUComputePassDescriptor
-{
-    const(WGPUChainedStruct)* nextInChain;
-    const(char)* label;
-}
-*/
-
 struct WGPUComputePassTimestampWrite
 {
     WGPUQuerySet querySet;
@@ -829,14 +839,6 @@ struct WGPUPipelineLayoutDescriptor
     const(WGPUBindGroupLayout)* bindGroupLayouts;
 }
 
-/*
-struct WGPUPrimitiveDepthClampingState
-{
-    WGPUChainedStruct chain;
-    bool clampDepth;
-}
-*/
-
 struct WGPUPrimitiveDepthClipControl
 {
     WGPUChainedStruct chain;
@@ -862,6 +864,12 @@ struct WGPUQuerySetDescriptor
     uint pipelineStatisticsCount;
 }
 
+struct WGPUQueueDescriptor
+{
+    const(WGPUChainedStruct)* nextInChain;
+    const(char)* label;
+}
+
 struct WGPURenderBundleDescriptor
 {
     const(WGPUChainedStruct)* nextInChain;
@@ -885,11 +893,11 @@ struct WGPURenderPassDepthStencilAttachment
     WGPUTextureView view;
     WGPULoadOp depthLoadOp;
     WGPUStoreOp depthStoreOp;
-    float clearDepth;
+    float depthClearValue;
     bool depthReadOnly;
     WGPULoadOp stencilLoadOp;
     WGPUStoreOp stencilStoreOp;
-    uint clearStencil;
+    uint stencilClearValue;
     bool stencilReadOnly;
 }
 
@@ -923,17 +931,18 @@ struct WGPUSamplerDescriptor
     WGPUAddressMode addressModeW;
     WGPUFilterMode magFilter;
     WGPUFilterMode minFilter;
-    WGPUFilterMode mipmapFilter;
+    WGPUMipmapFilterMode mipmapFilter;
     float lodMinClamp;
     float lodMaxClamp;
     WGPUCompareFunction compare;
     ushort maxAnisotropy;
 }
 
-struct WGPUShaderModuleDescriptor
+struct WGPUShaderModuleCompilationHint
 {
     const(WGPUChainedStruct)* nextInChain;
-    const(char)* label;
+    const(char)* entryPoint;
+    WGPUPipelineLayout layout;
 }
 
 struct WGPUShaderModuleSPIRVDescriptor
@@ -971,6 +980,12 @@ struct WGPUSurfaceDescriptor
     const(char)* label;
 }
 
+struct WGPUSurfaceDescriptorFromAndroidNativeWindow
+{
+    WGPUChainedStruct chain;
+    void* window;
+}
+
 struct WGPUSurfaceDescriptorFromCanvasHTMLSelector
 {
     WGPUChainedStruct chain;
@@ -983,6 +998,13 @@ struct WGPUSurfaceDescriptorFromMetalLayer
     void* layer;
 }
 
+struct WGPUSurfaceDescriptorFromWaylandSurface
+{
+    WGPUChainedStruct chain;
+    void* display;
+    void* surface;
+}
+
 struct WGPUSurfaceDescriptorFromWindowsHWND
 {
     WGPUChainedStruct chain;
@@ -990,7 +1012,14 @@ struct WGPUSurfaceDescriptorFromWindowsHWND
     void* hwnd;
 }
 
-struct WGPUSurfaceDescriptorFromXlib
+struct WGPUSurfaceDescriptorFromXcbWindow
+{
+    WGPUChainedStruct chain;
+    void* connection;
+    uint window;
+}
+
+struct WGPUSurfaceDescriptorFromXlibWindow
 {
     WGPUChainedStruct chain;
     void* display;
@@ -1131,13 +1160,21 @@ struct WGPURenderPassColorAttachment
     WGPUTextureView resolveTarget;
     WGPULoadOp loadOp;
     WGPUStoreOp storeOp;
-    WGPUColor clearColor;
+    WGPUColor clearValue;
 }
 
 struct WGPURequiredLimits
 {
     const(WGPUChainedStruct)* nextInChain;
     WGPULimits limits;
+}
+
+struct WGPUShaderModuleDescriptor
+{
+    const(WGPUChainedStruct)* nextInChain;
+    const(char)* label;
+    uint hintCount;
+    const(WGPUShaderModuleCompilationHint)* hints;
 }
 
 struct WGPUSupportedLimits
@@ -1156,6 +1193,8 @@ struct WGPUTextureDescriptor
     WGPUTextureFormat format;
     uint mipLevelCount;
     uint sampleCount;
+    uint viewFormatCount;
+    const(WGPUTextureFormat)* viewFormats;
 }
 
 struct WGPUVertexBufferLayout
@@ -1197,6 +1236,7 @@ struct WGPUDeviceDescriptor
     uint requiredFeaturesCount;
     const(WGPUFeatureName)* requiredFeatures;
     const(WGPURequiredLimits)* requiredLimits;
+    WGPUQueueDescriptor defaultQueue;
 }
 
 struct WGPURenderPassDescriptor
