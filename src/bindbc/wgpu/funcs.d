@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2019-2021 Timur Gafarov.
+Copyright (c) 2019-2022 Timur Gafarov.
 
 Boost Software License - Version 1.0 - August 17th, 2003
 
@@ -98,9 +98,6 @@ __gshared
     
     alias da_wgpuCommandEncoderCopyTextureToTexture = void function(WGPUCommandEncoder commandEncoder, const(WGPUImageCopyTexture)* source, const(WGPUImageCopyTexture)* destination, const(WGPUExtent3D)* copySize);
     da_wgpuCommandEncoderCopyTextureToTexture wgpuCommandEncoderCopyTextureToTexture;
-    
-    //alias da_wgpuCommandEncoderFillBuffer = void function(WGPUCommandEncoder commandEncoder, WGPUBuffer destination, ulong destinationOffset, ulong size, ubyte value);
-    //da_wgpuCommandEncoderFillBuffer wgpuCommandEncoderFillBuffer;
     
     alias da_wgpuCommandEncoderFinish = WGPUCommandBuffer function(WGPUCommandEncoder commandEncoder, const(WGPUCommandBufferDescriptor)* descriptor);
     da_wgpuCommandEncoderFinish wgpuCommandEncoderFinish;
