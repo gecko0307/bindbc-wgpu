@@ -26,4 +26,4 @@ It is a new low-level graphics and compute API for the Web that works on top of 
 Some useful links:
 * [WebGPU specification](https://www.w3.org/TR/webgpu/)
 * [WebGPU Shading Language specification](https://www.w3.org/TR/WGSL/)
-* [wgpu documentation](https://docs.rs/wgpu/0.11.0/wgpu/)
+* [wgpu documentation](https://docs.rs/wgpu/0.12.0/wgpu/)
