@@ -78,7 +78,7 @@ void main(string[] args)
         winWidth, winHeight,
         SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
     
-    wgpuSetLogLevel(WGPULogLevel.Debug);
+    // wgpuSetLogLevel(WGPULogLevel.Debug);
     
     SDL_SysWMinfo wmInfo;
     SDL_GetWindowWMInfo(sdlWindow, &wmInfo);
@@ -99,8 +99,8 @@ void main(string[] args)
             next: null,
             sType: cast(WGPUSType)WGPUNativeSType.DeviceExtras
         },
-        nativeFeatures: WGPUNativeFeature.TEXTURE_ADAPTER_SPECIFIC_FORMAT_FEATURES,
-        label: "Device",
+        // nativeFeatures: WGPUNativeFeature.TEXTURE_ADAPTER_SPECIFIC_FORMAT_FEATURES,
+        // label: "Device",
         tracePath: null,
     };
     WGPURequiredLimits limits = {
@@ -178,7 +178,7 @@ void main(string[] args)
         writeMask: WGPUColorWriteMask.All
     };
     WGPUFragmentState fs = {
-        modul: shaderModule,
+        module_: shaderModule,
         entryPoint: "fs_main",
         targetCount: 1,
         targets: &cts
@@ -187,7 +187,7 @@ void main(string[] args)
         label: "Render pipeline",
         layout: pipelineLayout,
         vertex: {
-            modul: shaderModule,
+            module_: shaderModule,
             entryPoint: "vs_main",
             bufferCount: 0,
             buffers: null
