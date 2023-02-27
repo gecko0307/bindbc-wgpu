@@ -70,6 +70,12 @@ void main(string[] args)
     
     if (SDL_Init(SDL_INIT_EVERYTHING) == -1)
         quit("Error: failed to init SDL: " ~ to!string(SDL_GetError()));
+
+    wgpuSetLogLevel(WGPULogLevel.Trace);
+    wgpuSetLogCallback(&logCallback, null);
+
+    WGPUInstanceDescriptor instanceDesc;
+    WGPUInstance instance = wgpuCreateInstance(&instanceDesc);
     
     uint winWidth = 1280;
     uint winHeight = 720;
@@ -78,19 +84,17 @@ void main(string[] args)
         winWidth, winHeight,
         SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
     
-    wgpuSetLogLevel(WGPULogLevel.Debug);
-    
     SDL_SysWMinfo wmInfo;
     SDL_GetWindowWMInfo(sdlWindow, &wmInfo);
     writeln("Subsystem: ", wmInfo.subsystem);
-    WGPUSurface surface = createSurface(wmInfo);
+    WGPUSurface surface = createSurface(instance, wmInfo);
     
     WGPUAdapter adapter;
     WGPURequestAdapterOptions adapterOpts = {
         nextInChain: null,
         compatibleSurface: surface
     };
-    wgpuInstanceRequestAdapter(null, &adapterOpts, &requestAdapterCallback, cast(void*)&adapter);
+    wgpuInstanceRequestAdapter(instance, &adapterOpts, &requestAdapterCallback, cast(void*)&adapter);
     writeln("Adapter OK");
     
     WGPUDevice device;
@@ -99,8 +103,8 @@ void main(string[] args)
             next: null,
             sType: cast(WGPUSType)WGPUNativeSType.DeviceExtras
         },
-        nativeFeatures: WGPUNativeFeature.TEXTURE_ADAPTER_SPECIFIC_FORMAT_FEATURES,
-        label: "Device",
+        // nativeFeatures: WGPUNativeFeature.TEXTURE_ADAPTER_SPECIFIC_FORMAT_FEATURES,
+        // label: "Device",
         tracePath: null,
     };
     WGPURequiredLimits limits = {
@@ -178,7 +182,7 @@ void main(string[] args)
         writeMask: WGPUColorWriteMask.All
     };
     WGPUFragmentState fs = {
-        modul: shaderModule,
+        module_: shaderModule,
         entryPoint: "fs_main",
         targetCount: 1,
         targets: &cts
@@ -187,7 +191,7 @@ void main(string[] args)
         label: "Render pipeline",
         layout: pipelineLayout,
         vertex: {
-            modul: shaderModule,
+            module_: shaderModule,
             entryPoint: "vs_main",
             bufferCount: 0,
             buffers: null
@@ -298,7 +302,7 @@ void main(string[] args)
     SDL_Quit();
 }
 
-WGPUSurface createSurface(SDL_SysWMinfo wmInfo)
+WGPUSurface createSurface(WGPUInstance instance, SDL_SysWMinfo wmInfo)
 {
     WGPUSurface surface;
     version(Windows)
@@ -319,7 +323,7 @@ WGPUSurface createSurface(SDL_SysWMinfo wmInfo)
                 label: null,
                 nextInChain: cast(const(WGPUChainedStruct)*)&sfdHwnd
             };
-            surface = wgpuInstanceCreateSurface(null, &sfd);
+            surface = wgpuInstanceCreateSurface(instance, &sfd);
         }
         else
         {
@@ -329,7 +333,13 @@ WGPUSurface createSurface(SDL_SysWMinfo wmInfo)
     else version(linux)
     {
         // Needs test!
-        if (wmInfo.subsystem == SDL_SYSWM_X11)
+        // System might use XCB so SDL_SysWMinfo will contain subsystem SDL_SYSWM_UNKNOWN. Although, X11 still can be used to craete surface
+        if (wmInfo.subsystem == SDL_SYSWM_WAYLAND)
+        {
+            // TODO: support Wayland
+            quit("Unsupported subsystem, sorry");
+        }
+        else if (true)//wmInfo.subsystem == SDL_SYSWM_X11)
         {
             auto x11_display = wmInfo.info.x11.display;
             auto x11_window = wmInfo.info.x11.window;
@@ -345,12 +355,7 @@ WGPUSurface createSurface(SDL_SysWMinfo wmInfo)
                 label: null,
                 nextInChain: cast(const(WGPUChainedStruct)*)&sfdX11
             };
-            surface = wgpuInstanceCreateSurface(null, &sfd);
-        }
-        else if (wmInfo.subsystem == SDL_SYSWM_WAYLAND)
-        {
-            // TODO: support Wayland
-            quit("Unsupported subsystem, sorry");
+            surface = wgpuInstanceCreateSurface(instance, &sfd);
         }
         else
         {
@@ -374,7 +379,7 @@ WGPUSurface createSurface(SDL_SysWMinfo wmInfo)
             label: null,
             nextInChain: cast(const(WGPUChainedStruct)*)&sfdMetal
         };
-        surface = wgpuInstanceCreateSurface(null, &sfd);
+        surface = wgpuInstanceCreateSurface(instance, &sfd);
         
         SDL_DestroyRenderer(renderer);
     }
@@ -383,6 +388,22 @@ WGPUSurface createSurface(SDL_SysWMinfo wmInfo)
 
 extern(C)
 {
+    void logCallback(WGPULogLevel level, const(char)* msg, void* user_data)
+    {
+        const (char)[] level_message;
+        switch(level)
+        {
+            case WGPULogLevel.Off:level_message = "off";break;
+            case WGPULogLevel.Error:level_message = "error";break;
+            case WGPULogLevel.Warn:level_message = "warn";break;
+            case WGPULogLevel.Info:level_message = "info";break;
+            case WGPULogLevel.Debug:level_message = "debug";break;
+            case WGPULogLevel.Trace:level_message = "trace";break;
+            default: level_message = "-";
+        }
+        writeln("WebGPU ", level_message, ": ",  to!string(msg));
+    }
+
     void requestAdapterCallback(WGPURequestAdapterStatus status, WGPUAdapter adapter, const(char)* message, void* userdata)
     {
         if (status == WGPURequestAdapterStatus.Success)

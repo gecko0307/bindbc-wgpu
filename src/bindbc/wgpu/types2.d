@@ -33,28 +33,27 @@ import bindbc.wgpu.types;
  * Type definitions from wgpu.h
  */
 
-alias WGPUBufferMapCallback = extern(C) void function(WGPUBufferMapAsyncStatus status, void* userdata);
-alias WGPUCompilationInfoCallback = extern(C) void function(WGPUCompilationInfoRequestStatus status, const(WGPUCompilationInfo)* compilationInfo, void* userdata);
-alias WGPUCreateComputePipelineAsyncCallback = extern(C) void function(WGPUCreatePipelineAsyncStatus status, WGPUComputePipeline pipeline, const(char)* message, void* userdata);
-alias WGPUCreateRenderPipelineAsyncCallback = extern(C) void function(WGPUCreatePipelineAsyncStatus status, WGPURenderPipeline pipeline, const(char)* message, void* userdata);
-alias WGPUDeviceLostCallback = extern(C) void function(WGPUDeviceLostReason reason, const(char)* message, void* userdata);
-alias WGPUErrorCallback = extern(C) void function(WGPUErrorType type, const(char)* message, void* userdata);
-alias WGPUProc = extern(C) void function();
-alias WGPUQueueWorkDoneCallback = extern(C) void function(WGPUQueueWorkDoneStatus status, void* userdata);
-alias WGPURequestAdapterCallback = extern(C) void function(WGPURequestAdapterStatus status, WGPUAdapter adapter, const(char)* message, void* userdata);
-alias WGPURequestDeviceCallback = extern(C) void function(WGPURequestDeviceStatus status, WGPUDevice device, const(char)* message, void* userdata);
-
 enum WGPUNativeSType
 {
     // Start at 6 to prevent collisions with webgpu STypes
     DeviceExtras = 0x60000001,
     AdapterExtras = 0x60000002,
+    RequiredLimitsExtras = 0x60000003,
+    PipelineLayoutExtras = 0x60000004,
+    ShaderModuleGLSLDescriptor = 0x60000005,
+    SupportedLimitsExtras = 0x60000003,
+    InstanceExtras = 0x60000006,
+    SwapChainDescriptorExtras = 0x60000007,
     Force32 = 0x7FFFFFFF
 }
 
 enum WGPUNativeFeature
 {
-    TEXTURE_ADAPTER_SPECIFIC_FORMAT_FEATURES = 0x10000000
+    PUSH_CONSTANTS = 0x60000001,
+    TEXTURE_ADAPTER_SPECIFIC_FORMAT_FEATURES = 0x60000002,
+    MULTI_DRAW_INDIRECT = 0x60000003,
+    MULTI_DRAW_INDIRECT_COUNT = 0x60000004,
+    VERTEX_WRITABLE_STORAGE = 0x60000005
 }
 
 enum WGPULogLevel
@@ -68,6 +67,49 @@ enum WGPULogLevel
     Force32 = 0x7FFFFFFF
 }
 
+enum WGPUInstanceBackend
+{
+    Vulkan = 1 << 1,
+    GL = 1 << 5,
+    Metal = 1 << 2,
+    DX12 = 1 << 3,
+    DX11 = 1 << 4,
+    BrowserWebGPU = 1 << 6,
+    Primary = WGPUInstanceBackend.Vulkan | WGPUInstanceBackend.Metal | WGPUInstanceBackend.DX12 | WGPUInstanceBackend.BrowserWebGPU,
+    Secondary = WGPUInstanceBackend.GL | WGPUInstanceBackend.DX11,
+    None = 0x00000000,
+    Force32 = 0x7FFFFFFF
+}
+
+alias WGPUInstanceBackendFlags = uint;
+
+enum WGPUDx12Compiler
+{
+    Undefined = 0x00000000,
+    Fxc = 0x00000001,
+    Dxc = 0x00000002,
+    Force32 = 0x7FFFFFFF
+}
+
+enum WGPUCompositeAlphaMode
+{
+    Auto = 0x00000000,
+    Opaque = 0x00000001,
+    PreMultiplied = 0x00000002,
+    PostMultiplied = 0x00000003,
+    Inherit = 0x00000004,
+    Force32 = 0x7FFFFFFF
+}
+
+struct WGPUInstanceExtras
+{
+    WGPUChainedStruct chain;
+    WGPUInstanceBackendFlags backends;
+    WGPUDx12Compiler dx12ShaderCompiler;
+    const(char)* dxilPath;
+    const(char)* dxcPath;
+}
+
 struct WGPUAdapterExtras
 {
     WGPUChainedStruct chain;
@@ -77,9 +119,112 @@ struct WGPUAdapterExtras
 struct WGPUDeviceExtras
 {
     WGPUChainedStruct chain;
-    WGPUNativeFeature nativeFeatures;
-    const(char)* label;
     const(char)* tracePath;
 }
+struct WGPURequiredLimitsExtras
+{
+    WGPUChainedStruct chain;
+    uint maxPushConstantSize;
+}
 
-alias WGPULogCallback = extern(C) void function(WGPULogLevel level, const(char)* msg);
+struct WGPUSupportedLimitsExtras
+{
+    WGPUChainedStructOut chain;
+    uint maxPushConstantSize;
+}
+
+struct WGPUPushConstantRange
+{
+    alias WGPUShaderStageFlags = uint;
+    WGPUShaderStageFlags stages;
+    uint start;
+    uint end;
+}
+
+struct WGPUPipelineLayoutExtras
+{
+    WGPUChainedStruct chain;
+    uint pushConstantRangeCount;
+    WGPUPushConstantRange* pushConstantRanges;
+}
+
+alias WGPUSubmissionIndex = ulong;
+
+struct WGPUWrappedSubmissionIndex
+{
+    WGPUQueue queue;
+    WGPUSubmissionIndex submissionIndex;
+}
+
+struct WGPUShaderDefine
+{
+    const(char)* name;
+    const(char)* value;
+}
+
+struct WGPUShaderModuleGLSLDescriptor
+{
+    WGPUChainedStruct chain;
+    WGPUShaderStage stage;
+    const(char)* code;
+    uint defineCount;
+    WGPUShaderDefine* defines;
+}
+
+struct WGPUStorageReport
+{
+    size_t numOccupied;
+    size_t numVacant;
+    size_t numError;
+    size_t elementSize;
+}
+
+struct WGPUHubReport
+{
+    WGPUStorageReport adapters;
+    WGPUStorageReport devices;
+    WGPUStorageReport pipelineLayouts;
+    WGPUStorageReport shaderModules;
+    WGPUStorageReport bindGroupLayouts;
+    WGPUStorageReport bindGroups;
+    WGPUStorageReport commandBuffers;
+    WGPUStorageReport renderBundles;
+    WGPUStorageReport renderPipelines;
+    WGPUStorageReport computePipelines;
+    WGPUStorageReport querySets;
+    WGPUStorageReport buffers;
+    WGPUStorageReport textures;
+    WGPUStorageReport textureViews;
+    WGPUStorageReport samplers;
+}
+
+struct WGPUGlobalReport
+{
+    WGPUStorageReport surfaces;
+    WGPUBackendType backendType;
+    WGPUHubReport vulkan;
+    WGPUHubReport metal;
+    WGPUHubReport dx12;
+    WGPUHubReport dx11;
+    WGPUHubReport gl;
+}
+
+struct WGPUSurfaceCapabilities
+{
+    size_t formatCount;
+    WGPUTextureFormat* formats;
+    size_t presentModeCount;
+    WGPUPresentMode* presentModes;
+    size_t alphaModeCount;
+    WGPUCompositeAlphaMode* alphaModes;
+}
+
+struct WGPUSwapChainDescriptorExtras
+{
+    WGPUChainedStruct chain;
+    WGPUCompositeAlphaMode alphaMode;
+    size_t viewFormatCount;
+    const(WGPUTextureFormat)* viewFormats;
+}
+
+alias WGPULogCallback = extern(C) void function (WGPULogLevel level, const(char)* message, void* userdata);

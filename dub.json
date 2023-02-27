@@ -29,7 +29,7 @@
         },
         {
             "name": "demo",
-            "targetName": "demo",
+            "targetName": "demo_binary",
             "targetType": "executable",
             "mainSourceFile": "demo/main.d",
             "dependencies": {
@@ -38,6 +38,7 @@
             "versions": [
                 "SDL_2010"
             ],
+            "lflags-posix": ["-rpath=."],
             "copyFiles-windows-x86": ["demo/lib/x86/*.dll"],
             "copyFiles-windows-x86_64": ["demo/lib/x64/*.dll"]
         }
