@@ -71,7 +71,16 @@ void main(string[] args)
     if (SDL_Init(SDL_INIT_EVERYTHING) == -1)
         quit("Error: failed to init SDL: " ~ to!string(SDL_GetError()));
 
-    wgpuSetLogLevel(WGPULogLevel.Trace);
+    debug
+    {
+        WGPULogLevel logLevel = WGPULogLevel.Debug; // WGPULogLevel.Trace
+    }
+    else
+    {
+        WGPULogLevel logLevel = WGPULogLevel.Warn;
+    }
+
+    wgpuSetLogLevel(logLevel);
     wgpuSetLogCallback(&logCallback, null);
 
     WGPUInstanceDescriptor instanceDesc;
@@ -110,7 +119,13 @@ void main(string[] args)
     WGPURequiredLimits limits = {
         nextInChain: null,
         limits: {
-            maxBindGroups: 1
+            maxBindGroups: 1,
+            
+            // Why are these necessary under Windows?
+            minUniformBufferOffsetAlignment: 256,
+            minStorageBufferOffsetAlignment: 256,
+            maxInterStageShaderComponents: 60,
+            maxInterStageShaderVariables: 16
         }
     };
     WGPUDeviceDescriptor deviceDesc = {
@@ -203,7 +218,7 @@ void main(string[] args)
             cullMode: WGPUCullMode.None
         },
         multisample: {
-            count: 1, 
+            count: 1,
             mask: ~0,
             alphaToCoverageEnabled: false
         },
@@ -214,7 +229,18 @@ void main(string[] args)
     writeln("Render pipeline OK");
     
     WGPUSwapChain createSwapChain(uint w, uint h) {
+        WGPUSwapChainDescriptorExtras swcDescExtras = {
+            chain: {
+                next: null,
+                sType: cast(WGPUSType)WGPUNativeSType.SwapChainDescriptorExtras
+            },
+            alphaMode: WGPUCompositeAlphaMode.Auto,
+            viewFormatCount: 0,
+            viewFormats: null
+        };
+        
         WGPUSwapChainDescriptor swcDesc = {
+            nextInChain: cast(WGPUChainedStruct*)&swcDescExtras,
             usage: WGPUTextureUsage.RenderAttachment,
             format: swapChainFormat,
             width: w,
@@ -291,6 +317,7 @@ void main(string[] args)
         wgpuRenderPassEncoderSetBindGroup(renderPass, 0, bindGroup, 0, null);
         wgpuRenderPassEncoderDraw(renderPass, 3, 1, 0, 0);
         wgpuRenderPassEncoderEnd(renderPass);
+        wgpuTextureViewDrop(nextTextureView);
         
         WGPUQueue queue = wgpuDeviceGetQueue(device);
         WGPUCommandBufferDescriptor cmdbufDesc = { label: null };
@@ -333,13 +360,13 @@ WGPUSurface createSurface(WGPUInstance instance, SDL_SysWMinfo wmInfo)
     else version(linux)
     {
         // Needs test!
-        // System might use XCB so SDL_SysWMinfo will contain subsystem SDL_SYSWM_UNKNOWN. Although, X11 still can be used to craete surface
+        // System might use XCB so SDL_SysWMinfo will contain subsystem SDL_SYSWM_UNKNOWN. Although, X11 still can be used to create surface
         if (wmInfo.subsystem == SDL_SYSWM_WAYLAND)
         {
             // TODO: support Wayland
             quit("Unsupported subsystem, sorry");
         }
-        else if (true)//wmInfo.subsystem == SDL_SYSWM_X11)
+        else
         {
             auto x11_display = wmInfo.info.x11.display;
             auto x11_window = wmInfo.info.x11.window;
@@ -356,10 +383,6 @@ WGPUSurface createSurface(WGPUInstance instance, SDL_SysWMinfo wmInfo)
                 nextInChain: cast(const(WGPUChainedStruct)*)&sfdX11
             };
             surface = wgpuInstanceCreateSurface(instance, &sfd);
-        }
-        else
-        {
-            quit("Unsupported subsystem, sorry");
         }
     }
     else version(OSX)

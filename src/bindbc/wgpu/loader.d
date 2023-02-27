@@ -69,7 +69,7 @@ WGPUSupport loadWGPU()
     {
         const(char)[][1] libNames =
         [
-            "libwgpu_native.dll"
+            "wgpu_native.dll"
         ];
     }
     else version(OSX)

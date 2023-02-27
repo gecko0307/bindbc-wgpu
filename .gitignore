@@ -1,9 +1,18 @@
-*.a
-*.lib
-*.exe
+# Compiled object files
+*.o
+*.obj
 
-# Backup files
-*~
+# Compiled Static libraries
+/*.a
+/*.lib
+
+# Executables
+/*.exe
+
+# Libraries
+/*.dll
+/*.so
+/*.dylib
 
 # Dub files
 .dub
@@ -12,3 +21,16 @@ dub.selections.json
 # Dub test files
 __test__library__
 tests
+
+# Documentation
+docs/
+docs.json
+
+# Coverage files
+*.lst
+
+# Debug info
+*.pdb
+
+# Backup files
+*~

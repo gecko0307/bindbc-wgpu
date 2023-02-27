@@ -4,7 +4,7 @@ struct VertexOutput
     @location(0) fragmentPosition: vec4<f32>
 };
 
-@stage(vertex)
+@vertex
 fn vs_main(@builtin(vertex_index) vertexIndex: u32) -> VertexOutput
 {
     let x = f32(i32(vertexIndex) - 1);
@@ -20,7 +20,7 @@ struct FragmentInput
     @location(0) position: vec4<f32>
 };
 
-@stage(fragment)
+@fragment
 fn fs_main(input: FragmentInput) -> @location(0) vec4<f32>
 {
     return input.position;
