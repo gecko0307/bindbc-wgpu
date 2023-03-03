@@ -119,13 +119,6 @@ void main(string[] args)
     WGPURequiredLimits limits = {
         nextInChain: null,
         limits: {
-            maxBindGroups: 1,
-            
-            // Why are these necessary under Windows?
-            minUniformBufferOffsetAlignment: 256,
-            minStorageBufferOffsetAlignment: 256,
-            maxInterStageShaderComponents: 60,
-            maxInterStageShaderVariables: 16
         }
     };
     WGPUDeviceDescriptor deviceDesc = {

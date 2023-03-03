@@ -792,38 +792,41 @@ struct WGPUInstanceDescriptor
     const(WGPUChainedStruct)* nextInChain;
 }
 
+/**
+ * Reference: https://www.w3.org/TR/webgpu/#limits
+ */
 struct WGPULimits
 {
-    uint maxTextureDimension1D;
-    uint maxTextureDimension2D;
-    uint maxTextureDimension3D;
-    uint maxTextureArrayLayers;
-    uint maxBindGroups;
-    uint maxBindingsPerBindGroup;
-    uint maxDynamicUniformBuffersPerPipelineLayout;
-    uint maxDynamicStorageBuffersPerPipelineLayout;
-    uint maxSampledTexturesPerShaderStage;
-    uint maxSamplersPerShaderStage;
-    uint maxStorageBuffersPerShaderStage;
-    uint maxStorageTexturesPerShaderStage;
-    uint maxUniformBuffersPerShaderStage;
-    ulong maxUniformBufferBindingSize;
-    ulong maxStorageBufferBindingSize;
-    uint minUniformBufferOffsetAlignment;
-    uint minStorageBufferOffsetAlignment;
-    uint maxVertexBuffers;
-    ulong maxBufferSize;
-    uint maxVertexAttributes;
-    uint maxVertexBufferArrayStride;
-    uint maxInterStageShaderComponents;
-    uint maxInterStageShaderVariables;
-    uint maxColorAttachments;
-    uint maxComputeWorkgroupStorageSize;
-    uint maxComputeInvocationsPerWorkgroup;
-    uint maxComputeWorkgroupSizeX;
-    uint maxComputeWorkgroupSizeY;
-    uint maxComputeWorkgroupSizeZ;
-    uint maxComputeWorkgroupsPerDimension;
+    uint maxTextureDimension1D = 8192;
+    uint maxTextureDimension2D = 8192;
+    uint maxTextureDimension3D = 2048;
+    uint maxTextureArrayLayers = 256;
+    uint maxBindGroups = 4;
+    uint maxBindingsPerBindGroup = 640;
+    uint maxDynamicUniformBuffersPerPipelineLayout = 8;
+    uint maxDynamicStorageBuffersPerPipelineLayout = 4;
+    uint maxSampledTexturesPerShaderStage = 16;
+    uint maxSamplersPerShaderStage = 16;
+    uint maxStorageBuffersPerShaderStage = 8;
+    uint maxStorageTexturesPerShaderStage = 4;
+    uint maxUniformBuffersPerShaderStage = 12;
+    ulong maxUniformBufferBindingSize = 65536;
+    ulong maxStorageBufferBindingSize = 134217728;
+    uint minUniformBufferOffsetAlignment = 256;
+    uint minStorageBufferOffsetAlignment = 256;
+    uint maxVertexBuffers = 8;
+    ulong maxBufferSize = 268435456;
+    uint maxVertexAttributes = 16;
+    uint maxVertexBufferArrayStride = 2048;
+    uint maxInterStageShaderComponents = 60;
+    uint maxInterStageShaderVariables = 16;
+    uint maxColorAttachments = 8;
+    uint maxComputeWorkgroupStorageSize = 16384;
+    uint maxComputeInvocationsPerWorkgroup = 256;
+    uint maxComputeWorkgroupSizeX = 256;
+    uint maxComputeWorkgroupSizeY = 256;
+    uint maxComputeWorkgroupSizeZ = 64;
+    uint maxComputeWorkgroupsPerDimension = 65535;
 }
 
 struct WGPUMultisampleState
