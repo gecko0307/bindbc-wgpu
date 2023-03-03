@@ -793,7 +793,7 @@ struct WGPUInstanceDescriptor
 }
 
 /**
- * Reference: https://www.w3.org/TR/webgpu/#limits
+ * Default values as per https://www.w3.org/TR/webgpu/#limits
  */
 struct WGPULimits
 {

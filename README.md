@@ -18,6 +18,8 @@ This repository also includes a simple triangle demo that can be compiled by run
 
 `dub build --config=demo`
 
+More advanced demo can be found [here](https://github.com/gecko0307/wgpu-dlang).
+
 ## What is WebGPU?
 It is a new low-level graphics and compute API for the Web that works on top of Vulkan, DirectX 12, or Metal. It exposes the generic computational facilities available in today's GPUs in a cross-platform way. 
 
