@@ -258,7 +258,7 @@ void main(string[] args)
                     {
                         winWidth = event.window.data1;
                         winHeight = event.window.data2;
-                        writeln(winWidth, "x", winHeight);
+                        writeln("Resize: ", winWidth, "x", winHeight);
                         swapChain = createSwapChain(winWidth, winHeight);
                     }
                     break;
@@ -352,13 +352,12 @@ WGPUSurface createSurface(WGPUInstance instance, SDL_SysWMinfo wmInfo)
     }
     else version(linux)
     {
-        // Needs test!
-        // System might use XCB so SDL_SysWMinfo will contain subsystem SDL_SYSWM_UNKNOWN. Although, X11 still can be used to create surface
         if (wmInfo.subsystem == SDL_SYSWM_WAYLAND)
         {
             // TODO: support Wayland
             quit("Unsupported subsystem, sorry");
         }
+        // System might use XCB so SDL_SysWMinfo will contain subsystem SDL_SYSWM_UNKNOWN. Although, X11 still can be used to create surface
         else
         {
             auto x11_display = wmInfo.info.x11.display;

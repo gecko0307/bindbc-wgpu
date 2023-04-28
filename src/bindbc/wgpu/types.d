@@ -145,6 +145,13 @@ enum WGPUBufferMapAsyncStatus
     Force32 = 0x7FFFFFFF
 }
 
+enum WGPUBufferMapState {
+    Unmapped = 0x00000000,
+    Pending = 0x00000001,
+    Mapped = 0x00000002,
+    Force32 = 0x7FFFFFFF
+}
+
 enum WGPUCompareFunction
 {
     Undefined = 0x00000000,
@@ -186,10 +193,11 @@ enum WGPUComputePassTimestampLocation
 enum WGPUCreatePipelineAsyncStatus
 {
     Success = 0x00000000,
-    Error = 0x00000001,
-    DeviceLost = 0x00000002,
-    DeviceDestroyed = 0x00000003,
-    Unknown = 0x00000004,
+    ValidationError = 0x00000001,
+    InternalError = 0x00000002,
+    DeviceLost = 0x00000003,
+    DeviceDestroyed = 0x00000004,
+    Unknown = 0x00000005,
     Force32 = 0x7FFFFFFF
 }
 
@@ -240,6 +248,7 @@ enum WGPUFeatureName
     IndirectFirstInstance = 0x00000008,
     ShaderF16 = 0x00000009,
     RG11B10UfloatRenderable = 0x0000000A,
+    BGRA8UnormStorage = 0x0000000B,
     Force32 = 0x7FFFFFFF
 }
 
@@ -764,6 +773,9 @@ struct WGPUCompilationMessage
     ulong linePos;
     ulong offset;
     ulong length;
+    ulong utf16LinePos;
+    ulong utf16Offset;
+    ulong utf16Length;
 }
 
 struct WGPUComputePassTimestampWrite
@@ -821,6 +833,7 @@ struct WGPULimits
     uint maxInterStageShaderComponents = 60;
     uint maxInterStageShaderVariables = 16;
     uint maxColorAttachments = 8;
+    uint maxColorAttachmentBytesPerSample = 32;
     uint maxComputeWorkgroupStorageSize = 16384;
     uint maxComputeInvocationsPerWorkgroup = 256;
     uint maxComputeWorkgroupSizeX = 256;
@@ -1346,6 +1359,7 @@ alias WGPUProcBindGroupLayoutSetLabel = extern(C) void function (WGPUBindGroupLa
 // Procs of Buffer
 alias WGPUProcBufferDestroy = extern(C) void function (WGPUBuffer buffer);
 alias WGPUProcBufferGetConstMappedRange = extern(C) const(void)* function (WGPUBuffer buffer, size_t offset, size_t size);
+alias WGPUProcBufferGetMapState = extern(C) WGPUBufferMapState function (WGPUBuffer buffer);
 alias WGPUProcBufferGetMappedRange = extern(C) void* function (WGPUBuffer buffer, size_t offset, size_t size);
 alias WGPUProcBufferGetSize = extern(C) size_t function (WGPUBuffer buffer);
 alias WGPUProcBufferGetUsage = extern(C) WGPUBufferUsage function (WGPUBuffer buffer);
@@ -1468,7 +1482,7 @@ alias WGPUProcRenderPassEncoderDrawIndirect = extern(C) void function (WGPURende
 alias WGPUProcRenderPassEncoderEnd = extern(C) void function (WGPURenderPassEncoder renderPassEncoder);
 alias WGPUProcRenderPassEncoderEndOcclusionQuery = extern(C) void function (WGPURenderPassEncoder renderPassEncoder);
 alias WGPUProcRenderPassEncoderEndPipelineStatisticsQuery = extern(C) void function (WGPURenderPassEncoder renderPassEncoder);
-alias WGPUProcRenderPassEncoderExecuteBundles = extern(C) void function (WGPURenderPassEncoder renderPassEncoder, uint bundlesCount, const(WGPURenderBundle)* bundles);
+alias WGPUProcRenderPassEncoderExecuteBundles = extern(C) void function (WGPURenderPassEncoder renderPassEncoder, uint bundleCount, const(WGPURenderBundle)* bundles);
 alias WGPUProcRenderPassEncoderInsertDebugMarker = extern(C) void function (WGPURenderPassEncoder renderPassEncoder, const(char)* markerLabel);
 alias WGPUProcRenderPassEncoderPopDebugGroup = extern(C) void function (WGPURenderPassEncoder renderPassEncoder);
 alias WGPUProcRenderPassEncoderPushDebugGroup = extern(C) void function (WGPURenderPassEncoder renderPassEncoder, const(char)* groupLabel);

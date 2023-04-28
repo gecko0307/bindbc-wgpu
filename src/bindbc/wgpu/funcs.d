@@ -77,6 +77,9 @@ __gshared
     alias da_wgpuBufferGetConstMappedRange = const (void)* function(WGPUBuffer buffer, size_t offset, size_t size);
     da_wgpuBufferGetConstMappedRange wgpuBufferGetConstMappedRange;
     
+    alias da_wgpuBufferGetMapState = WGPUBufferMapState function(WGPUBuffer buffer);
+    da_wgpuBufferGetMapState wgpuBufferGetMapState;
+    
     alias da_wgpuBufferGetMappedRange = void* function(WGPUBuffer buffer, size_t offset, size_t size);
     da_wgpuBufferGetMappedRange wgpuBufferGetMappedRange;
     
@@ -370,7 +373,7 @@ __gshared
     alias da_wgpuRenderPassEncoderEndPipelineStatisticsQuery = void function(WGPURenderPassEncoder renderPassEncoder);
     da_wgpuRenderPassEncoderEndPipelineStatisticsQuery wgpuRenderPassEncoderEndPipelineStatisticsQuery;
     
-    alias da_wgpuRenderPassEncoderExecuteBundles = void function(WGPURenderPassEncoder renderPassEncoder, uint bundlesCount, const(WGPURenderBundle)* bundles);
+    alias da_wgpuRenderPassEncoderExecuteBundles = void function(WGPURenderPassEncoder renderPassEncoder, uint bundleCount, const(WGPURenderBundle)* bundles);
     da_wgpuRenderPassEncoderExecuteBundles wgpuRenderPassEncoderExecuteBundles;
     
     alias da_wgpuRenderPassEncoderInsertDebugMarker = void function(WGPURenderPassEncoder renderPassEncoder, const(char)* markerLabel);
@@ -578,6 +581,4 @@ __gshared
     
     alias da_wgpuTextureViewDrop = void function(WGPUTextureView textureView);
     da_wgpuTextureViewDrop wgpuTextureViewDrop;
-    
-
 }
