@@ -956,20 +956,23 @@ struct WGPUSamplerBindingLayout
     WGPUSamplerBindingType type;
 }
 
+/**
+ * Default values as per https://www.w3.org/TR/webgpu/#GPUSamplerDescriptor
+ */
 struct WGPUSamplerDescriptor
 {
     const(WGPUChainedStruct)* nextInChain;
     const(char)* label; // nullable
-    WGPUAddressMode addressModeU;
-    WGPUAddressMode addressModeV;
-    WGPUAddressMode addressModeW;
-    WGPUFilterMode magFilter;
-    WGPUFilterMode minFilter;
-    WGPUMipmapFilterMode mipmapFilter;
-    float lodMinClamp;
-    float lodMaxClamp;
+    WGPUAddressMode addressModeU = WGPUAddressMode.ClampToEdge;
+    WGPUAddressMode addressModeV = WGPUAddressMode.ClampToEdge;
+    WGPUAddressMode addressModeW = WGPUAddressMode.ClampToEdge;
+    WGPUFilterMode magFilter = WGPUFilterMode.Nearest;
+    WGPUFilterMode minFilter = WGPUFilterMode.Nearest;
+    WGPUMipmapFilterMode mipmapFilter = WGPUMipmapFilterMode.Nearest;
+    float lodMinClamp = 0.0f;
+    float lodMaxClamp = 32.0f;
     WGPUCompareFunction compare;
-    ushort maxAnisotropy;
+    ushort maxAnisotropy = 1;
 }
 
 struct WGPUShaderModuleCompilationHint
