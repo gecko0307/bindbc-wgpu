@@ -12,7 +12,7 @@ Usage:
 }
 ```
 
-Since 0.8.0, major and minor version numbers of the bindbc-wgpu package is in sync with wgpu-native versioning. Patch number can be different.
+Since 0.8.0, major and minor version numbers of the bindbc-wgpu package are in sync with wgpu-native versioning. Patch number can be different.
 
 This repository also includes a simple triangle demo that can be compiled by running 
 
@@ -28,4 +28,4 @@ It is a new low-level graphics and compute API for the Web that works on top of 
 Some useful links:
 * [WebGPU specification](https://www.w3.org/TR/webgpu/)
 * [WebGPU Shading Language specification](https://www.w3.org/TR/WGSL/)
-* [wgpu documentation](https://docs.rs/wgpu/0.15.1/wgpu/)
+* [wgpu documentation](https://docs.rs/wgpu/0.16.0/wgpu/)
