@@ -14,11 +14,7 @@ Usage:
 
 Since 0.8.0, major and minor version numbers of the bindbc-wgpu package are in sync with wgpu-native versioning. Patch number can be different.
 
-This repository also includes a simple triangle demo that can be compiled by running 
-
-`dub build --config=demo`
-
-More advanced demo can be found [here](https://github.com/gecko0307/wgpu-dlang).
+This repository also includes a simple triangle drawing example. More advanced demo can be found [here](https://github.com/gecko0307/wgpu-dlang).
 
 ## What is WebGPU?
 It is a new low-level graphics and compute API for the Web that works on top of Vulkan, DirectX 12, or Metal. It exposes the generic computational facilities available in today's GPUs in a cross-platform way. 

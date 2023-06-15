@@ -1,0 +1,24 @@
+{
+    "name": "demo",
+    "description": "Triangle demo",
+    "homepage": "https://github.com/gecko0307/bindbc-wgpu",
+    "license": "BSL-1.0",
+    "authors": [
+        "Timur Gafarov"
+    ],
+    "dependencies": {
+        "bindbc-wgpu": { "path": ".." },
+        "bindbc-sdl": "~>1.0.1"
+    },
+    "versions": [
+        "SDL_2010"
+    ],
+    "buildRequirements": [
+        "allowWarnings"
+    ],
+    "mainSourceFile": "src/main.d",
+    "targetType": "executable",
+    "lflags-posix": ["-rpath=."],
+    "copyFiles-windows-x86": ["lib/x86/*.dll"],
+    "copyFiles-windows-x86_64": ["lib/x64/*.dll"]
+}
