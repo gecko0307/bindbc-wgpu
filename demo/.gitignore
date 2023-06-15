@@ -35,7 +35,3 @@ __dummy.html
 *.dll
 *.so
 *.dylib
-
-# Standard assets
-data/__internal/
-gamecontrollerdb.txt
