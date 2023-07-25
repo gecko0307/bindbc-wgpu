@@ -37,548 +37,251 @@ import bindbc.wgpu.types2;
 
 __gshared
 {
-    extern(C) @nogc nothrow:
-
+    WGPUProcCreateInstance wgpuCreateInstance;
+    WGPUProcGetProcAddress wgpuGetProcAddress;
     
-    alias da_wgpuCreateInstance = WGPUInstance function(const(WGPUInstanceDescriptor)* descriptor);
-    da_wgpuCreateInstance wgpuCreateInstance;
-    
-    alias da_wgpuGetProcAddress = WGPUProc function(WGPUDevice device, const(char)* procName);
-    da_wgpuGetProcAddress wgpuGetProcAddress;
-
     // Methods of Adapter
-    alias da_wgpuAdapterEnumerateFeatures = size_t function(WGPUAdapter adapter, WGPUFeatureName* features);
-    da_wgpuAdapterEnumerateFeatures wgpuAdapterEnumerateFeatures;
+    WGPUProcAdapterEnumerateFeatures wgpuAdapterEnumerateFeatures;
+    WGPUProcAdapterGetLimits wgpuAdapterGetLimits;
+    WGPUProcAdapterGetProperties wgpuAdapterGetProperties;
+    WGPUProcAdapterHasFeature wgpuAdapterHasFeature;
+    WGPUProcAdapterRequestDevice wgpuAdapterRequestDevice;
+    WGPUProcAdapterReference wgpuAdapterReference;
+    WGPUProcAdapterRelease wgpuAdapterRelease;
     
-    alias da_wgpuAdapterGetLimits = bool function(WGPUAdapter adapter, WGPUSupportedLimits* limits);
-    da_wgpuAdapterGetLimits wgpuAdapterGetLimits;
-    
-    alias da_wgpuAdapterGetProperties = void function(WGPUAdapter adapter, WGPUAdapterProperties* properties);
-    da_wgpuAdapterGetProperties wgpuAdapterGetProperties;
-    
-    alias da_wgpuAdapterHasFeature = bool function(WGPUAdapter adapter, WGPUFeatureName feature);
-    da_wgpuAdapterHasFeature wgpuAdapterHasFeature;
-    
-    alias da_wgpuAdapterRequestDevice = void function(WGPUAdapter adapter, const(WGPUDeviceDescriptor)* descriptor, WGPURequestDeviceCallback callback, void* userdata);
-    da_wgpuAdapterRequestDevice wgpuAdapterRequestDevice;
-
     // Methods of BindGroup
-    alias da_wgpuBindGroupSetLabel = void function(WGPUBindGroup bindGroup, const(char)* label);
-    da_wgpuBindGroupSetLabel wgpuBindGroupSetLabel;
-
+    WGPUProcBindGroupSetLabel wgpuBindGroupSetLabel;
+    WGPUProcBindGroupReference wgpuBindGroupReference;
+    WGPUProcBindGroupRelease wgpuBindGroupRelease;
+    
     // Methods of BindGroupLayout
-    alias da_wgpuBindGroupLayoutSetLabel = void function(WGPUBindGroupLayout bindGroupLayout, const(char)* label);
-    da_wgpuBindGroupLayoutSetLabel wgpuBindGroupLayoutSetLabel;
-
+    WGPUProcBindGroupLayoutSetLabel wgpuBindGroupLayoutSetLabel;
+    WGPUProcBindGroupLayoutReference wgpuBindGroupLayoutReference;
+    WGPUProcBindGroupLayoutRelease wgpuBindGroupLayoutRelease;
+    
     // Methods of Buffer
-    alias da_wgpuBufferDestroy = void function(WGPUBuffer buffer);
-    da_wgpuBufferDestroy wgpuBufferDestroy;
+    WGPUProcBufferDestroy wgpuBufferDestroy;
+    WGPUProcBufferGetConstMappedRange wgpuBufferGetConstMappedRange;
+    WGPUProcBufferGetMapState wgpuBufferGetMapState;
+    WGPUProcBufferGetMappedRange wgpuBufferGetMappedRange;
+    WGPUProcBufferGetSize wgpuBufferGetSize;
+    WGPUProcBufferGetUsage wgpuBufferGetUsage;
+    WGPUProcBufferMapAsync wgpuBufferMapAsync;
+    WGPUProcBufferSetLabel wgpuBufferSetLabel;
+    WGPUProcBufferUnmap wgpuBufferUnmap;
+    WGPUProcBufferReference wgpuBufferReference;
+    WGPUProcBufferRelease wgpuBufferRelease;
     
-    alias da_wgpuBufferGetConstMappedRange = const (void)* function(WGPUBuffer buffer, size_t offset, size_t size);
-    da_wgpuBufferGetConstMappedRange wgpuBufferGetConstMappedRange;
-    
-    alias da_wgpuBufferGetMapState = WGPUBufferMapState function(WGPUBuffer buffer);
-    da_wgpuBufferGetMapState wgpuBufferGetMapState;
-    
-    alias da_wgpuBufferGetMappedRange = void* function(WGPUBuffer buffer, size_t offset, size_t size);
-    da_wgpuBufferGetMappedRange wgpuBufferGetMappedRange;
-    
-    alias da_wgpuBufferGetSize = ulong function(WGPUBuffer buffer);
-    da_wgpuBufferGetSize wgpuBufferGetSize;
-    
-    alias da_wgpuBufferGetUsage = WGPUBufferUsage function(WGPUBuffer buffer);
-    da_wgpuBufferGetUsage wgpuBufferGetUsage;
-    
-    alias da_wgpuBufferMapAsync = void function(WGPUBuffer buffer, WGPUMapModeFlags mode, size_t offset, size_t size, WGPUBufferMapCallback callback, void* userdata);
-    da_wgpuBufferMapAsync wgpuBufferMapAsync;
-    
-    alias da_wgpuBufferSetLabel = void function(WGPUBuffer buffer, const(char)* label);
-    da_wgpuBufferSetLabel wgpuBufferSetLabel;
-    
-    alias da_wgpuBufferUnmap = void function(WGPUBuffer buffer);
-    da_wgpuBufferUnmap wgpuBufferUnmap;
-
     // Methods of CommandBuffer
-    alias da_wgpuCommandBufferSetLabel = void function(WGPUCommandBuffer commandBuffer, const(char)* label);
-    da_wgpuCommandBufferSetLabel wgpuCommandBufferSetLabel;
+    WGPUProcCommandBufferSetLabel wgpuCommandBufferSetLabel;
+    WGPUProcCommandBufferReference wgpuCommandBufferReference;
+    WGPUProcCommandBufferRelease wgpuCommandBufferRelease;
 
     // Methods of CommandEncoder
-    alias da_wgpuCommandEncoderBeginComputePass = WGPUComputePassEncoder function(WGPUCommandEncoder commandEncoder, const(WGPUComputePassDescriptor)* descriptor);
-    da_wgpuCommandEncoderBeginComputePass wgpuCommandEncoderBeginComputePass;
+    WGPUProcCommandEncoderBeginComputePass wgpuCommandEncoderBeginComputePass;
+    WGPUProcCommandEncoderBeginRenderPass wgpuCommandEncoderBeginRenderPass;
+    WGPUProcCommandEncoderClearBuffer wgpuCommandEncoderClearBuffer;
+    WGPUProcCommandEncoderCopyBufferToBuffer wgpuCommandEncoderCopyBufferToBuffer;
+    WGPUProcCommandEncoderCopyBufferToTexture wgpuCommandEncoderCopyBufferToTexture;
+    WGPUProcCommandEncoderCopyTextureToBuffer wgpuCommandEncoderCopyTextureToBuffer;
+    WGPUProcCommandEncoderCopyTextureToTexture wgpuCommandEncoderCopyTextureToTexture;
+    WGPUProcCommandEncoderFinish wgpuCommandEncoderFinish;
+    WGPUProcCommandEncoderInsertDebugMarker wgpuCommandEncoderInsertDebugMarker;
+    WGPUProcCommandEncoderPopDebugGroup wgpuCommandEncoderPopDebugGroup;
+    WGPUProcCommandEncoderPushDebugGroup wgpuCommandEncoderPushDebugGroup;
+    WGPUProcCommandEncoderResolveQuerySet wgpuCommandEncoderResolveQuerySet;
+    WGPUProcCommandEncoderSetLabel wgpuCommandEncoderSetLabel;
+    WGPUProcCommandEncoderWriteTimestamp wgpuCommandEncoderWriteTimestamp;
+    WGPUProcCommandEncoderReference wgpuCommandEncoderReference;
+    WGPUProcCommandEncoderRelease wgpuCommandEncoderRelease;
     
-    alias da_wgpuCommandEncoderBeginRenderPass = WGPURenderPassEncoder function(WGPUCommandEncoder commandEncoder, const(WGPURenderPassDescriptor)* descriptor);
-    da_wgpuCommandEncoderBeginRenderPass wgpuCommandEncoderBeginRenderPass;
-    
-    alias da_wgpuCommandEncoderClearBuffer = void function(WGPUCommandEncoder commandEncoder, WGPUBuffer buffer, ulong offset, ulong size);
-    da_wgpuCommandEncoderClearBuffer wgpuCommandEncoderClearBuffer;
-    
-    alias da_wgpuCommandEncoderCopyBufferToBuffer = void function(WGPUCommandEncoder commandEncoder, WGPUBuffer source, ulong sourceOffset, WGPUBuffer destination, ulong destinationOffset, ulong size);
-    da_wgpuCommandEncoderCopyBufferToBuffer wgpuCommandEncoderCopyBufferToBuffer;
-    
-    alias da_wgpuCommandEncoderCopyBufferToTexture = void function(WGPUCommandEncoder commandEncoder, const(WGPUImageCopyBuffer)* source, const(WGPUImageCopyTexture)* destination, const(WGPUExtent3D)* copySize);
-    da_wgpuCommandEncoderCopyBufferToTexture wgpuCommandEncoderCopyBufferToTexture;
-    
-    alias da_wgpuCommandEncoderCopyTextureToBuffer = void function(WGPUCommandEncoder commandEncoder, const(WGPUImageCopyTexture)* source, const(WGPUImageCopyBuffer)* destination, const(WGPUExtent3D)* copySize);
-    da_wgpuCommandEncoderCopyTextureToBuffer wgpuCommandEncoderCopyTextureToBuffer;
-    
-    alias da_wgpuCommandEncoderCopyTextureToTexture = void function(WGPUCommandEncoder commandEncoder, const(WGPUImageCopyTexture)* source, const(WGPUImageCopyTexture)* destination, const(WGPUExtent3D)* copySize);
-    da_wgpuCommandEncoderCopyTextureToTexture wgpuCommandEncoderCopyTextureToTexture;
-    
-    alias da_wgpuCommandEncoderFinish = WGPUCommandBuffer function(WGPUCommandEncoder commandEncoder, const(WGPUCommandBufferDescriptor)* descriptor);
-    da_wgpuCommandEncoderFinish wgpuCommandEncoderFinish;
-    
-    alias da_wgpuCommandEncoderInsertDebugMarker = void function(WGPUCommandEncoder commandEncoder, const(char)* markerLabel);
-    da_wgpuCommandEncoderInsertDebugMarker wgpuCommandEncoderInsertDebugMarker;
-    
-    alias da_wgpuCommandEncoderPopDebugGroup = void function(WGPUCommandEncoder commandEncoder);
-    da_wgpuCommandEncoderPopDebugGroup wgpuCommandEncoderPopDebugGroup;
-    
-    alias da_wgpuCommandEncoderPushDebugGroup = void function(WGPUCommandEncoder commandEncoder, const(char)* groupLabel);
-    da_wgpuCommandEncoderPushDebugGroup wgpuCommandEncoderPushDebugGroup;
-    
-    alias da_wgpuCommandEncoderResolveQuerySet = void function(WGPUCommandEncoder commandEncoder, WGPUQuerySet querySet, uint firstQuery, uint queryCount, WGPUBuffer destination, ulong destinationOffset);
-    da_wgpuCommandEncoderResolveQuerySet wgpuCommandEncoderResolveQuerySet;
-    
-    alias da_wgpuCommandEncoderSetLabel = void function(WGPUCommandEncoder commandEncoder, const(char)* label);
-    da_wgpuCommandEncoderSetLabel wgpuCommandEncoderSetLabel;
-    
-    alias da_wgpuCommandEncoderWriteTimestamp = void function(WGPUCommandEncoder commandEncoder, WGPUQuerySet querySet, uint queryIndex);
-    da_wgpuCommandEncoderWriteTimestamp wgpuCommandEncoderWriteTimestamp;
-
     // Methods of ComputePassEncoder
-    alias da_wgpuComputePassEncoderBeginPipelineStatisticsQuery = void function(WGPUComputePassEncoder computePassEncoder, WGPUQuerySet querySet, uint queryIndex);
-    da_wgpuComputePassEncoderBeginPipelineStatisticsQuery wgpuComputePassEncoderBeginPipelineStatisticsQuery;
+    WGPUProcComputePassEncoderBeginPipelineStatisticsQuery wgpuComputePassEncoderBeginPipelineStatisticsQuery;
+    WGPUProcComputePassEncoderDispatchWorkgroups wgpuComputePassEncoderDispatchWorkgroups;
+    WGPUProcComputePassEncoderDispatchWorkgroupsIndirect wgpuComputePassEncoderDispatchWorkgroupsIndirect;
+    WGPUProcComputePassEncoderEnd wgpuComputePassEncoderEnd;
+    WGPUProcComputePassEncoderEndPipelineStatisticsQuery wgpuComputePassEncoderEndPipelineStatisticsQuery;
+    WGPUProcComputePassEncoderInsertDebugMarker wgpuComputePassEncoderInsertDebugMarker;
+    WGPUProcComputePassEncoderPopDebugGroup wgpuComputePassEncoderPopDebugGroup;
+    WGPUProcComputePassEncoderPushDebugGroup wgpuComputePassEncoderPushDebugGroup;
+    WGPUProcComputePassEncoderSetBindGroup wgpuComputePassEncoderSetBindGroup;
+    WGPUProcComputePassEncoderSetLabel wgpuComputePassEncoderSetLabel;
+    WGPUProcComputePassEncoderSetPipeline wgpuComputePassEncoderSetPipeline;
+    WGPUProcComputePassEncoderReference wgpuComputePassEncoderReference;
+    WGPUProcComputePassEncoderRelease wgpuComputePassEncoderRelease;
     
-    alias da_wgpuComputePassEncoderDispatchWorkgroups = void function(WGPUComputePassEncoder computePassEncoder, uint workgroupCountX, uint workgroupCountY, uint workgroupCountZ);
-    da_wgpuComputePassEncoderDispatchWorkgroups wgpuComputePassEncoderDispatchWorkgroups;
-    
-    alias da_wgpuComputePassEncoderDispatchWorkgroupsIndirect = void function(WGPUComputePassEncoder computePassEncoder, WGPUBuffer indirectBuffer, ulong indirectOffset);
-    da_wgpuComputePassEncoderDispatchWorkgroupsIndirect wgpuComputePassEncoderDispatchWorkgroupsIndirect;
-    
-    alias da_wgpuComputePassEncoderEnd = void function(WGPUComputePassEncoder computePassEncoder);
-    da_wgpuComputePassEncoderEnd wgpuComputePassEncoderEnd;
-    
-    alias da_wgpuComputePassEncoderEndPipelineStatisticsQuery = void function(WGPUComputePassEncoder computePassEncoder);
-    da_wgpuComputePassEncoderEndPipelineStatisticsQuery wgpuComputePassEncoderEndPipelineStatisticsQuery;
-    
-    alias da_wgpuComputePassEncoderInsertDebugMarker = void function(WGPUComputePassEncoder computePassEncoder, const(char)* markerLabel);
-    da_wgpuComputePassEncoderInsertDebugMarker wgpuComputePassEncoderInsertDebugMarker;
-    
-    alias da_wgpuComputePassEncoderPopDebugGroup = void function(WGPUComputePassEncoder computePassEncoder);
-    da_wgpuComputePassEncoderPopDebugGroup wgpuComputePassEncoderPopDebugGroup;
-    
-    alias da_wgpuComputePassEncoderPushDebugGroup = void function(WGPUComputePassEncoder computePassEncoder, const(char)* groupLabel);
-    da_wgpuComputePassEncoderPushDebugGroup wgpuComputePassEncoderPushDebugGroup;
-    
-    alias da_wgpuComputePassEncoderSetBindGroup = void function(WGPUComputePassEncoder computePassEncoder, uint groupIndex, WGPUBindGroup group, uint dynamicOffsetCount, const(uint)* dynamicOffsets);
-    da_wgpuComputePassEncoderSetBindGroup wgpuComputePassEncoderSetBindGroup;
-    
-    alias da_wgpuComputePassEncoderSetLabel = void function(WGPUComputePassEncoder computePassEncoder, const(char)* label);
-    da_wgpuComputePassEncoderSetLabel wgpuComputePassEncoderSetLabel;
-    
-    alias da_wgpuComputePassEncoderSetPipeline = void function(WGPUComputePassEncoder computePassEncoder, WGPUComputePipeline pipeline);
-    da_wgpuComputePassEncoderSetPipeline wgpuComputePassEncoderSetPipeline;
-
     // Methods of ComputePipeline
-    alias da_wgpuComputePipelineGetBindGroupLayout = WGPUBindGroupLayout function(WGPUComputePipeline computePipeline, uint groupIndex);
-    da_wgpuComputePipelineGetBindGroupLayout wgpuComputePipelineGetBindGroupLayout;
+    WGPUProcComputePipelineGetBindGroupLayout wgpuComputePipelineGetBindGroupLayout;
+    WGPUProcComputePipelineSetLabel wgpuComputePipelineSetLabel;
+    WGPUProcComputePipelineReference wgpuComputePipelineReference;
+    WGPUProcComputePipelineRelease wgpuComputePipelineRelease;
     
-    alias da_wgpuComputePipelineSetLabel = void function(WGPUComputePipeline computePipeline, const(char)* label);
-    da_wgpuComputePipelineSetLabel wgpuComputePipelineSetLabel;
-
     // Methods of Device
-    alias da_wgpuDeviceCreateBindGroup = WGPUBindGroup function(WGPUDevice device, const(WGPUBindGroupDescriptor)* descriptor);
-    da_wgpuDeviceCreateBindGroup wgpuDeviceCreateBindGroup;
+    WGPUProcDeviceCreateBindGroup wgpuDeviceCreateBindGroup;
+    WGPUProcDeviceCreateBindGroupLayout wgpuDeviceCreateBindGroupLayout;
+    WGPUProcDeviceCreateBuffer wgpuDeviceCreateBuffer;
+    WGPUProcDeviceCreateCommandEncoder wgpuDeviceCreateCommandEncoder;
+    WGPUProcDeviceCreateComputePipeline wgpuDeviceCreateComputePipeline;
+    WGPUProcDeviceCreateComputePipelineAsync wgpuDeviceCreateComputePipelineAsync;
+    WGPUProcDeviceCreatePipelineLayout wgpuDeviceCreatePipelineLayout;
+    WGPUProcDeviceCreateQuerySet wgpuDeviceCreateQuerySet;
+    WGPUProcDeviceCreateRenderBundleEncoder wgpuDeviceCreateRenderBundleEncoder;
+    WGPUProcDeviceCreateRenderPipeline wgpuDeviceCreateRenderPipeline;
+    WGPUProcDeviceCreateRenderPipelineAsync wgpuDeviceCreateRenderPipelineAsync;
+    WGPUProcDeviceCreateSampler wgpuDeviceCreateSampler;
+    WGPUProcDeviceCreateShaderModule wgpuDeviceCreateShaderModule;
+    WGPUProcDeviceCreateSwapChain wgpuDeviceCreateSwapChain;
+    WGPUProcDeviceCreateTexture wgpuDeviceCreateTexture;
+    WGPUProcDeviceDestroy wgpuDeviceDestroy;
+    WGPUProcDeviceEnumerateFeatures wgpuDeviceEnumerateFeatures;
+    WGPUProcDeviceGetLimits wgpuDeviceGetLimits;
+    WGPUProcDeviceGetQueue wgpuDeviceGetQueue;
+    WGPUProcDeviceHasFeature wgpuDeviceHasFeature;
+    WGPUProcDevicePopErrorScope wgpuDevicePopErrorScope;
+    WGPUProcDevicePushErrorScope wgpuDevicePushErrorScope;
+    //WGPUProcDeviceSetDeviceLostCallback wgpuDeviceSetDeviceLostCallback;
+    WGPUProcDeviceSetLabel wgpuDeviceSetLabel;
+    WGPUProcDeviceSetUncapturedErrorCallback wgpuDeviceSetUncapturedErrorCallback;
+    WGPUProcDeviceReference wgpuDeviceReference;
+    WGPUProcDeviceRelease wgpuDeviceRelease;
     
-    alias da_wgpuDeviceCreateBindGroupLayout = WGPUBindGroupLayout function(WGPUDevice device, const(WGPUBindGroupLayoutDescriptor)* descriptor);
-    da_wgpuDeviceCreateBindGroupLayout wgpuDeviceCreateBindGroupLayout;
-    
-    alias da_wgpuDeviceCreateBuffer = WGPUBuffer function(WGPUDevice device, const(WGPUBufferDescriptor)* descriptor);
-    da_wgpuDeviceCreateBuffer wgpuDeviceCreateBuffer;
-    
-    alias da_wgpuDeviceCreateCommandEncoder = WGPUCommandEncoder function(WGPUDevice device, const(WGPUCommandEncoderDescriptor)* descriptor);
-    da_wgpuDeviceCreateCommandEncoder wgpuDeviceCreateCommandEncoder;
-    
-    alias da_wgpuDeviceCreateComputePipeline = WGPUComputePipeline function(WGPUDevice device, const(WGPUComputePipelineDescriptor)* descriptor);
-    da_wgpuDeviceCreateComputePipeline wgpuDeviceCreateComputePipeline;
-    
-    alias da_wgpuDeviceCreateComputePipelineAsync = void function(WGPUDevice device, const(WGPUComputePipelineDescriptor)* descriptor, WGPUCreateComputePipelineAsyncCallback callback, void* userdata);
-    da_wgpuDeviceCreateComputePipelineAsync wgpuDeviceCreateComputePipelineAsync;
-    
-    alias da_wgpuDeviceCreatePipelineLayout = WGPUPipelineLayout function(WGPUDevice device, const(WGPUPipelineLayoutDescriptor)* descriptor);
-    da_wgpuDeviceCreatePipelineLayout wgpuDeviceCreatePipelineLayout;
-    
-    alias da_wgpuDeviceCreateQuerySet = WGPUQuerySet function(WGPUDevice device, const(WGPUQuerySetDescriptor)* descriptor);
-    da_wgpuDeviceCreateQuerySet wgpuDeviceCreateQuerySet;
-    
-    alias da_wgpuDeviceCreateRenderBundleEncoder = WGPURenderBundleEncoder function(WGPUDevice device, const(WGPURenderBundleEncoderDescriptor)* descriptor);
-    da_wgpuDeviceCreateRenderBundleEncoder wgpuDeviceCreateRenderBundleEncoder;
-    
-    alias da_wgpuDeviceCreateRenderPipeline = WGPURenderPipeline function(WGPUDevice device, const(WGPURenderPipelineDescriptor)* descriptor);
-    da_wgpuDeviceCreateRenderPipeline wgpuDeviceCreateRenderPipeline;
-    
-    alias da_wgpuDeviceCreateRenderPipelineAsync = void function(WGPUDevice device, const(WGPURenderPipelineDescriptor)* descriptor, WGPUCreateRenderPipelineAsyncCallback callback, void* userdata);
-    da_wgpuDeviceCreateRenderPipelineAsync wgpuDeviceCreateRenderPipelineAsync;
-    
-    alias da_wgpuDeviceCreateSampler = WGPUSampler function(WGPUDevice device, const(WGPUSamplerDescriptor)* descriptor);
-    da_wgpuDeviceCreateSampler wgpuDeviceCreateSampler;
-    
-    alias da_wgpuDeviceCreateShaderModule = WGPUShaderModule function(WGPUDevice device, const(WGPUShaderModuleDescriptor)* descriptor);
-    da_wgpuDeviceCreateShaderModule wgpuDeviceCreateShaderModule;
-    
-    alias da_wgpuDeviceCreateSwapChain = WGPUSwapChain function(WGPUDevice device, WGPUSurface surface, const(WGPUSwapChainDescriptor)* descriptor);
-    da_wgpuDeviceCreateSwapChain wgpuDeviceCreateSwapChain;
-    
-    alias da_wgpuDeviceCreateTexture = WGPUTexture function(WGPUDevice device, const(WGPUTextureDescriptor)* descriptor);
-    da_wgpuDeviceCreateTexture wgpuDeviceCreateTexture;
-    
-    alias da_wgpuDeviceDestroy = void function(WGPUDevice device);
-    da_wgpuDeviceDestroy wgpuDeviceDestroy;
-    
-    alias da_wgpuDeviceEnumerateFeatures = size_t function(WGPUDevice device, WGPUFeatureName* features);
-    da_wgpuDeviceEnumerateFeatures wgpuDeviceEnumerateFeatures;
-    
-    alias da_wgpuDeviceGetLimits = bool function(WGPUDevice device, WGPUSupportedLimits* limits);
-    da_wgpuDeviceGetLimits wgpuDeviceGetLimits;
-    
-    alias da_wgpuDeviceGetQueue = WGPUQueue function(WGPUDevice device);
-    da_wgpuDeviceGetQueue wgpuDeviceGetQueue;
-    
-    alias da_wgpuDeviceHasFeature = bool function(WGPUDevice device, WGPUFeatureName feature);
-    da_wgpuDeviceHasFeature wgpuDeviceHasFeature;
-    
-    alias da_wgpuDevicePopErrorScope = bool function(WGPUDevice device, WGPUErrorCallback callback, void* userdata);
-    da_wgpuDevicePopErrorScope wgpuDevicePopErrorScope;
-    
-    alias da_wgpuDevicePushErrorScope = void function(WGPUDevice device, WGPUErrorFilter filter);
-    da_wgpuDevicePushErrorScope wgpuDevicePushErrorScope;
-    
-    alias da_wgpuDeviceSetDeviceLostCallback = void function(WGPUDevice device, WGPUDeviceLostCallback callback, void* userdata);
-    da_wgpuDeviceSetDeviceLostCallback wgpuDeviceSetDeviceLostCallback;
-    
-    alias da_wgpuDeviceSetLabel = void function(WGPUDevice device, const(char)* label);
-    da_wgpuDeviceSetLabel wgpuDeviceSetLabel;
-    
-    alias da_wgpuDeviceSetUncapturedErrorCallback = void function(WGPUDevice device, WGPUErrorCallback callback, void* userdata);
-    da_wgpuDeviceSetUncapturedErrorCallback wgpuDeviceSetUncapturedErrorCallback;
-
     // Methods of Instance
-    alias da_wgpuInstanceCreateSurface = WGPUSurface function(WGPUInstance instance, const(WGPUSurfaceDescriptor)* descriptor);
-    da_wgpuInstanceCreateSurface wgpuInstanceCreateSurface;
+    WGPUProcInstanceCreateSurface wgpuInstanceCreateSurface;
+    WGPUProcInstanceProcessEvents wgpuInstanceProcessEvents;
+    WGPUProcInstanceRequestAdapter wgpuInstanceRequestAdapter;
+    WGPUProcInstanceReference wgpuInstanceReference;
+    WGPUProcInstanceRelease wgpuInstanceRelease;
     
-    alias da_wgpuInstanceProcessEvents = void function(WGPUInstance instance);
-    da_wgpuInstanceProcessEvents wgpuInstanceProcessEvents;
-    
-    alias da_wgpuInstanceRequestAdapter = void function(WGPUInstance instance, const(WGPURequestAdapterOptions)* options, WGPURequestAdapterCallback callback, void* userdata);
-    da_wgpuInstanceRequestAdapter wgpuInstanceRequestAdapter;
-
     // Methods of PipelineLayout
-    alias da_wgpuPipelineLayoutSetLabel = void function(WGPUPipelineLayout pipelineLayout, const(char)* label);
-    da_wgpuPipelineLayoutSetLabel wgpuPipelineLayoutSetLabel;
-
+    WGPUProcPipelineLayoutSetLabel wgpuPipelineLayoutSetLabel;
+    WGPUProcPipelineLayoutReference wgpuPipelineLayoutReference;
+    WGPUProcPipelineLayoutRelease wgpuPipelineLayoutRelease;
+    
     // Methods of QuerySet
-    alias da_wgpuQuerySetDestroy = void function(WGPUQuerySet querySet);
-    da_wgpuQuerySetDestroy wgpuQuerySetDestroy;
+    WGPUProcQuerySetDestroy wgpuQuerySetDestroy;
+    WGPUProcQuerySetGetCount wgpuQuerySetGetCount;
+    WGPUProcQuerySetGetType wgpuQuerySetGetType;
+    WGPUProcQuerySetSetLabel wgpuQuerySetSetLabel;
+    WGPUProcQuerySetReference wgpuQuerySetReference;
+    WGPUProcQuerySetRelease wgpuQuerySetRelease;
     
-    alias da_wgpuQuerySetGetCount = uint function(WGPUQuerySet querySet);
-    da_wgpuQuerySetGetCount wgpuQuerySetGetCount;
-    
-    alias da_wgpuQuerySetGetType = WGPUQueryType function(WGPUQuerySet querySet);
-    da_wgpuQuerySetGetType wgpuQuerySetGetType;
-    
-    alias da_wgpuQuerySetSetLabel = void function(WGPUQuerySet querySet, const(char)* label);
-    da_wgpuQuerySetSetLabel wgpuQuerySetSetLabel;
-
     // Methods of Queue
-    alias da_wgpuQueueOnSubmittedWorkDone = void function(WGPUQueue queue, WGPUQueueWorkDoneCallback callback, void* userdata);
-    da_wgpuQueueOnSubmittedWorkDone wgpuQueueOnSubmittedWorkDone;
+    WGPUProcQueueOnSubmittedWorkDone wgpuQueueOnSubmittedWorkDone;
+    WGPUProcQueueSetLabel wgpuQueueSetLabel;
+    WGPUProcQueueSubmit wgpuQueueSubmit;
+    WGPUProcQueueWriteBuffer wgpuQueueWriteBuffer;
+    WGPUProcQueueWriteTexture wgpuQueueWriteTexture;
+    WGPUProcQueueReference wgpuQueueReference;
+    WGPUProcQueueRelease wgpuQueueRelease;
     
-    alias da_wgpuQueueSetLabel = void function(WGPUQueue queue, const(char)* label);
-    da_wgpuQueueSetLabel wgpuQueueSetLabel;
-    
-    alias da_wgpuQueueSubmit = void function(WGPUQueue queue, uint commandCount, const(WGPUCommandBuffer)* commands);
-    da_wgpuQueueSubmit wgpuQueueSubmit;
-    
-    alias da_wgpuQueueWriteBuffer = void function(WGPUQueue queue, WGPUBuffer buffer, ulong bufferOffset, const(void)* data, size_t size);
-    da_wgpuQueueWriteBuffer wgpuQueueWriteBuffer;
-    
-    alias da_wgpuQueueWriteTexture = void function(WGPUQueue queue, const(WGPUImageCopyTexture)* destination, const(void)* data, size_t dataSize, const(WGPUTextureDataLayout)* dataLayout, const(WGPUExtent3D)* writeSize);
-    da_wgpuQueueWriteTexture wgpuQueueWriteTexture;
-
     // Methods of RenderBundleEncoder
-    alias da_wgpuRenderBundleEncoderDraw = void function(WGPURenderBundleEncoder renderBundleEncoder, uint vertexCount, uint instanceCount, uint firstVertex, uint firstInstance);
-    da_wgpuRenderBundleEncoderDraw wgpuRenderBundleEncoderDraw;
+    WGPUProcRenderBundleSetLabel wgpuRenderBundleSetLabel;
+    WGPUProcRenderBundleReference wgpuRenderBundleReference;
+    WGPUProcRenderBundleRelease wgpuRenderBundleRelease;
     
-    alias da_wgpuRenderBundleEncoderDrawIndexed = void function(WGPURenderBundleEncoder renderBundleEncoder, uint indexCount, uint instanceCount, uint firstIndex, int baseVertex, uint firstInstance);
-    da_wgpuRenderBundleEncoderDrawIndexed wgpuRenderBundleEncoderDrawIndexed;
-    
-    alias da_wgpuRenderBundleEncoderDrawIndexedIndirect = void function(WGPURenderBundleEncoder renderBundleEncoder, WGPUBuffer indirectBuffer, ulong indirectOffset);
-    da_wgpuRenderBundleEncoderDrawIndexedIndirect wgpuRenderBundleEncoderDrawIndexedIndirect;
-    
-    alias da_wgpuRenderBundleEncoderDrawIndirect = void function(WGPURenderBundleEncoder renderBundleEncoder, WGPUBuffer indirectBuffer, ulong indirectOffset);
-    da_wgpuRenderBundleEncoderDrawIndirect wgpuRenderBundleEncoderDrawIndirect;
-    
-    alias da_wgpuRenderBundleEncoderFinish = WGPURenderBundle function(WGPURenderBundleEncoder renderBundleEncoder, const(WGPURenderBundleDescriptor)* descriptor);
-    da_wgpuRenderBundleEncoderFinish wgpuRenderBundleEncoderFinish;
-    
-    alias da_wgpuRenderBundleEncoderInsertDebugMarker = void function(WGPURenderBundleEncoder renderBundleEncoder, const(char)* markerLabel);
-    da_wgpuRenderBundleEncoderInsertDebugMarker wgpuRenderBundleEncoderInsertDebugMarker;
-    
-    alias da_wgpuRenderBundleEncoderPopDebugGroup = void function(WGPURenderBundleEncoder renderBundleEncoder);
-    da_wgpuRenderBundleEncoderPopDebugGroup wgpuRenderBundleEncoderPopDebugGroup;
-    
-    alias da_wgpuRenderBundleEncoderPushDebugGroup = void function(WGPURenderBundleEncoder renderBundleEncoder, const(char)* groupLabel);
-    da_wgpuRenderBundleEncoderPushDebugGroup wgpuRenderBundleEncoderPushDebugGroup;
-    
-    alias da_wgpuRenderBundleEncoderSetBindGroup = void function(WGPURenderBundleEncoder renderBundleEncoder, uint groupIndex, WGPUBindGroup group, uint dynamicOffsetCount, const(uint)* dynamicOffsets);
-    da_wgpuRenderBundleEncoderSetBindGroup wgpuRenderBundleEncoderSetBindGroup;
-    
-    alias da_wgpuRenderBundleEncoderSetIndexBuffer = void function(WGPURenderBundleEncoder renderBundleEncoder, WGPUBuffer buffer, WGPUIndexFormat format, ulong offset, ulong size);
-    da_wgpuRenderBundleEncoderSetIndexBuffer wgpuRenderBundleEncoderSetIndexBuffer;
-    
-    alias da_wgpuRenderBundleEncoderSetLabel = void function(WGPURenderBundleEncoder renderBundleEncoder, const(char)* label);
-    da_wgpuRenderBundleEncoderSetLabel wgpuRenderBundleEncoderSetLabel;
-    
-    alias da_wgpuRenderBundleEncoderSetPipeline = void function(WGPURenderBundleEncoder renderBundleEncoder, WGPURenderPipeline pipeline);
-    da_wgpuRenderBundleEncoderSetPipeline wgpuRenderBundleEncoderSetPipeline;
-    
-    alias da_wgpuRenderBundleEncoderSetVertexBuffer = void function(WGPURenderBundleEncoder renderBundleEncoder, uint slot, WGPUBuffer buffer, ulong offset, ulong size);
-    da_wgpuRenderBundleEncoderSetVertexBuffer wgpuRenderBundleEncoderSetVertexBuffer;
+    // Methods of RenderBundleEncoder
+    WGPUProcRenderBundleEncoderDraw wgpuRenderBundleEncoderDraw;
+    WGPUProcRenderBundleEncoderDrawIndexed wgpuRenderBundleEncoderDrawIndexed;
+    WGPUProcRenderBundleEncoderDrawIndexedIndirect wgpuRenderBundleEncoderDrawIndexedIndirect;
+    WGPUProcRenderBundleEncoderDrawIndirect wgpuRenderBundleEncoderDrawIndirect;
+    WGPUProcRenderBundleEncoderFinish wgpuRenderBundleEncoderFinish;
+    WGPUProcRenderBundleEncoderInsertDebugMarker wgpuRenderBundleEncoderInsertDebugMarker;
+    WGPUProcRenderBundleEncoderPopDebugGroup wgpuRenderBundleEncoderPopDebugGroup;
+    WGPUProcRenderBundleEncoderPushDebugGroup wgpuRenderBundleEncoderPushDebugGroup;
+    WGPUProcRenderBundleEncoderSetBindGroup wgpuRenderBundleEncoderSetBindGroup;
+    WGPUProcRenderBundleEncoderSetIndexBuffer wgpuRenderBundleEncoderSetIndexBuffer;
+    WGPUProcRenderBundleEncoderSetLabel wgpuRenderBundleEncoderSetLabel;
+    WGPUProcRenderBundleEncoderSetPipeline wgpuRenderBundleEncoderSetPipeline;
+    WGPUProcRenderBundleEncoderSetVertexBuffer wgpuRenderBundleEncoderSetVertexBuffer;
+    WGPUProcRenderBundleEncoderReference wgpuRenderBundleEncoderReference;
+    WGPUProcRenderBundleEncoderRelease wgpuRenderBundleEncoderRelease;
 
     // Methods of RenderPassEncoder
-    alias da_wgpuRenderPassEncoderBeginOcclusionQuery = void function(WGPURenderPassEncoder renderPassEncoder, uint queryIndex);
-    da_wgpuRenderPassEncoderBeginOcclusionQuery wgpuRenderPassEncoderBeginOcclusionQuery;
-    
-    alias da_wgpuRenderPassEncoderBeginPipelineStatisticsQuery = void function(WGPURenderPassEncoder renderPassEncoder, WGPUQuerySet querySet, uint queryIndex);
-    da_wgpuRenderPassEncoderBeginPipelineStatisticsQuery wgpuRenderPassEncoderBeginPipelineStatisticsQuery;
-    
-    alias da_wgpuRenderPassEncoderDraw = void function(WGPURenderPassEncoder renderPassEncoder, uint vertexCount, uint instanceCount, uint firstVertex, uint firstInstance);
-    da_wgpuRenderPassEncoderDraw wgpuRenderPassEncoderDraw;
-    
-    alias da_wgpuRenderPassEncoderDrawIndexed = void function(WGPURenderPassEncoder renderPassEncoder, uint indexCount, uint instanceCount, uint firstIndex, int baseVertex, uint firstInstance);
-    da_wgpuRenderPassEncoderDrawIndexed wgpuRenderPassEncoderDrawIndexed;
-    
-    alias da_wgpuRenderPassEncoderDrawIndexedIndirect = void function(WGPURenderPassEncoder renderPassEncoder, WGPUBuffer indirectBuffer, ulong indirectOffset);
-    da_wgpuRenderPassEncoderDrawIndexedIndirect wgpuRenderPassEncoderDrawIndexedIndirect;
-    
-    alias da_wgpuRenderPassEncoderDrawIndirect = void function(WGPURenderPassEncoder renderPassEncoder, WGPUBuffer indirectBuffer, ulong indirectOffset);
-    da_wgpuRenderPassEncoderDrawIndirect wgpuRenderPassEncoderDrawIndirect;
-    
-    alias da_wgpuRenderPassEncoderEnd = void function(WGPURenderPassEncoder renderPassEncoder);
-    da_wgpuRenderPassEncoderEnd wgpuRenderPassEncoderEnd;
-    
-    alias da_wgpuRenderPassEncoderEndOcclusionQuery = void function(WGPURenderPassEncoder renderPassEncoder);
-    da_wgpuRenderPassEncoderEndOcclusionQuery wgpuRenderPassEncoderEndOcclusionQuery;
-    
-    alias da_wgpuRenderPassEncoderEndPipelineStatisticsQuery = void function(WGPURenderPassEncoder renderPassEncoder);
-    da_wgpuRenderPassEncoderEndPipelineStatisticsQuery wgpuRenderPassEncoderEndPipelineStatisticsQuery;
-    
-    alias da_wgpuRenderPassEncoderExecuteBundles = void function(WGPURenderPassEncoder renderPassEncoder, uint bundleCount, const(WGPURenderBundle)* bundles);
-    da_wgpuRenderPassEncoderExecuteBundles wgpuRenderPassEncoderExecuteBundles;
-    
-    alias da_wgpuRenderPassEncoderInsertDebugMarker = void function(WGPURenderPassEncoder renderPassEncoder, const(char)* markerLabel);
-    da_wgpuRenderPassEncoderInsertDebugMarker wgpuRenderPassEncoderInsertDebugMarker;
-    
-    alias da_wgpuRenderPassEncoderPopDebugGroup = void function(WGPURenderPassEncoder renderPassEncoder);
-    da_wgpuRenderPassEncoderPopDebugGroup wgpuRenderPassEncoderPopDebugGroup;
-    
-    alias da_wgpuRenderPassEncoderPushDebugGroup = void function(WGPURenderPassEncoder renderPassEncoder, const(char)* groupLabel);
-    da_wgpuRenderPassEncoderPushDebugGroup wgpuRenderPassEncoderPushDebugGroup;
-    
-    alias da_wgpuRenderPassEncoderSetBindGroup = void function(WGPURenderPassEncoder renderPassEncoder, uint groupIndex, WGPUBindGroup group, uint dynamicOffsetCount, const(uint)* dynamicOffsets);
-    da_wgpuRenderPassEncoderSetBindGroup wgpuRenderPassEncoderSetBindGroup;
-    
-    alias da_wgpuRenderPassEncoderSetBlendConstant = void function(WGPURenderPassEncoder renderPassEncoder, const(WGPUColor)* color);
-    da_wgpuRenderPassEncoderSetBlendConstant wgpuRenderPassEncoderSetBlendConstant;
-    
-    alias da_wgpuRenderPassEncoderSetIndexBuffer = void function(WGPURenderPassEncoder renderPassEncoder, WGPUBuffer buffer, WGPUIndexFormat format, ulong offset, ulong size);
-    da_wgpuRenderPassEncoderSetIndexBuffer wgpuRenderPassEncoderSetIndexBuffer;
-    
-    alias da_wgpuRenderPassEncoderSetLabel = void function(WGPURenderPassEncoder renderPassEncoder, const(char)* label);
-    da_wgpuRenderPassEncoderSetLabel wgpuRenderPassEncoderSetLabel;
-    
-    alias da_wgpuRenderPassEncoderSetPipeline = void function(WGPURenderPassEncoder renderPassEncoder, WGPURenderPipeline pipeline);
-    da_wgpuRenderPassEncoderSetPipeline wgpuRenderPassEncoderSetPipeline;
-    
-    alias da_wgpuRenderPassEncoderSetScissorRect = void function(WGPURenderPassEncoder renderPassEncoder, uint x, uint y, uint width, uint height);
-    da_wgpuRenderPassEncoderSetScissorRect wgpuRenderPassEncoderSetScissorRect;
-    
-    alias da_wgpuRenderPassEncoderSetStencilReference = void function(WGPURenderPassEncoder renderPassEncoder, uint reference);
-    da_wgpuRenderPassEncoderSetStencilReference wgpuRenderPassEncoderSetStencilReference;
-    
-    alias da_wgpuRenderPassEncoderSetVertexBuffer = void function(WGPURenderPassEncoder renderPassEncoder, uint slot, WGPUBuffer buffer, ulong offset, ulong size);
-    da_wgpuRenderPassEncoderSetVertexBuffer wgpuRenderPassEncoderSetVertexBuffer;
-    
-    alias da_wgpuRenderPassEncoderSetViewport = void function(WGPURenderPassEncoder renderPassEncoder, float x, float y, float width, float height, float minDepth, float maxDepth);
-    da_wgpuRenderPassEncoderSetViewport wgpuRenderPassEncoderSetViewport;
+    WGPUProcRenderPassEncoderBeginOcclusionQuery wgpuRenderPassEncoderBeginOcclusionQuery;
+    WGPUProcRenderPassEncoderBeginPipelineStatisticsQuery wgpuRenderPassEncoderBeginPipelineStatisticsQuery;
+    WGPUProcRenderPassEncoderDraw wgpuRenderPassEncoderDraw;
+    WGPUProcRenderPassEncoderDrawIndexed wgpuRenderPassEncoderDrawIndexed;
+    WGPUProcRenderPassEncoderDrawIndexedIndirect wgpuRenderPassEncoderDrawIndexedIndirect;
+    WGPUProcRenderPassEncoderDrawIndirect wgpuRenderPassEncoderDrawIndirect;
+    WGPUProcRenderPassEncoderEnd wgpuRenderPassEncoderEnd;
+    WGPUProcRenderPassEncoderEndOcclusionQuery wgpuRenderPassEncoderEndOcclusionQuery;
+    WGPUProcRenderPassEncoderEndPipelineStatisticsQuery wgpuRenderPassEncoderEndPipelineStatisticsQuery;
+    WGPUProcRenderPassEncoderExecuteBundles wgpuRenderPassEncoderExecuteBundles;
+    WGPUProcRenderPassEncoderInsertDebugMarker wgpuRenderPassEncoderInsertDebugMarker;
+    WGPUProcRenderPassEncoderPopDebugGroup wgpuRenderPassEncoderPopDebugGroup;
+    WGPUProcRenderPassEncoderPushDebugGroup wgpuRenderPassEncoderPushDebugGroup;
+    WGPUProcRenderPassEncoderSetBindGroup wgpuRenderPassEncoderSetBindGroup;
+    WGPUProcRenderPassEncoderSetBlendConstant wgpuRenderPassEncoderSetBlendConstant;
+    WGPUProcRenderPassEncoderSetIndexBuffer wgpuRenderPassEncoderSetIndexBuffer;
+    WGPUProcRenderPassEncoderSetLabel wgpuRenderPassEncoderSetLabel;
+    WGPUProcRenderPassEncoderSetPipeline wgpuRenderPassEncoderSetPipeline;
+    WGPUProcRenderPassEncoderSetScissorRect wgpuRenderPassEncoderSetScissorRect;
+    WGPUProcRenderPassEncoderSetStencilReference wgpuRenderPassEncoderSetStencilReference;
+    WGPUProcRenderPassEncoderSetVertexBuffer wgpuRenderPassEncoderSetVertexBuffer;
+    WGPUProcRenderPassEncoderSetViewport wgpuRenderPassEncoderSetViewport;
+    WGPUProcRenderPassEncoderReference wgpuRenderPassEncoderReference;
+    WGPUProcRenderPassEncoderRelease wgpuRenderPassEncoderRelease;
 
     // Methods of RenderPipeline
-    alias da_wgpuRenderPipelineGetBindGroupLayout = WGPUBindGroupLayout function(WGPURenderPipeline renderPipeline, uint groupIndex);
-    da_wgpuRenderPipelineGetBindGroupLayout wgpuRenderPipelineGetBindGroupLayout;
-    
-    alias da_wgpuRenderPipelineSetLabel = void function(WGPURenderPipeline renderPipeline, const(char)* label);
-    da_wgpuRenderPipelineSetLabel wgpuRenderPipelineSetLabel;
+    WGPUProcRenderPipelineGetBindGroupLayout wgpuRenderPipelineGetBindGroupLayout;
+    WGPUProcRenderPipelineSetLabel wgpuRenderPipelineSetLabel;
+    WGPUProcRenderPipelineReference wgpuRenderPipelineReference;
+    WGPUProcRenderPipelineRelease wgpuRenderPipelineRelease;
 
     // Methods of Sampler
-    alias da_wgpuSamplerSetLabel = void function(WGPUSampler sampler, const(char)* label);
-    da_wgpuSamplerSetLabel wgpuSamplerSetLabel;
+    WGPUProcSamplerSetLabel wgpuSamplerSetLabel;
+    WGPUProcSamplerReference wgpuSamplerReference;
+    WGPUProcSamplerRelease wgpuSamplerRelease;
 
     // Methods of ShaderModule
-    alias da_wgpuShaderModuleGetCompilationInfo = void function(WGPUShaderModule shaderModule, WGPUCompilationInfoCallback callback, void* userdata);
-    da_wgpuShaderModuleGetCompilationInfo wgpuShaderModuleGetCompilationInfo;
-    
-    alias da_wgpuShaderModuleSetLabel = void function(WGPUShaderModule shaderModule, const(char)* label);
-    da_wgpuShaderModuleSetLabel wgpuShaderModuleSetLabel;
+    WGPUProcShaderModuleGetCompilationInfo wgpuShaderModuleGetCompilationInfo;
+    WGPUProcShaderModuleSetLabel wgpuShaderModuleSetLabel;
+    WGPUProcShaderModuleReference wgpuShaderModuleReference;
+    WGPUProcShaderModuleRelease wgpuShaderModuleRelease;
 
     // Methods of Surface
-    alias da_wgpuSurfaceGetPreferredFormat = WGPUTextureFormat function(WGPUSurface surface, WGPUAdapter adapter);
-    da_wgpuSurfaceGetPreferredFormat wgpuSurfaceGetPreferredFormat;
+    WGPUProcSurfaceGetPreferredFormat wgpuSurfaceGetPreferredFormat;
+    WGPUProcSurfaceReference wgpuSurfaceReference;
+    WGPUProcSurfaceRelease wgpuSurfaceRelease;
 
     // Methods of SwapChain
-    alias da_wgpuSwapChainGetCurrentTextureView = WGPUTextureView function(WGPUSwapChain swapChain);
-    da_wgpuSwapChainGetCurrentTextureView wgpuSwapChainGetCurrentTextureView;
-    
-    alias da_wgpuSwapChainPresent = void function(WGPUSwapChain swapChain);
-    da_wgpuSwapChainPresent wgpuSwapChainPresent;
+    WGPUProcSwapChainGetCurrentTextureView wgpuSwapChainGetCurrentTextureView;
+    WGPUProcSwapChainPresent wgpuSwapChainPresent;
+    WGPUProcSwapChainReference wgpuSwapChainReference;
+    WGPUProcSwapChainRelease wgpuSwapChainRelease;
 
     // Methods of Texture
-    alias da_wgpuTextureCreateView = WGPUTextureView function(WGPUTexture texture, const(WGPUTextureViewDescriptor)* descriptor);
-    da_wgpuTextureCreateView wgpuTextureCreateView;
-    
-    alias da_wgpuTextureDestroy = void function(WGPUTexture texture);
-    da_wgpuTextureDestroy wgpuTextureDestroy;
-    
-    alias da_wgpuTextureGetDepthOrArrayLayers = uint function(WGPUTexture texture);
-    da_wgpuTextureGetDepthOrArrayLayers wgpuTextureGetDepthOrArrayLayers;
-    
-    alias da_wgpuTextureGetDimension = WGPUTextureDimension function(WGPUTexture texture);
-    da_wgpuTextureGetDimension wgpuTextureGetDimension;
-    
-    alias da_wgpuTextureGetFormat = WGPUTextureFormat function(WGPUTexture texture);
-    da_wgpuTextureGetFormat wgpuTextureGetFormat;
-    
-    alias da_wgpuTextureGetHeight = uint function(WGPUTexture texture);
-    da_wgpuTextureGetHeight wgpuTextureGetHeight;
-    
-    alias da_wgpuTextureGetMipLevelCount = uint function(WGPUTexture texture);
-    da_wgpuTextureGetMipLevelCount wgpuTextureGetMipLevelCount;
-    
-    alias da_wgpuTextureGetSampleCount = uint function(WGPUTexture texture);
-    da_wgpuTextureGetSampleCount wgpuTextureGetSampleCount;
-    
-    alias da_wgpuTextureGetUsage = WGPUTextureUsage function(WGPUTexture texture);
-    da_wgpuTextureGetUsage wgpuTextureGetUsage;
-    
-    alias da_wgpuTextureGetWidth = uint function(WGPUTexture texture);
-    da_wgpuTextureGetWidth wgpuTextureGetWidth;
-    
-    alias da_wgpuTextureSetLabel = void function(WGPUTexture texture, const(char)* label);
-    da_wgpuTextureSetLabel wgpuTextureSetLabel;
+    WGPUProcTextureCreateView wgpuTextureCreateView;
+    WGPUProcTextureDestroy wgpuTextureDestroy;
+    WGPUProcTextureGetDepthOrArrayLayers wgpuTextureGetDepthOrArrayLayers;
+    WGPUProcTextureGetDimension wgpuTextureGetDimension;
+    WGPUProcTextureGetFormat wgpuTextureGetFormat;
+    WGPUProcTextureGetHeight wgpuTextureGetHeight;
+    WGPUProcTextureGetMipLevelCount wgpuTextureGetMipLevelCount;
+    WGPUProcTextureGetSampleCount wgpuTextureGetSampleCount;
+    WGPUProcTextureGetUsage wgpuTextureGetUsage;
+    WGPUProcTextureGetWidth wgpuTextureGetWidth;
+    WGPUProcTextureSetLabel wgpuTextureSetLabel;
+    WGPUProcTextureReference wgpuTextureReference;
+    WGPUProcTextureRelease wgpuTextureRelease;
 
-    // Methods of TextureVie
-    alias da_wgpuTextureViewSetLabel = void function(WGPUTextureView textureView, const(char)* label);
-    da_wgpuTextureViewSetLabel wgpuTextureViewSetLabel;
+    // Methods of TextureView
+    WGPUProcTextureViewSetLabel wgpuTextureViewSetLabel;
+    WGPUProcTextureViewReference wgpuTextureViewReference;
+    WGPUProcTextureViewRelease wgpuTextureViewRelease;
 
     //
-    alias da_wgpuGenerateReport = void function(WGPUInstance instance, WGPUGlobalReport* report);
-    da_wgpuGenerateReport wgpuGenerateReport;
-    
-    alias da_wgpuQueueSubmitForIndex = WGPUSubmissionIndex function(WGPUQueue queue, uint commandCount, const(WGPUCommandBuffer)* commands);
-    da_wgpuQueueSubmitForIndex wgpuQueueSubmitForIndex;
-    
-    alias da_wgpuDevicePoll = bool function(WGPUDevice device, bool wait, const(WGPUWrappedSubmissionIndex)* wrappedSubmissionIndex);
-    da_wgpuDevicePoll wgpuDevicePoll;
-    
-    alias da_wgpuSetLogCallback = void function(WGPULogCallback callback, void* userdata);
-    da_wgpuSetLogCallback wgpuSetLogCallback;
-    
-    alias da_wgpuSetLogLevel = void function(WGPULogLevel level);
-    da_wgpuSetLogLevel wgpuSetLogLevel;
-    
-    alias da_wgpuGetVersion = uint function();
-    da_wgpuGetVersion wgpuGetVersion;
-    
-    alias da_wgpuSurfaceGetCapabilities = void function(WGPUSurface surface, WGPUAdapter adapter, WGPUSurfaceCapabilities* capabilities);
-    da_wgpuSurfaceGetCapabilities wgpuSurfaceGetCapabilities;
-    
-    alias da_wgpuRenderPassEncoderSetPushConstants = void function(WGPURenderPassEncoder encoder, WGPUShaderStageFlags stages, uint offset, uint sizeBytes, void* data);
-    da_wgpuRenderPassEncoderSetPushConstants wgpuRenderPassEncoderSetPushConstants;
-    
-    alias da_wgpuRenderPassEncoderMultiDrawIndirect = void function(WGPURenderPassEncoder encoder, WGPUBuffer buffer, ulong offset, uint count);
-    da_wgpuRenderPassEncoderMultiDrawIndirect wgpuRenderPassEncoderMultiDrawIndirect;
-    
-    alias da_wgpuRenderPassEncoderMultiDrawIndexedIndirect = void function(WGPURenderPassEncoder encoder, WGPUBuffer buffer, ulong offset, uint count);
-    da_wgpuRenderPassEncoderMultiDrawIndexedIndirect wgpuRenderPassEncoderMultiDrawIndexedIndirect;
-    
-    alias da_wgpuRenderPassEncoderMultiDrawIndirectCount = void function(WGPURenderPassEncoder encoder, WGPUBuffer buffer, ulong offset, WGPUBuffer count_buffer, ulong count_buffer_offset, uint max_count);
-    da_wgpuRenderPassEncoderMultiDrawIndirectCount wgpuRenderPassEncoderMultiDrawIndirectCount;
-    
-    alias da_wgpuRenderPassEncoderMultiDrawIndexedIndirectCount = void function(WGPURenderPassEncoder encoder, WGPUBuffer buffer, ulong offset, WGPUBuffer count_buffer, ulong count_buffer_offset, uint max_count);
-    da_wgpuRenderPassEncoderMultiDrawIndexedIndirectCount wgpuRenderPassEncoderMultiDrawIndexedIndirectCount;
-    
-    alias da_wgpuInstanceDrop = void function(WGPUInstance instance);
-    da_wgpuInstanceDrop wgpuInstanceDrop;
-    
-    alias da_wgpuAdapterDrop = void function(WGPUAdapter adapter);
-    da_wgpuAdapterDrop wgpuAdapterDrop;
-    
-    alias da_wgpuBindGroupDrop = void function(WGPUBindGroup bindGroup);
-    da_wgpuBindGroupDrop wgpuBindGroupDrop;
-    
-    alias da_wgpuBindGroupLayoutDrop = void function(WGPUBindGroupLayout bindGroupLayout);
-    da_wgpuBindGroupLayoutDrop wgpuBindGroupLayoutDrop;
-    
-    alias da_wgpuBufferDrop = void function(WGPUBuffer buffer);
-    da_wgpuBufferDrop wgpuBufferDrop;
-    
-    alias da_wgpuCommandBufferDrop = void function(WGPUCommandBuffer commandBuffer);
-    da_wgpuCommandBufferDrop wgpuCommandBufferDrop;
-    
-    alias da_wgpuCommandEncoderDrop = void function(WGPUCommandEncoder commandEncoder);
-    da_wgpuCommandEncoderDrop wgpuCommandEncoderDrop;
-    
-    alias da_wgpuRenderPassEncoderDrop = void function(WGPURenderPassEncoder renderPassEncoder);
-    da_wgpuRenderPassEncoderDrop wgpuRenderPassEncoderDrop;
-    
-    alias da_wgpuComputePassEncoderDrop = void function(WGPUComputePassEncoder computePassEncoder);
-    da_wgpuComputePassEncoderDrop wgpuComputePassEncoderDrop;
-    
-    alias da_wgpuRenderBundleEncoderDrop = void function(WGPURenderBundleEncoder renderBundleEncoder);
-    da_wgpuRenderBundleEncoderDrop wgpuRenderBundleEncoderDrop;
-    
-    alias da_wgpuComputePipelineDrop = void function(WGPUComputePipeline computePipeline);
-    da_wgpuComputePipelineDrop wgpuComputePipelineDrop;
-    
-    alias da_wgpuDeviceDrop = void function(WGPUDevice device);
-    da_wgpuDeviceDrop wgpuDeviceDrop;
-    
-    alias da_wgpuPipelineLayoutDrop = void function(WGPUPipelineLayout pipelineLayout);
-    da_wgpuPipelineLayoutDrop wgpuPipelineLayoutDrop;
-    
-    alias da_wgpuQuerySetDrop = void function(WGPUQuerySet querySet);
-    da_wgpuQuerySetDrop wgpuQuerySetDrop;
-    
-    alias da_wgpuRenderBundleDrop = void function(WGPURenderBundle renderBundle);
-    da_wgpuRenderBundleDrop wgpuRenderBundleDrop;
-    
-    alias da_wgpuRenderPipelineDrop = void function(WGPURenderPipeline renderPipeline);
-    da_wgpuRenderPipelineDrop wgpuRenderPipelineDrop;
-    
-    alias da_wgpuSamplerDrop = void function(WGPUSampler sampler);
-    da_wgpuSamplerDrop wgpuSamplerDrop;
-    
-    alias da_wgpuShaderModuleDrop = void function(WGPUShaderModule shaderModule);
-    da_wgpuShaderModuleDrop wgpuShaderModuleDrop;
-    
-    alias da_wgpuSurfaceDrop = void function(WGPUSurface surface);
-    da_wgpuSurfaceDrop wgpuSurfaceDrop;
-    
-    alias da_wgpuSwapChainDrop = void function(WGPUSwapChain swapChain);
-    da_wgpuSwapChainDrop wgpuSwapChainDrop;
-    
-    alias da_wgpuTextureDrop = void function(WGPUTexture texture);
-    da_wgpuTextureDrop wgpuTextureDrop;
-    
-    alias da_wgpuTextureViewDrop = void function(WGPUTextureView textureView);
-    da_wgpuTextureViewDrop wgpuTextureViewDrop;
+    WGPUProcGenerateReport wgpuGenerateReport;
+    WGPUProcInstanceEnumerateAdapters wgpuInstanceEnumerateAdapters;
+    WGPUProcQueueSubmitForIndex wgpuQueueSubmitForIndex;
+    WGPUProcDevicePoll wgpuDevicePoll;
+    WGPUProcSetLogCallback wgpuSetLogCallback;
+    WGPUProcSetLogLevel wgpuSetLogLevel;
+    WGPUProcGetVersion wgpuGetVersion;
+    WGPUProcSurfaceGetCapabilities wgpuSurfaceGetCapabilities;
+    WGPUProcRenderPassEncoderSetPushConstants wgpuRenderPassEncoderSetPushConstants;
+    WGPUProcRenderPassEncoderMultiDrawIndirect wgpuRenderPassEncoderMultiDrawIndirect;
+    WGPUProcRenderPassEncoderMultiDrawIndexedIndirect wgpuRenderPassEncoderMultiDrawIndexedIndirect;
+    WGPUProcRenderPassEncoderMultiDrawIndirectCount wgpuRenderPassEncoderMultiDrawIndirectCount;
+    WGPUProcRenderPassEncoderMultiDrawIndexedIndirectCount wgpuRenderPassEncoderMultiDrawIndexedIndirectCount;
 }

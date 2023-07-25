@@ -36,7 +36,7 @@ enum WGPUSupport
 {
     noLibrary,
     badLibrary,
-    wgpu010
+    wgpu017
 }
 
 private
@@ -113,13 +113,13 @@ WGPUSupport loadWGPU(const(char)* libName)
     import std.algorithm.searching: startsWith;
     static foreach(m; __traits(allMembers, bindbc.wgpu.funcs))
     {
-        static if (m.startsWith("da_"))
+        static if (m.startsWith("wgpu"))
             lib.bindSymbol(
-                cast(void**)&__traits(getMember, bindbc.wgpu.funcs, m[3..$]),
-                __traits(getMember, bindbc.wgpu.funcs, m[3..$]).stringof);
+                cast(void**)&__traits(getMember, bindbc.wgpu.funcs, m),
+                __traits(getMember, bindbc.wgpu.funcs, m).stringof);
     }
     
-    loadedVersion = WGPUSupport.wgpu010;
+    loadedVersion = WGPUSupport.wgpu017;
     
     if (errorCount() != errCount)
         return WGPUSupport.badLibrary;

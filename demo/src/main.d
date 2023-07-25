@@ -70,6 +70,7 @@ void main(string[] args)
     
     if (SDL_Init(SDL_INIT_EVERYTHING) == -1)
         quit("Error: failed to init SDL: " ~ to!string(SDL_GetError()));
+    writeln("SDL OK");
 
     debug
     {
@@ -82,9 +83,11 @@ void main(string[] args)
 
     wgpuSetLogLevel(logLevel);
     wgpuSetLogCallback(&logCallback, null);
+    writeln("Log OK");
 
     WGPUInstanceDescriptor instanceDesc;
     WGPUInstance instance = wgpuCreateInstance(&instanceDesc);
+    writeln("Instance OK");
     
     uint winWidth = 1280;
     uint winHeight = 720;
@@ -92,6 +95,7 @@ void main(string[] args)
         SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
         winWidth, winHeight,
         SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
+    writeln("Window OK");
     
     SDL_SysWMinfo wmInfo;
     SDL_GetWindowWMInfo(sdlWindow, &wmInfo);
@@ -310,7 +314,7 @@ void main(string[] args)
         wgpuRenderPassEncoderSetBindGroup(renderPass, 0, bindGroup, 0, null);
         wgpuRenderPassEncoderDraw(renderPass, 3, 1, 0, 0);
         wgpuRenderPassEncoderEnd(renderPass);
-        wgpuTextureViewDrop(nextTextureView);
+        wgpuTextureViewRelease(nextTextureView);
         
         WGPUQueue queue = wgpuDeviceGetQueue(device);
         WGPUCommandBufferDescriptor cmdbufDesc = { label: null };
@@ -405,16 +409,16 @@ extern(C)
 {
     void logCallback(WGPULogLevel level, const(char)* msg, void* user_data)
     {
-        const (char)[] level_message;
+        const(char)[] level_message;
         switch(level)
         {
-            case WGPULogLevel.Off:level_message = "off";break;
-            case WGPULogLevel.Error:level_message = "error";break;
-            case WGPULogLevel.Warn:level_message = "warn";break;
-            case WGPULogLevel.Info:level_message = "info";break;
-            case WGPULogLevel.Debug:level_message = "debug";break;
-            case WGPULogLevel.Trace:level_message = "trace";break;
-            default: level_message = "-";
+            case WGPULogLevel.Off: level_message = "off"; break;
+            case WGPULogLevel.Error: level_message = "error"; break;
+            case WGPULogLevel.Warn: level_message = "warn"; break;
+            case WGPULogLevel.Info: level_message = "info"; break;
+            case WGPULogLevel.Debug: level_message = "debug"; break;
+            case WGPULogLevel.Trace: level_message = "trace"; break;
+            default: level_message = "-"; break;
         }
         writeln("WebGPU ", level_message, ": ",  to!string(msg));
     }

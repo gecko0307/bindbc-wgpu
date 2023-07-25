@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2019-2022 Timur Gafarov.
+Copyright (c) 2019-2023 Timur Gafarov.
 
 Boost Software License - Version 1.0 - August 17th, 2003
 
@@ -49,11 +49,12 @@ enum WGPUNativeSType
 
 enum WGPUNativeFeature
 {
-    PUSH_CONSTANTS = 0x60000001,
-    TEXTURE_ADAPTER_SPECIFIC_FORMAT_FEATURES = 0x60000002,
-    MULTI_DRAW_INDIRECT = 0x60000003,
-    MULTI_DRAW_INDIRECT_COUNT = 0x60000004,
-    VERTEX_WRITABLE_STORAGE = 0x60000005
+    PushConstants = 0x60000001,
+    TextureAdapterSpecificFormatFeatures = 0x60000002,
+    MultiDrawIndirect = 0x60000003,
+    MultiDrawIndirectCount = 0x60000004,
+    VertexWritableStorage = 0x60000005,
+    Force32 = 0x7FFFFFFF
 }
 
 enum WGPULogLevel
@@ -110,11 +111,13 @@ struct WGPUInstanceExtras
     const(char)* dxcPath;
 }
 
+/*
 struct WGPUAdapterExtras
 {
     WGPUChainedStruct chain;
     WGPUBackendType backend;
 }
+*/
 
 struct WGPUDeviceExtras
 {
@@ -227,4 +230,31 @@ struct WGPUSwapChainDescriptorExtras
     const(WGPUTextureFormat)* viewFormats;
 }
 
-alias WGPULogCallback = extern(C) void function (WGPULogLevel level, const(char)* message, void* userdata);
+struct WGPUInstanceEnumerateAdapterOptions
+{
+    const(WGPUChainedStruct)* nextInChain;
+    WGPUInstanceBackendFlags backends;
+}
+
+extern(C):
+
+alias WGPULogCallback = void function (WGPULogLevel level, const(char)* message, void* userdata);
+
+extern(C) @nogc nothrow:
+
+alias WGPUProcGenerateReport = void function(WGPUInstance instance, WGPUGlobalReport* report);
+alias WGPUProcInstanceEnumerateAdapters = size_t function(WGPUInstance instance, const(WGPUInstanceEnumerateAdapterOptions)* options, WGPUAdapter* adapters);
+alias WGPUProcQueueSubmitForIndex = WGPUSubmissionIndex function(WGPUQueue queue, size_t commandCount, const(WGPUCommandBuffer)* commands);
+
+// Returns true if the queue is empty, or false if there are more queue submissions still in flight.
+alias WGPUProcDevicePoll = bool function(WGPUDevice device, bool wait, const(WGPUWrappedSubmissionIndex)* wrappedSubmissionIndex);
+
+alias WGPUProcSetLogCallback = void function(WGPULogCallback callback, void* userdata);
+alias WGPUProcSetLogLevel = void function(WGPULogLevel level);
+alias WGPUProcGetVersion = uint function();
+alias WGPUProcSurfaceGetCapabilities = void function(WGPUSurface surface, WGPUAdapter adapter, WGPUSurfaceCapabilities* capabilities);
+alias WGPUProcRenderPassEncoderSetPushConstants = void function(WGPURenderPassEncoder encoder, WGPUShaderStageFlags stages, uint offset, uint sizeBytes, const(void)* data);
+alias WGPUProcRenderPassEncoderMultiDrawIndirect = void function(WGPURenderPassEncoder encoder, WGPUBuffer buffer, ulong offset, uint count);
+alias WGPUProcRenderPassEncoderMultiDrawIndexedIndirect = void function(WGPURenderPassEncoder encoder, WGPUBuffer buffer, ulong offset, uint count);
+alias WGPUProcRenderPassEncoderMultiDrawIndirectCount = void function(WGPURenderPassEncoder encoder, WGPUBuffer buffer, ulong offset, WGPUBuffer count_buffer, ulong count_buffer_offset, uint max_count);
+alias WGPUProcRenderPassEncoderMultiDrawIndexedIndirectCount = void function(WGPURenderPassEncoder encoder, WGPUBuffer buffer, ulong offset, WGPUBuffer count_buffer, ulong count_buffer_offset, uint max_count);
