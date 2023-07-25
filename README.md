@@ -14,6 +14,8 @@ Usage:
 
 Since 0.8.0, major and minor version numbers of the bindbc-wgpu package are in sync with wgpu-native versioning. Patch number can be different.
 
+Since 0.17.0, this binding doesn't provide dynamic libraries (libwgpu_native), you should install them by yourself.
+
 This repository also includes a simple triangle drawing example. More advanced demo can be found [here](https://github.com/gecko0307/wgpu-dlang).
 
 ## What is WebGPU?
