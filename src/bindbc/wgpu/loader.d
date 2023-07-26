@@ -111,12 +111,12 @@ WGPUSupport loadWGPU(const(char)* libName)
     loadedVersion = WGPUSupport.badLibrary;
     
     import std.algorithm.searching: startsWith;
-    static foreach(m; __traits(allMembers, bindbc.wgpu.funcs))
+    static foreach(symbol; __traits(allMembers, bindbc.wgpu.funcs))
     {
-        static if (m.startsWith("wgpu"))
+        static if (symbol.startsWith("wgpu"))
             lib.bindSymbol(
-                cast(void**)&__traits(getMember, bindbc.wgpu.funcs, m),
-                __traits(getMember, bindbc.wgpu.funcs, m).stringof);
+                cast(void**)&__traits(getMember, bindbc.wgpu.funcs, symbol),
+                __traits(getMember, bindbc.wgpu.funcs, symbol).stringof);
     }
     
     loadedVersion = WGPUSupport.wgpu017;
