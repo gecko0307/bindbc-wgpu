@@ -82,7 +82,7 @@ enum WGPUInstanceBackend
     Force32 = 0x7FFFFFFF
 }
 
-alias WGPUInstanceBackendFlags = uint;
+alias WGPUInstanceBackendFlags = WGPUFlags;
 
 enum WGPUDx12Compiler
 {
@@ -110,14 +110,6 @@ struct WGPUInstanceExtras
     const(char)* dxilPath;
     const(char)* dxcPath;
 }
-
-/*
-struct WGPUAdapterExtras
-{
-    WGPUChainedStruct chain;
-    WGPUBackendType backend;
-}
-*/
 
 struct WGPUDeviceExtras
 {

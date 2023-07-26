@@ -440,17 +440,6 @@ enum WGPUTextureAspect
     Force32 = 0x7FFFFFFF
 }
 
-/*
-enum WGPUTextureComponentType
-{
-    Float = 0x00000000,
-    Sint = 0x00000001,
-    Uint = 0x00000002,
-    DepthComparison = 0x00000003,
-    Force32 = 0x7FFFFFFF
-}
-*/
-
 enum WGPUTextureDimension
 {
     D1 = 0x00000000,
@@ -1458,7 +1447,6 @@ alias WGPUProcDeviceGetQueue = WGPUQueue* function (WGPUDevice device);
 alias WGPUProcDeviceHasFeature = bool function (WGPUDevice device, WGPUFeatureName feature);
 alias WGPUProcDevicePopErrorScope = bool function (WGPUDevice device, WGPUErrorCallback callback, void* userdata);
 alias WGPUProcDevicePushErrorScope = void function (WGPUDevice device, WGPUErrorFilter filter);
-//alias WGPUProcDeviceSetDeviceLostCallback = void function (WGPUDevice device, WGPUDeviceLostCallback callback, void* userdata);
 alias WGPUProcDeviceSetLabel = void function (WGPUDevice device, const(char)* label);
 alias WGPUProcDeviceSetUncapturedErrorCallback = void function (WGPUDevice device, WGPUErrorCallback callback, void* userdata);
 alias WGPUProcDeviceReference = void function (WGPUDevice device);
