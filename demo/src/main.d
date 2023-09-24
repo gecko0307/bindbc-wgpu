@@ -100,7 +100,7 @@ void main(string[] args)
     SDL_SysWMinfo wmInfo;
     SDL_GetWindowWMInfo(sdlWindow, &wmInfo);
     writeln("Subsystem: ", wmInfo.subsystem);
-    WGPUSurface surface = createSurface(instance, wmInfo);
+    WGPUSurface surface = createSurface(instance, sdlWindow, wmInfo);
     
     WGPUAdapter adapter;
     WGPURequestAdapterOptions adapterOpts = {
@@ -326,7 +326,7 @@ void main(string[] args)
     SDL_Quit();
 }
 
-WGPUSurface createSurface(WGPUInstance instance, SDL_SysWMinfo wmInfo)
+WGPUSurface createSurface(WGPUInstance instance, SDL_Window* window, SDL_SysWMinfo wmInfo)
 {
     WGPUSurface surface;
     version(Windows)
@@ -384,7 +384,7 @@ WGPUSurface createSurface(WGPUInstance instance, SDL_SysWMinfo wmInfo)
     else version(OSX)
     {
         // Needs test!
-        SDL_Renderer* renderer = SDL_CreateRenderer(window.sdlWindow, -1, SDL_RENDERER_PRESENTVSYNC);
+        SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_PRESENTVSYNC);
         auto metalLayer = SDL_RenderGetMetalLayer(renderer);
         
         WGPUSurfaceDescriptorFromMetalLayer sfdMetal = {
