@@ -18,7 +18,7 @@
     ],
     "mainSourceFile": "src/main.d",
     "targetType": "executable",
-    "lflags-posix": ["-rpath=."],
+    "lflags-linux": ["-rpath=."],
     "copyFiles-windows-x86": ["lib/x86/*.dll"],
     "copyFiles-windows-x86_64": ["lib/x64/*.dll"]
 }
