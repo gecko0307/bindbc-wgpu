@@ -38,10 +38,12 @@ enum ulong WGPU_COPY_STRIDE_UNDEFINED = 0xffffffffUL;
 enum ulong WGPU_LIMIT_U32_UNDEFINED = 0xffffffffUL;
 enum ulong WGPU_LIMIT_U64_UNDEFINED = 0xffffffffffffffffUL;
 enum ulong WGPU_MIP_LEVEL_COUNT_UNDEFINED = 0xffffffffUL;
+enum ulong WGPU_QUERY_SET_INDEX_UNDEFINED = 0xffffffffUL;
 enum ulong WGPU_WHOLE_MAP_SIZE = SIZE_MAX;
 enum ulong WGPU_WHOLE_SIZE = 0xffffffffffffffffUL;
 
 alias WGPUFlags = uint;
+alias WGPUBool = uint;
 
 alias WGPUAdapter = void*;
 alias WGPUBindGroup = void*;
@@ -63,7 +65,6 @@ alias WGPURenderPipeline = void*;
 alias WGPUSampler = void*;
 alias WGPUShaderModule = void*;
 alias WGPUSurface = void*;
-alias WGPUSwapChain = void*;
 alias WGPUTexture = void*;
 alias WGPUTextureView = void*;
 
@@ -138,7 +139,7 @@ enum WGPUBufferBindingType
 enum WGPUBufferMapAsyncStatus
 {
     Success = 0x00000000,
-    Error = 0x00000001,
+    ValidationError = 0x00000001,
     Unknown = 0x00000002,
     DeviceLost = 0x00000003,
     DestroyedBeforeCallback = 0x00000004,
@@ -187,10 +188,12 @@ enum WGPUCompilationMessageType
     Force32 = 0x7FFFFFFF
 }
 
-enum WGPUComputePassTimestampLocation
-{
-    Beginning = 0x00000000,
-    End = 0x00000001,
+enum WGPUCompositeAlphaMode {
+    Auto = 0x00000000,
+    Opaque = 0x00000001,
+    Premultiplied = 0x00000002,
+    Unpremultiplied = 0x00000003,
+    Inherit = 0x00000004,
     Force32 = 0x7FFFFFFF
 }
 
@@ -312,18 +315,12 @@ enum WGPUPowerPreference
     Force32 = 0x7FFFFFFF
 }
 
-enum WGPUPredefinedColorSpace
-{
-    Undefined = 0x00000000,
-    Srgb = 0x00000001,
-    Force32 = 0x7FFFFFFF
-}
-
 enum WGPUPresentMode
 {
-    Immediate = 0x00000000,
-    Mailbox = 0x00000001,
-    Fifo = 0x00000002,
+    Fifo = 0x00000000,
+    FifoRelaxed = 0x00000001,
+    Immediate = 0x00000002,
+    Mailbox = 0x00000003,
     Force32 = 0x7FFFFFFF
 }
 
@@ -351,13 +348,6 @@ enum WGPUQueueWorkDoneStatus
     Error = 0x00000001,
     Unknown = 0x00000002,
     DeviceLost = 0x00000003,
-    Force32 = 0x7FFFFFFF
-}
-
-enum WGPURenderPassTimestampLocation
-{
-    Beginning = 0x00000000,
-    End = 0x00000001,
     Force32 = 0x7FFFFFFF
 }
 
@@ -429,6 +419,16 @@ enum WGPUStoreOp
     Undefined = 0x00000000,
     Store = 0x00000001,
     Discard = 0x00000002,
+    Force32 = 0x7FFFFFFF
+}
+
+enum WGPUSurfaceGetCurrentTextureStatus {
+    Success = 0x00000000,
+    Timeout = 0x00000001,
+    Outdated = 0x00000002,
+    Lost = 0x00000003,
+    OutOfMemory = 0x00000004,
+    DeviceLost = 0x00000005,
     Force32 = 0x7FFFFFFF
 }
 
@@ -727,7 +727,7 @@ struct WGPUBufferBindingLayout
 {
     const(WGPUChainedStruct)* nextInChain;
     WGPUBufferBindingType type;
-    bool hasDynamicOffset;
+    WGPUBool hasDynamicOffset;
     ulong minBindingSize;
 }
 
@@ -737,7 +737,7 @@ struct WGPUBufferDescriptor
     const(char)* label; // nullable
     WGPUBufferUsageFlags usage;
     ulong size;
-    bool mappedAtCreation;
+    WGPUBool mappedAtCreation;
 }
 
 struct WGPUColor
@@ -774,11 +774,11 @@ struct WGPUCompilationMessage
     ulong utf16Length;
 }
 
-struct WGPUComputePassTimestampWrite
+struct WGPUComputePassTimestampWrites
 {
     WGPUQuerySet querySet;
-    uint queryIndex;
-    WGPUComputePassTimestampLocation location;
+    uint beginningOfPassWriteIndex;
+    uint endOfPassWriteIndex;
 }
 
 struct WGPUConstantEntry
@@ -810,6 +810,7 @@ struct WGPULimits
     uint maxTextureDimension3D = 2048;
     uint maxTextureArrayLayers = 256;
     uint maxBindGroups = 4;
+    uint maxBindGroupsPlusVertexBuffers = 24;
     uint maxBindingsPerBindGroup = 640;
     uint maxDynamicUniformBuffersPerPipelineLayout = 8;
     uint maxDynamicStorageBuffersPerPipelineLayout = 4;
@@ -843,7 +844,7 @@ struct WGPUMultisampleState
     const(WGPUChainedStruct)* nextInChain;
     uint count;
     uint mask;
-    bool alphaToCoverageEnabled;
+    WGPUBool alphaToCoverageEnabled;
 }
 
 struct WGPUOrigin3D
@@ -865,7 +866,7 @@ struct WGPUPipelineLayoutDescriptor
 struct WGPUPrimitiveDepthClipControl
 {
     WGPUChainedStruct chain;
-    bool unclippedDepth;
+    WGPUBool unclippedDepth;
 }
 
 struct WGPUPrimitiveState
@@ -903,12 +904,12 @@ struct WGPURenderBundleEncoderDescriptor
 {
     const(WGPUChainedStruct)* nextInChain;
     const(char)* label; // nullable
-    size_t colorFormatsCount;
+    size_t colorFormatCount;
     const(WGPUTextureFormat)* colorFormats;
     WGPUTextureFormat depthStencilFormat;
     uint sampleCount;
-    bool depthReadOnly;
-    bool stencilReadOnly;
+    WGPUBool depthReadOnly;
+    WGPUBool stencilReadOnly;
 }
 
 struct WGPURenderPassDepthStencilAttachment
@@ -917,11 +918,11 @@ struct WGPURenderPassDepthStencilAttachment
     WGPULoadOp depthLoadOp;
     WGPUStoreOp depthStoreOp;
     float depthClearValue;
-    bool depthReadOnly;
+    WGPUBool depthReadOnly;
     WGPULoadOp stencilLoadOp;
     WGPUStoreOp stencilStoreOp;
     uint stencilClearValue;
-    bool stencilReadOnly;
+    WGPUBool stencilReadOnly;
 }
 
 // Can be chained in WGPURenderPassDescriptor
@@ -931,11 +932,11 @@ struct WGPURenderPassDescriptorMaxDrawCount
     ulong maxDrawCount;
 }
 
-struct WGPURenderPassTimestampWrite
+struct WGPURenderPassTimestampWrites
 {
     WGPUQuerySet querySet;
-    uint queryIndex;
-    WGPURenderPassTimestampLocation location;
+    uint beginningOfPassWriteIndex;
+    uint endOfPassWriteIndex;
 }
 
 struct WGPURequestAdapterOptions
@@ -944,7 +945,7 @@ struct WGPURequestAdapterOptions
     WGPUSurface compatibleSurface; // nullable
     WGPUPowerPreference powerPreference;
     WGPUBackendType backendType;
-    bool forceFallbackAdapter;
+    WGPUBool forceFallbackAdapter;
 }
 
 struct WGPUSamplerBindingLayout
@@ -1010,6 +1011,31 @@ struct WGPUStorageTextureBindingLayout
     WGPUTextureViewDimension viewDimension;
 }
 
+struct WGPUSurfaceCapabilities
+{
+    WGPUChainedStructOut * nextInChain;
+    size_t formatCount;
+    WGPUTextureFormat* formats;
+    size_t presentModeCount;
+    WGPUPresentMode* presentModes;
+    size_t alphaModeCount;
+    WGPUCompositeAlphaMode* alphaModes;
+}
+
+struct WGPUSurfaceConfiguration
+{
+    const(WGPUChainedStruct)* nextInChain;
+    WGPUDevice device;
+    WGPUTextureFormat format;
+    WGPUTextureUsageFlags usage;
+    size_t viewFormatCount;
+    const(WGPUTextureFormat)* viewFormats;
+    WGPUCompositeAlphaMode alphaMode;
+    uint width;
+    uint height;
+    WGPUPresentMode presentMode;
+}
+
 struct WGPUSurfaceDescriptor
 {
     const(WGPUChainedStruct)* nextInChain;
@@ -1069,15 +1095,11 @@ struct WGPUSurfaceDescriptorFromXlibWindow
     uint window;
 }
 
-struct WGPUSwapChainDescriptor
+struct WGPUSurfaceTexture
 {
-    const(WGPUChainedStruct)* nextInChain;
-    const(char)* label; // nullable
-    WGPUTextureUsageFlags usage;
-    WGPUTextureFormat format;
-    uint width;
-    uint height;
-    WGPUPresentMode presentMode;
+    WGPUTexture texture;
+    WGPUBool suboptimal;
+    WGPUSurfaceGetCurrentTextureStatus status;
 }
 
 struct WGPUTextureBindingLayout
@@ -1085,7 +1107,7 @@ struct WGPUTextureBindingLayout
     const(WGPUChainedStruct)* nextInChain;
     WGPUTextureSampleType sampleType;
     WGPUTextureViewDimension viewDimension;
-    bool multisampled;
+    WGPUBool multisampled;
 }
 
 struct WGPUTextureDataLayout
@@ -1153,15 +1175,14 @@ struct WGPUComputePassDescriptor
 {
     const(WGPUChainedStruct)* nextInChain;
     const(char)* label; // nullable
-    size_t timestampWriteCount;
-    const(WGPUComputePassTimestampWrite)* timestampWrites;
+    const(WGPUComputePassTimestampWrites)* timestampWrites;
 }
 
 struct WGPUDepthStencilState
 {
     const(WGPUChainedStruct)* nextInChain;
     WGPUTextureFormat format;
-    bool depthWriteEnabled;
+    WGPUBool depthWriteEnabled;
     WGPUCompareFunction depthCompare;
     WGPUStencilFaceState stencilFront;
     WGPUStencilFaceState stencilBack;
@@ -1199,6 +1220,7 @@ struct WGPUProgrammableStageDescriptor
 
 struct WGPURenderPassColorAttachment
 {
+    const(WGPUChainedStruct)* nextInChain;
     WGPUTextureView view; // nullable
     WGPUTextureView resolveTarget; // nullable
     WGPULoadOp loadOp;
@@ -1276,7 +1298,7 @@ struct WGPUDeviceDescriptor
 {
     const(WGPUChainedStruct)* nextInChain;
     const(char)* label; // nullable
-    size_t requiredFeaturesCount;
+    size_t requiredFeatureCount;
     const(WGPUFeatureName)* requiredFeatures;
     const(WGPURequiredLimits)* requiredLimits; // nullable
     WGPUQueueDescriptor defaultQueue;
@@ -1292,8 +1314,7 @@ struct WGPURenderPassDescriptor
     const(WGPURenderPassColorAttachment)* colorAttachments;
     const(WGPURenderPassDepthStencilAttachment)* depthStencilAttachment; // nullable
     WGPUQuerySet occlusionQuerySet; // nullable
-    size_t timestampWriteCount;
-    const(WGPURenderPassTimestampWrite)* timestampWrites;
+    const(WGPURenderPassTimestampWrites)* timestampWrites;
 }
 
 struct WGPUVertexState
@@ -1350,9 +1371,9 @@ alias WGPUProcGetProcAddress = void function (WGPUDevice device, const(char)* pr
 
 // Procs of Adapter
 alias WGPUProcAdapterEnumerateFeatures = size_t function (WGPUAdapter adapter, WGPUFeatureName* features);
-alias WGPUProcAdapterGetLimits = bool function (WGPUAdapter adapter, WGPUSupportedLimits* limits);
+alias WGPUProcAdapterGetLimits = WGPUBool function (WGPUAdapter adapter, WGPUSupportedLimits* limits);
 alias WGPUProcAdapterGetProperties = void function (WGPUAdapter adapter, WGPUAdapterProperties* properties);
-alias WGPUProcAdapterHasFeature = bool function (WGPUAdapter adapter, WGPUFeatureName feature);
+alias WGPUProcAdapterHasFeature = WGPUBool function (WGPUAdapter adapter, WGPUFeatureName feature);
 alias WGPUProcAdapterRequestDevice = void function (WGPUAdapter adapter, const(WGPUDeviceDescriptor)* descriptor /* nullable */, WGPURequestDeviceCallback callback, void* userdata);
 alias WGPUProcAdapterReference = void function(WGPUAdapter adapter);
 alias WGPUProcAdapterRelease = void function(WGPUAdapter adapter);
@@ -1438,14 +1459,13 @@ alias WGPUProcDeviceCreateRenderPipeline = WGPURenderPipeline* function (WGPUDev
 alias WGPUProcDeviceCreateRenderPipelineAsync = void function (WGPUDevice device, const(WGPURenderPipelineDescriptor)* descriptor, WGPUCreateRenderPipelineAsyncCallback callback, void* userdata);
 alias WGPUProcDeviceCreateSampler = WGPUSampler* function (WGPUDevice device, const(WGPUSamplerDescriptor)* descriptor /* nullable */);
 alias WGPUProcDeviceCreateShaderModule = WGPUShaderModule* function (WGPUDevice device, const(WGPUShaderModuleDescriptor)* descriptor);
-alias WGPUProcDeviceCreateSwapChain = WGPUSwapChain* function (WGPUDevice device, WGPUSurface surface, const(WGPUSwapChainDescriptor)* descriptor);
 alias WGPUProcDeviceCreateTexture = WGPUTexture* function (WGPUDevice device, const(WGPUTextureDescriptor)* descriptor);
 alias WGPUProcDeviceDestroy = void function (WGPUDevice device);
 alias WGPUProcDeviceEnumerateFeatures = size_t function (WGPUDevice device, WGPUFeatureName* features);
-alias WGPUProcDeviceGetLimits = bool function (WGPUDevice device, WGPUSupportedLimits* limits);
+alias WGPUProcDeviceGetLimits = WGPUBool function (WGPUDevice device, WGPUSupportedLimits* limits);
 alias WGPUProcDeviceGetQueue = WGPUQueue* function (WGPUDevice device);
-alias WGPUProcDeviceHasFeature = bool function (WGPUDevice device, WGPUFeatureName feature);
-alias WGPUProcDevicePopErrorScope = bool function (WGPUDevice device, WGPUErrorCallback callback, void* userdata);
+alias WGPUProcDeviceHasFeature = WGPUBool function (WGPUDevice device, WGPUFeatureName feature);
+alias WGPUProcDevicePopErrorScope = void function (WGPUDevice device, WGPUErrorCallback callback, void* userdata);
 alias WGPUProcDevicePushErrorScope = void function (WGPUDevice device, WGPUErrorFilter filter);
 alias WGPUProcDeviceSetLabel = void function (WGPUDevice device, const(char)* label);
 alias WGPUProcDeviceSetUncapturedErrorCallback = void function (WGPUDevice device, WGPUErrorCallback callback, void* userdata);
@@ -1547,15 +1567,17 @@ alias WGPUProcShaderModuleReference = void function (WGPUShaderModule shaderModu
 alias WGPUProcShaderModuleRelease = void function (WGPUShaderModule shaderModule);
 
 // Procs of Surface
+alias WGPUProcSurfaceConfigure = void function (WGPUSurface surface, const(WGPUSurfaceConfiguration)* config);
+alias WGPUProcSurfaceGetCapabilities = void function (WGPUSurface surface, WGPUAdapter adapter, WGPUSurfaceCapabilities* capabilities);
+alias WGPUProcSurfaceGetCurrentTexture = void function (WGPUSurface surface, WGPUSurfaceTexture * surfaceTexture);
 alias WGPUProcSurfaceGetPreferredFormat = WGPUTextureFormat function (WGPUSurface surface, WGPUAdapter adapter);
+alias WGPUProcSurfacePresent = void function (WGPUSurface surface);
+alias WGPUProcSurfaceUnconfigure = void function (WGPUSurface surface);
 alias WGPUProcSurfaceReference = void function (WGPUSurface surface);
 alias WGPUProcSurfaceRelease = void function (WGPUSurface surface);
 
-// Procs of SwapChain
-alias WGPUProcSwapChainGetCurrentTextureView = WGPUTextureView* function (WGPUSwapChain swapChain);
-alias WGPUProcSwapChainPresent = void function (WGPUSwapChain swapChain);
-alias WGPUProcSwapChainReference = void function (WGPUSwapChain swapChain);
-alias WGPUProcSwapChainRelease = void function (WGPUSwapChain swapChain);
+// Procs of SurfaceCapabilities
+alias WGPUProcSurfaceCapabilitiesFreeMembers = void function (WGPUSurfaceCapabilities capabilities);
 
 // Procs of Texture
 alias WGPUProcTextureCreateView = WGPUTextureView* function (WGPUTexture texture, const(WGPUTextureViewDescriptor)* descriptor /* nullable */);
@@ -1566,7 +1588,7 @@ alias WGPUProcTextureGetFormat = WGPUTextureFormat function (WGPUTexture texture
 alias WGPUProcTextureGetHeight = uint function (WGPUTexture texture);
 alias WGPUProcTextureGetMipLevelCount = uint function (WGPUTexture texture);
 alias WGPUProcTextureGetSampleCount = uint function (WGPUTexture texture);
-alias WGPUProcTextureGetUsage = WGPUTextureUsage function (WGPUTexture texture);
+alias WGPUProcTextureGetUsage = WGPUTextureUsageFlags function (WGPUTexture texture);
 alias WGPUProcTextureGetWidth = uint function (WGPUTexture texture);
 alias WGPUProcTextureSetLabel = void function (WGPUTexture texture, const(char)* label);
 alias WGPUProcTextureReference = void function (WGPUTexture texture);

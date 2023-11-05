@@ -68,7 +68,7 @@ void main(string[] args)
         SDL_SetHint(SDL_HINT_RENDER_DRIVER, toStringz("metal"));
     }
     
-    if (SDL_Init(SDL_INIT_EVERYTHING) == -1)
+    if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
         quit("Error: failed to init SDL: " ~ to!string(SDL_GetError()));
     writeln("SDL OK");
 
@@ -98,7 +98,11 @@ void main(string[] args)
     writeln("Window OK");
     
     SDL_SysWMinfo wmInfo;
-    SDL_GetWindowWMInfo(sdlWindow, &wmInfo);
+    SDL_VERSION(&wmInfo.version_); 
+    if(SDL_GetWindowWMInfo(sdlWindow, &wmInfo) != SDL_TRUE)
+    {
+        quit("Error: failed to init SDL: " ~ to!string(SDL_GetError()));
+    }
     writeln("Subsystem: ", wmInfo.subsystem);
     WGPUSurface surface = createSurface(instance, sdlWindow, wmInfo);
     
@@ -127,7 +131,7 @@ void main(string[] args)
     };
     WGPUDeviceDescriptor deviceDesc = {
         nextInChain: cast(const(WGPUChainedStruct)*)&deviceExtras,
-        requiredFeaturesCount: 0,
+        requiredFeatureCount: 0,
         requiredFeatures: null,
         requiredLimits: &limits
     };
@@ -173,8 +177,8 @@ void main(string[] args)
     WGPUPipelineLayout pipelineLayout = wgpuDeviceCreatePipelineLayout(device, &plDesc);
     writeln("Pipeline layout OK");
     
-    WGPUTextureFormat swapChainFormat = wgpuSurfaceGetPreferredFormat(surface, adapter);
-    writeln(swapChainFormat);
+    WGPUTextureFormat surfaceFormat = wgpuSurfaceGetPreferredFormat(surface, adapter);
+    writeln(surfaceFormat);
     
     WGPUBlendState blend = {
         color: {
@@ -189,7 +193,7 @@ void main(string[] args)
         }
     };
     WGPUColorTargetState cts = {
-        format: swapChainFormat,
+        format: surfaceFormat,
         blend: &blend,
         writeMask: WGPUColorWriteMask.All
     };
@@ -225,29 +229,23 @@ void main(string[] args)
     WGPURenderPipeline pipeline = wgpuDeviceCreateRenderPipeline(device, &rpDesc);
     writeln("Render pipeline OK");
     
-    WGPUSwapChain createSwapChain(uint w, uint h) {
-        WGPUSwapChainDescriptorExtras swcDescExtras = {
-            chain: {
-                next: null,
-                sType: cast(WGPUSType)WGPUNativeSType.SwapChainDescriptorExtras
-            },
-            alphaMode: WGPUCompositeAlphaMode.Auto,
-            viewFormatCount: 0,
-            viewFormats: null
-        };
-        
-        WGPUSwapChainDescriptor swcDesc = {
-            nextInChain: cast(WGPUChainedStruct*)&swcDescExtras,
+    void configureSurface(uint w, uint h) {
+        WGPUSurfaceConfiguration config = {
+            nextInChain: null,
+            device: device,
+            format: surfaceFormat,
             usage: WGPUTextureUsage.RenderAttachment,
-            format: swapChainFormat,
+            viewFormatCount: 0,
+            viewFormats: null,
+            alphaMode: WGPUCompositeAlphaMode.Auto,
             width: w,
             height: h,
             presentMode: WGPUPresentMode.Fifo
         };
-        return wgpuDeviceCreateSwapChain(device, surface, &swcDesc);
+        wgpuSurfaceConfigure(surface, &config);
     }
 
-    WGPUSwapChain swapChain = createSwapChain(winWidth, winHeight);
+    configureSurface(winWidth, winHeight);
     
     bool running = true;
     while(running)
@@ -263,7 +261,7 @@ void main(string[] args)
                         winWidth = event.window.data1;
                         winHeight = event.window.data2;
                         writeln("Resize: ", winWidth, "x", winHeight);
-                        swapChain = createSwapChain(winWidth, winHeight);
+                        configureSurface(winWidth, winHeight);
                     }
                     break;
                 case SDL_KEYUP:
@@ -287,9 +285,15 @@ void main(string[] args)
         if (isMinimized)
             continue;
         
-        WGPUTextureView nextTextureView = wgpuSwapChainGetCurrentTextureView(swapChain);
+        WGPUSurfaceTexture surfaceTexture;
+        wgpuSurfaceGetCurrentTexture(surface, &surfaceTexture);
+        if (surfaceTexture.status != WGPUSurfaceGetCurrentTextureStatus.Success)
+            continue;
+        
+        WGPUTextureView nextTextureView = wgpuTextureCreateView(surfaceTexture.texture, null);
         if (!nextTextureView)
             continue;
+        
         
         WGPUCommandEncoderDescriptor ceDesc = {
             label: "Command Encoder"
@@ -320,7 +324,7 @@ void main(string[] args)
         WGPUCommandBufferDescriptor cmdbufDesc = { label: null };
         WGPUCommandBuffer cmdBuffer = wgpuCommandEncoderFinish(encoder, &cmdbufDesc);
         wgpuQueueSubmit(queue, 1, &cmdBuffer);
-        wgpuSwapChainPresent(swapChain);
+        wgpuSurfacePresent(surface);
     }
     
     SDL_Quit();

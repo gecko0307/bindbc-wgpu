@@ -130,7 +130,6 @@ __gshared
     WGPUProcDeviceCreateRenderPipelineAsync wgpuDeviceCreateRenderPipelineAsync;
     WGPUProcDeviceCreateSampler wgpuDeviceCreateSampler;
     WGPUProcDeviceCreateShaderModule wgpuDeviceCreateShaderModule;
-    WGPUProcDeviceCreateSwapChain wgpuDeviceCreateSwapChain;
     WGPUProcDeviceCreateTexture wgpuDeviceCreateTexture;
     WGPUProcDeviceDestroy wgpuDeviceDestroy;
     WGPUProcDeviceEnumerateFeatures wgpuDeviceEnumerateFeatures;
@@ -240,15 +239,17 @@ __gshared
     WGPUProcShaderModuleRelease wgpuShaderModuleRelease;
 
     // Methods of Surface
+    WGPUProcSurfaceConfigure wgpuSurfaceConfigure;
+    WGPUProcSurfaceGetCapabilities wgpuSurfaceGetCapabilities;
+    WGPUProcSurfaceGetCurrentTexture wgpuSurfaceGetCurrentTexture;
     WGPUProcSurfaceGetPreferredFormat wgpuSurfaceGetPreferredFormat;
+    WGPUProcSurfacePresent wgpuSurfacePresent;
+    WGPUProcSurfaceUnconfigure wgpuSurfaceUnconfigure;
     WGPUProcSurfaceReference wgpuSurfaceReference;
     WGPUProcSurfaceRelease wgpuSurfaceRelease;
 
-    // Methods of SwapChain
-    WGPUProcSwapChainGetCurrentTextureView wgpuSwapChainGetCurrentTextureView;
-    WGPUProcSwapChainPresent wgpuSwapChainPresent;
-    WGPUProcSwapChainReference wgpuSwapChainReference;
-    WGPUProcSwapChainRelease wgpuSwapChainRelease;
+    // Methods of SurfaceCapabilities
+    WGPUProcSurfaceCapabilitiesFreeMembers wgpuSurfaceCapabilitiesFreeMembers;
 
     // Methods of Texture
     WGPUProcTextureCreateView wgpuTextureCreateView;
@@ -278,7 +279,6 @@ __gshared
     WGPUProcSetLogCallback wgpuSetLogCallback;
     WGPUProcSetLogLevel wgpuSetLogLevel;
     WGPUProcGetVersion wgpuGetVersion;
-    WGPUProcSurfaceGetCapabilities wgpuSurfaceGetCapabilities;
     WGPUProcRenderPassEncoderSetPushConstants wgpuRenderPassEncoderSetPushConstants;
     WGPUProcRenderPassEncoderMultiDrawIndirect wgpuRenderPassEncoderMultiDrawIndirect;
     WGPUProcRenderPassEncoderMultiDrawIndexedIndirect wgpuRenderPassEncoderMultiDrawIndexedIndirect;

@@ -36,24 +36,26 @@ import bindbc.wgpu.types;
 enum WGPUNativeSType
 {
     // Start at 6 to prevent collisions with webgpu STypes
-    DeviceExtras = 0x60000001,
-    AdapterExtras = 0x60000002,
-    RequiredLimitsExtras = 0x60000003,
-    PipelineLayoutExtras = 0x60000004,
-    ShaderModuleGLSLDescriptor = 0x60000005,
-    SupportedLimitsExtras = 0x60000003,
-    InstanceExtras = 0x60000006,
-    SwapChainDescriptorExtras = 0x60000007,
+    DeviceExtras = 0x00030001,
+    RequiredLimitsExtras = 0x00030002,
+    PipelineLayoutExtras = 0x00030003,
+    ShaderModuleGLSLDescriptor = 0x00030004,
+    SupportedLimitsExtras = 0x00030005,
+    InstanceExtras = 0x00030006,
+    BindGroupEntryExtras = 0x00030007,
+    BindGroupLayoutEntryExtras = 0x00030008,
     Force32 = 0x7FFFFFFF
 }
 
 enum WGPUNativeFeature
 {
-    PushConstants = 0x60000001,
-    TextureAdapterSpecificFormatFeatures = 0x60000002,
-    MultiDrawIndirect = 0x60000003,
-    MultiDrawIndirectCount = 0x60000004,
-    VertexWritableStorage = 0x60000005,
+    PushConstants = 0x00030001,
+    TextureAdapterSpecificFormatFeatures = 0x00030002,
+    MultiDrawIndirect = 0x00030003,
+    MultiDrawIndirectCount = 0x00030004,
+    VertexWritableStorage = 0x00030005,
+    TextureBindingArray = 0x00030006,
+    SampledTextureAndStorageBufferArrayNonUniformIndexing = 0x00030007,
     Force32 = 0x7FFFFFFF
 }
 
@@ -70,19 +72,30 @@ enum WGPULogLevel
 
 enum WGPUInstanceBackend
 {
-    Vulkan = 1 << 1,
-    GL = 1 << 5,
+    All = 0x00000000,
+    Vulkan = 1 << 0,
+    GL = 1 << 1,
     Metal = 1 << 2,
     DX12 = 1 << 3,
     DX11 = 1 << 4,
-    BrowserWebGPU = 1 << 6,
-    Primary = WGPUInstanceBackend.Vulkan | WGPUInstanceBackend.Metal | WGPUInstanceBackend.DX12 | WGPUInstanceBackend.BrowserWebGPU,
-    Secondary = WGPUInstanceBackend.GL | WGPUInstanceBackend.DX11,
-    None = 0x00000000,
+    BrowserWebGPU = 1 << 5,
+    Primary = Vulkan | Metal | DX12 | BrowserWebGPU,
+    Secondary = GL | DX11,
     Force32 = 0x7FFFFFFF
 }
 
 alias WGPUInstanceBackendFlags = WGPUFlags;
+
+enum WGPUInstanceFlag 
+{
+    Default = 0x00000000,
+    Debug = 1 << 0,
+    Validation = 1 << 1,
+    DiscardHalLabels = 1 << 2,
+    Force32 = 0x7FFFFFFF
+}
+
+alias WGPUInstanceFlags = WGPUFlags;
 
 enum WGPUDx12Compiler
 {
@@ -92,13 +105,11 @@ enum WGPUDx12Compiler
     Force32 = 0x7FFFFFFF
 }
 
-enum WGPUCompositeAlphaMode
-{
-    Auto = 0x00000000,
-    Opaque = 0x00000001,
-    PreMultiplied = 0x00000002,
-    PostMultiplied = 0x00000003,
-    Inherit = 0x00000004,
+enum WGPUGles3MinorVersion {
+    Automatic = 0x00000000,
+    Version0 = 0x00000001,
+    Version1 = 0x00000002,
+    Version2 = 0x00000003,
     Force32 = 0x7FFFFFFF
 }
 
@@ -106,9 +117,11 @@ struct WGPUInstanceExtras
 {
     WGPUChainedStruct chain;
     WGPUInstanceBackendFlags backends;
+    WGPUInstanceFlags flags;
     WGPUDx12Compiler dx12ShaderCompiler;
-    const(char)* dxilPath;
-    const(char)* dxcPath;
+    WGPUGles3MinorVersion gles3MinorVersion;
+    const char * dxilPath;
+    const char * dxcPath;
 }
 
 struct WGPUDeviceExtras
@@ -116,16 +129,22 @@ struct WGPUDeviceExtras
     WGPUChainedStruct chain;
     const(char)* tracePath;
 }
+
+struct WGPUNativeLimits {
+    uint maxPushConstantSize;
+    uint maxNonSamplerBindings;
+}
+
 struct WGPURequiredLimitsExtras
 {
     WGPUChainedStruct chain;
-    uint maxPushConstantSize;
+    WGPUNativeLimits limits;
 }
 
 struct WGPUSupportedLimitsExtras
 {
     WGPUChainedStructOut chain;
-    uint maxPushConstantSize;
+    WGPUNativeLimits limits;
 }
 
 struct WGPUPushConstantRange
@@ -204,28 +223,27 @@ struct WGPUGlobalReport
     WGPUHubReport gl;
 }
 
-struct WGPUSurfaceCapabilities
-{
-    size_t formatCount;
-    WGPUTextureFormat* formats;
-    size_t presentModeCount;
-    WGPUPresentMode* presentModes;
-    size_t alphaModeCount;
-    WGPUCompositeAlphaMode* alphaModes;
-}
-
-struct WGPUSwapChainDescriptorExtras
-{
-    WGPUChainedStruct chain;
-    WGPUCompositeAlphaMode alphaMode;
-    size_t viewFormatCount;
-    const(WGPUTextureFormat)* viewFormats;
-}
-
 struct WGPUInstanceEnumerateAdapterOptions
 {
     const(WGPUChainedStruct)* nextInChain;
     WGPUInstanceBackendFlags backends;
+}
+
+struct WGPUBindGroupEntryExtras
+{
+    WGPUChainedStruct chain;
+    const(WGPUBuffer)* buffers;
+    size_t bufferCount;
+    const(WGPUSampler)* samplers;
+    size_t samplerCount;
+    const(WGPUTextureView)* textureViews;
+    size_t textureViewCount;
+}
+
+struct WGPUBindGroupLayoutEntryExtras
+{
+    WGPUChainedStruct chain;
+    uint count;
 }
 
 extern(C):
@@ -236,17 +254,22 @@ extern(C) @nogc nothrow:
 
 alias WGPUProcGenerateReport = void function(WGPUInstance instance, WGPUGlobalReport* report);
 alias WGPUProcInstanceEnumerateAdapters = size_t function(WGPUInstance instance, const(WGPUInstanceEnumerateAdapterOptions)* options, WGPUAdapter* adapters);
+
 alias WGPUProcQueueSubmitForIndex = WGPUSubmissionIndex function(WGPUQueue queue, size_t commandCount, const(WGPUCommandBuffer)* commands);
 
 // Returns true if the queue is empty, or false if there are more queue submissions still in flight.
-alias WGPUProcDevicePoll = bool function(WGPUDevice device, bool wait, const(WGPUWrappedSubmissionIndex)* wrappedSubmissionIndex);
+alias WGPUProcDevicePoll = WGPUBool function(WGPUDevice device, WGPUBool wait, const(WGPUWrappedSubmissionIndex)* wrappedSubmissionIndex);
 
 alias WGPUProcSetLogCallback = void function(WGPULogCallback callback, void* userdata);
+
 alias WGPUProcSetLogLevel = void function(WGPULogLevel level);
+
 alias WGPUProcGetVersion = uint function();
-alias WGPUProcSurfaceGetCapabilities = void function(WGPUSurface surface, WGPUAdapter adapter, WGPUSurfaceCapabilities* capabilities);
+
 alias WGPUProcRenderPassEncoderSetPushConstants = void function(WGPURenderPassEncoder encoder, WGPUShaderStageFlags stages, uint offset, uint sizeBytes, const(void)* data);
+
 alias WGPUProcRenderPassEncoderMultiDrawIndirect = void function(WGPURenderPassEncoder encoder, WGPUBuffer buffer, ulong offset, uint count);
 alias WGPUProcRenderPassEncoderMultiDrawIndexedIndirect = void function(WGPURenderPassEncoder encoder, WGPUBuffer buffer, ulong offset, uint count);
+
 alias WGPUProcRenderPassEncoderMultiDrawIndirectCount = void function(WGPURenderPassEncoder encoder, WGPUBuffer buffer, ulong offset, WGPUBuffer count_buffer, ulong count_buffer_offset, uint max_count);
 alias WGPUProcRenderPassEncoderMultiDrawIndexedIndirectCount = void function(WGPURenderPassEncoder encoder, WGPUBuffer buffer, ulong offset, WGPUBuffer count_buffer, ulong count_buffer_offset, uint max_count);
