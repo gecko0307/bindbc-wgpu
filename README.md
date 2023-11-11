@@ -8,7 +8,7 @@ Dynamic binding to [gfx-rs/wgpu-native](https://github.com/gfx-rs/wgpu-native) b
 Usage:
 ```
 "dependencies": {
-    "bindbc-wgpu": "0.17.0"
+    "bindbc-wgpu": "0.18.0"
 }
 ```
 
@@ -26,4 +26,4 @@ It is a new low-level graphics and compute API for the Web that works on top of 
 Some useful links:
 * [WebGPU specification](https://www.w3.org/TR/webgpu/)
 * [WebGPU Shading Language specification](https://www.w3.org/TR/WGSL/)
-* [wgpu documentation](https://docs.rs/wgpu/0.16.0/wgpu/)
+* [wgpu documentation](https://docs.rs/wgpu/0.18.0/wgpu)
