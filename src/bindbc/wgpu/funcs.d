@@ -96,11 +96,9 @@ __gshared
     WGPUProcCommandEncoderRelease wgpuCommandEncoderRelease;
     
     // Methods of ComputePassEncoder
-    WGPUProcComputePassEncoderBeginPipelineStatisticsQuery wgpuComputePassEncoderBeginPipelineStatisticsQuery;
     WGPUProcComputePassEncoderDispatchWorkgroups wgpuComputePassEncoderDispatchWorkgroups;
     WGPUProcComputePassEncoderDispatchWorkgroupsIndirect wgpuComputePassEncoderDispatchWorkgroupsIndirect;
     WGPUProcComputePassEncoderEnd wgpuComputePassEncoderEnd;
-    WGPUProcComputePassEncoderEndPipelineStatisticsQuery wgpuComputePassEncoderEndPipelineStatisticsQuery;
     WGPUProcComputePassEncoderInsertDebugMarker wgpuComputePassEncoderInsertDebugMarker;
     WGPUProcComputePassEncoderPopDebugGroup wgpuComputePassEncoderPopDebugGroup;
     WGPUProcComputePassEncoderPushDebugGroup wgpuComputePassEncoderPushDebugGroup;
@@ -197,14 +195,12 @@ __gshared
 
     // Methods of RenderPassEncoder
     WGPUProcRenderPassEncoderBeginOcclusionQuery wgpuRenderPassEncoderBeginOcclusionQuery;
-    WGPUProcRenderPassEncoderBeginPipelineStatisticsQuery wgpuRenderPassEncoderBeginPipelineStatisticsQuery;
     WGPUProcRenderPassEncoderDraw wgpuRenderPassEncoderDraw;
     WGPUProcRenderPassEncoderDrawIndexed wgpuRenderPassEncoderDrawIndexed;
     WGPUProcRenderPassEncoderDrawIndexedIndirect wgpuRenderPassEncoderDrawIndexedIndirect;
     WGPUProcRenderPassEncoderDrawIndirect wgpuRenderPassEncoderDrawIndirect;
     WGPUProcRenderPassEncoderEnd wgpuRenderPassEncoderEnd;
     WGPUProcRenderPassEncoderEndOcclusionQuery wgpuRenderPassEncoderEndOcclusionQuery;
-    WGPUProcRenderPassEncoderEndPipelineStatisticsQuery wgpuRenderPassEncoderEndPipelineStatisticsQuery;
     WGPUProcRenderPassEncoderExecuteBundles wgpuRenderPassEncoderExecuteBundles;
     WGPUProcRenderPassEncoderInsertDebugMarker wgpuRenderPassEncoderInsertDebugMarker;
     WGPUProcRenderPassEncoderPopDebugGroup wgpuRenderPassEncoderPopDebugGroup;
@@ -284,4 +280,8 @@ __gshared
     WGPUProcRenderPassEncoderMultiDrawIndexedIndirect wgpuRenderPassEncoderMultiDrawIndexedIndirect;
     WGPUProcRenderPassEncoderMultiDrawIndirectCount wgpuRenderPassEncoderMultiDrawIndirectCount;
     WGPUProcRenderPassEncoderMultiDrawIndexedIndirectCount wgpuRenderPassEncoderMultiDrawIndexedIndirectCount;
+    WGPUProcComputePassEncoderBeginPipelineStatisticsQuery wgpuComputePassEncoderBeginPipelineStatisticsQuery;
+    WGPUProcComputePassEncoderEndPipelineStatisticsQuery wgpuComputePassEncoderEndPipelineStatisticsQuery;
+    WGPUProcRenderPassEncoderBeginPipelineStatisticsQuery wgpuRenderPassEncoderBeginPipelineStatisticsQuery;
+    WGPUProcRenderPassEncoderEndPipelineStatisticsQuery wgpuRenderPassEncoderEndPipelineStatisticsQuery;
 }

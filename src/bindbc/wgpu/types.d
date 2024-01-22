@@ -248,15 +248,14 @@ enum WGPUFeatureName
     DepthClipControl = 0x00000001,
     Depth32FloatStencil8 = 0x00000002,
     TimestampQuery = 0x00000003,
-    PipelineStatisticsQuery = 0x00000004,
-    TextureCompressionBC = 0x00000005,
-    TextureCompressionETC2 = 0x00000006,
-    TextureCompressionASTC = 0x00000007,
-    IndirectFirstInstance = 0x00000008,
-    ShaderF16 = 0x00000009,
-    RG11B10UfloatRenderable = 0x0000000A,
-    BGRA8UnormStorage = 0x0000000B,
-    Float32Filterable = 0x0000000C,
+    TextureCompressionBC = 0x00000004,
+    TextureCompressionETC2 = 0x00000005,
+    TextureCompressionASTC = 0x00000006,
+    IndirectFirstInstance = 0x00000007,
+    ShaderF16 = 0x00000008,
+    RG11B10UfloatRenderable = 0x00000009,
+    BGRA8UnormStorage = 0x0000000A,
+    Float32Filterable = 0x0000000B,
     Force32 = 0x7FFFFFFF
 }
 
@@ -297,6 +296,7 @@ enum WGPUMipmapFilterMode
     Force32 = 0x7FFFFFFF
 }
 
+/*
 enum WGPUPipelineStatisticName
 {
     VertexShaderInvocations = 0x00000000,
@@ -306,6 +306,7 @@ enum WGPUPipelineStatisticName
     ComputeShaderInvocations = 0x00000004,
     Force32 = 0x7FFFFFFF
 }
+*/
 
 enum WGPUPowerPreference
 {
@@ -337,8 +338,7 @@ enum WGPUPrimitiveTopology
 enum WGPUQueryType
 {
     Occlusion = 0x00000000,
-    PipelineStatistics = 0x00000001,
-    Timestamp = 0x00000002,
+    Timestamp = 0x00000001,
     Force32 = 0x7FFFFFFF
 }
 
@@ -411,6 +411,8 @@ enum WGPUStorageTextureAccess
 {
     Undefined = 0x00000000,
     WriteOnly = 0x00000001,
+    ReadOnly = 0x00000002,
+    ReadWrite = 0x00000003,
     Force32 = 0x7FFFFFFF
 }
 
@@ -475,76 +477,77 @@ enum WGPUTextureFormat
     RGBA8Sint = 0x00000016,
     BGRA8Unorm = 0x00000017,
     BGRA8UnormSrgb = 0x00000018,
-    RGB10A2Unorm = 0x00000019,
-    RG11B10Ufloat = 0x0000001A,
-    RGB9E5Ufloat = 0x0000001B,
-    RG32Float = 0x0000001C,
-    RG32Uint = 0x0000001D,
-    RG32Sint = 0x0000001E,
-    RGBA16Uint = 0x0000001F,
-    RGBA16Sint = 0x00000020,
-    RGBA16Float = 0x00000021,
-    RGBA32Float = 0x00000022,
-    RGBA32Uint = 0x00000023,
-    RGBA32Sint = 0x00000024,
-    Stencil8 = 0x00000025,
-    Depth16Unorm = 0x00000026,
-    Depth24Plus = 0x00000027,
-    Depth24PlusStencil8 = 0x00000028,
-    Depth32Float = 0x00000029,
-    Depth32FloatStencil8 = 0x0000002A,
-    BC1RGBAUnorm = 0x0000002B,
-    BC1RGBAUnormSrgb = 0x0000002C,
-    BC2RGBAUnorm = 0x0000002D,
-    BC2RGBAUnormSrgb = 0x0000002E,
-    BC3RGBAUnorm = 0x0000002F,
-    BC3RGBAUnormSrgb = 0x00000030,
-    BC4RUnorm = 0x00000031,
-    BC4RSnorm = 0x00000032,
-    BC5RGUnorm = 0x00000033,
-    BC5RGSnorm = 0x00000034,
-    BC6HRGBUfloat = 0x00000035,
-    BC6HRGBFloat = 0x00000036,
-    BC7RGBAUnorm = 0x00000037,
-    BC7RGBAUnormSrgb = 0x00000038,
-    ETC2RGB8Unorm = 0x00000039,
-    ETC2RGB8UnormSrgb = 0x0000003A,
-    ETC2RGB8A1Unorm = 0x0000003B,
-    ETC2RGB8A1UnormSrgb = 0x0000003C,
-    ETC2RGBA8Unorm = 0x0000003D,
-    ETC2RGBA8UnormSrgb = 0x0000003E,
-    EACR11Unorm = 0x0000003F,
-    EACR11Snorm = 0x00000040,
-    EACRG11Unorm = 0x00000041,
-    EACRG11Snorm = 0x00000042,
-    ASTC4x4Unorm = 0x00000043,
-    ASTC4x4UnormSrgb = 0x00000044,
-    ASTC5x4Unorm = 0x00000045,
-    ASTC5x4UnormSrgb = 0x00000046,
-    ASTC5x5Unorm = 0x00000047,
-    ASTC5x5UnormSrgb = 0x00000048,
-    ASTC6x5Unorm = 0x00000049,
-    ASTC6x5UnormSrgb = 0x0000004A,
-    ASTC6x6Unorm = 0x0000004B,
-    ASTC6x6UnormSrgb = 0x0000004C,
-    ASTC8x5Unorm = 0x0000004D,
-    ASTC8x5UnormSrgb = 0x0000004E,
-    ASTC8x6Unorm = 0x0000004F,
-    ASTC8x6UnormSrgb = 0x00000050,
-    ASTC8x8Unorm = 0x00000051,
-    ASTC8x8UnormSrgb = 0x00000052,
-    ASTC10x5Unorm = 0x00000053,
-    ASTC10x5UnormSrgb = 0x00000054,
-    ASTC10x6Unorm = 0x00000055,
-    ASTC10x6UnormSrgb = 0x00000056,
-    ASTC10x8Unorm = 0x00000057,
-    ASTC10x8UnormSrgb = 0x00000058,
-    ASTC10x10Unorm = 0x00000059,
-    ASTC10x10UnormSrgb = 0x0000005A,
-    ASTC12x10Unorm = 0x0000005B,
-    ASTC12x10UnormSrgb = 0x0000005C,
-    ASTC12x12Unorm = 0x0000005D,
-    ASTC12x12UnormSrgb = 0x0000005E,
+    RGB10A2Uint = 0x00000019,
+    RGB10A2Unorm = 0x0000001A,
+    RG11B10Ufloat = 0x0000001B,
+    RGB9E5Ufloat = 0x0000001C,
+    RG32Float = 0x0000001D,
+    RG32Uint = 0x0000001E,
+    RG32Sint = 0x0000001F,
+    RGBA16Uint = 0x00000020,
+    RGBA16Sint = 0x00000021,
+    RGBA16Float = 0x00000022,
+    RGBA32Float = 0x00000023,
+    RGBA32Uint = 0x00000024,
+    RGBA32Sint = 0x00000025,
+    Stencil8 = 0x00000026,
+    Depth16Unorm = 0x00000027,
+    Depth24Plus = 0x00000028,
+    Depth24PlusStencil8 = 0x00000029,
+    Depth32Float = 0x0000002A,
+    Depth32FloatStencil8 = 0x0000002B,
+    BC1RGBAUnorm = 0x0000002C,
+    BC1RGBAUnormSrgb = 0x0000002D,
+    BC2RGBAUnorm = 0x0000002E,
+    BC2RGBAUnormSrgb = 0x0000002F,
+    BC3RGBAUnorm = 0x00000030,
+    BC3RGBAUnormSrgb = 0x00000031,
+    BC4RUnorm = 0x00000032,
+    BC4RSnorm = 0x00000033,
+    BC5RGUnorm = 0x00000034,
+    BC5RGSnorm = 0x00000035,
+    BC6HRGBUfloat = 0x00000036,
+    BC6HRGBFloat = 0x00000037,
+    BC7RGBAUnorm = 0x00000038,
+    BC7RGBAUnormSrgb = 0x00000039,
+    ETC2RGB8Unorm = 0x0000003A,
+    ETC2RGB8UnormSrgb = 0x0000003B,
+    ETC2RGB8A1Unorm = 0x0000003C,
+    ETC2RGB8A1UnormSrgb = 0x0000003D,
+    ETC2RGBA8Unorm = 0x0000003E,
+    ETC2RGBA8UnormSrgb = 0x0000003F,
+    EACR11Unorm = 0x00000040,
+    EACR11Snorm = 0x00000041,
+    EACRG11Unorm = 0x00000042,
+    EACRG11Snorm = 0x00000043,
+    ASTC4x4Unorm = 0x00000044,
+    ASTC4x4UnormSrgb = 0x00000045,
+    ASTC5x4Unorm = 0x00000046,
+    ASTC5x4UnormSrgb = 0x00000047,
+    ASTC5x5Unorm = 0x00000048,
+    ASTC5x5UnormSrgb = 0x00000049,
+    ASTC6x5Unorm = 0x0000004A,
+    ASTC6x5UnormSrgb = 0x0000004B,
+    ASTC6x6Unorm = 0x0000004C,
+    ASTC6x6UnormSrgb = 0x0000004D,
+    ASTC8x5Unorm = 0x0000004E,
+    ASTC8x5UnormSrgb = 0x0000004F,
+    ASTC8x6Unorm = 0x00000050,
+    ASTC8x6UnormSrgb = 0x00000051,
+    ASTC8x8Unorm = 0x00000052,
+    ASTC8x8UnormSrgb = 0x00000053,
+    ASTC10x5Unorm = 0x00000054,
+    ASTC10x5UnormSrgb = 0x00000055,
+    ASTC10x6Unorm = 0x00000056,
+    ASTC10x6UnormSrgb = 0x00000057,
+    ASTC10x8Unorm = 0x00000058,
+    ASTC10x8UnormSrgb = 0x00000059,
+    ASTC10x10Unorm = 0x0000005A,
+    ASTC10x10UnormSrgb = 0x0000005B,
+    ASTC12x10Unorm = 0x0000005C,
+    ASTC12x10UnormSrgb = 0x0000005D,
+    ASTC12x12Unorm = 0x0000005E,
+    ASTC12x12UnormSrgb = 0x0000005F,
     Force32 = 0x7FFFFFFF
 }
 
@@ -884,8 +887,6 @@ struct WGPUQuerySetDescriptor
     const(char)* label; // nullable
     WGPUQueryType type;
     uint count;
-    const(WGPUPipelineStatisticName)* pipelineStatistics;
-    size_t pipelineStatisticsCount;
 }
 
 struct WGPUQueueDescriptor
@@ -1092,7 +1093,7 @@ struct WGPUSurfaceDescriptorFromXlibWindow
 {
     WGPUChainedStruct chain;
     void* display;
-    uint window;
+    ulong window;
 }
 
 struct WGPUSurfaceTexture
@@ -1213,7 +1214,7 @@ struct WGPUProgrammableStageDescriptor
 {
     const(WGPUChainedStruct)* nextInChain;
     WGPUShaderModule module_;
-    const(char)* entryPoint;
+    const(char)* entryPoint; // nullable
     size_t constantCount;
     const(WGPUConstantEntry)* constants;
 }
@@ -1314,14 +1315,14 @@ struct WGPURenderPassDescriptor
     const(WGPURenderPassColorAttachment)* colorAttachments;
     const(WGPURenderPassDepthStencilAttachment)* depthStencilAttachment; // nullable
     WGPUQuerySet occlusionQuerySet; // nullable
-    const(WGPURenderPassTimestampWrites)* timestampWrites;
+    const(WGPURenderPassTimestampWrites)* timestampWrites; // nullable
 }
 
 struct WGPUVertexState
 {
     const(WGPUChainedStruct)* nextInChain;
     WGPUShaderModule module_;
-    const(char)* entryPoint;
+    const(char)* entryPoint; // nullable
     size_t constantCount;
     const(WGPUConstantEntry)* constants;
     size_t bufferCount;
@@ -1332,7 +1333,7 @@ struct WGPUFragmentState
 {
     const(WGPUChainedStruct)* nextInChain;
     WGPUShaderModule module_;
-    const(char)* entryPoint;
+    const(char)* entryPoint; // nullable
     size_t constantCount;
     const(WGPUConstantEntry)* constants;
     size_t targetCount;
@@ -1425,11 +1426,9 @@ alias WGPUProcCommandEncoderReference = void function (WGPUCommandEncoder comman
 alias WGPUProcCommandEncoderRelease = void function (WGPUCommandEncoder commandEncoder);
 
 // Procs of ComputePassEncoder
-alias WGPUProcComputePassEncoderBeginPipelineStatisticsQuery = void function (WGPUComputePassEncoder computePassEncoder, WGPUQuerySet querySet, uint queryIndex);
 alias WGPUProcComputePassEncoderDispatchWorkgroups = void function (WGPUComputePassEncoder computePassEncoder, uint workgroupCountX, uint workgroupCountY, uint workgroupCountZ);
 alias WGPUProcComputePassEncoderDispatchWorkgroupsIndirect = void function (WGPUComputePassEncoder computePassEncoder, WGPUBuffer indirectBuffer, ulong indirectOffset);
 alias WGPUProcComputePassEncoderEnd = void function (WGPUComputePassEncoder computePassEncoder);
-alias WGPUProcComputePassEncoderEndPipelineStatisticsQuery = void function (WGPUComputePassEncoder computePassEncoder);
 alias WGPUProcComputePassEncoderInsertDebugMarker = void function (WGPUComputePassEncoder computePassEncoder, const(char)* markerLabel);
 alias WGPUProcComputePassEncoderPopDebugGroup = void function (WGPUComputePassEncoder computePassEncoder);
 alias WGPUProcComputePassEncoderPushDebugGroup = void function (WGPUComputePassEncoder computePassEncoder, const(char)* groupLabel);
@@ -1525,14 +1524,12 @@ alias WGPUProcRenderBundleEncoderRelease = void function (WGPURenderBundleEncode
 
 // Procs of RenderPassEncoder
 alias WGPUProcRenderPassEncoderBeginOcclusionQuery = void function (WGPURenderPassEncoder renderPassEncoder, uint queryIndex);
-alias WGPUProcRenderPassEncoderBeginPipelineStatisticsQuery = void function (WGPURenderPassEncoder renderPassEncoder, WGPUQuerySet querySet, uint queryIndex);
 alias WGPUProcRenderPassEncoderDraw = void function (WGPURenderPassEncoder renderPassEncoder, uint vertexCount, uint instanceCount, uint firstVertex, uint firstInstance);
 alias WGPUProcRenderPassEncoderDrawIndexed = void function (WGPURenderPassEncoder renderPassEncoder, uint indexCount, uint instanceCount, uint firstIndex, int baseVertex, uint firstInstance);
 alias WGPUProcRenderPassEncoderDrawIndexedIndirect = void function (WGPURenderPassEncoder renderPassEncoder, WGPUBuffer indirectBuffer, ulong indirectOffset);
 alias WGPUProcRenderPassEncoderDrawIndirect = void function (WGPURenderPassEncoder renderPassEncoder, WGPUBuffer indirectBuffer, ulong indirectOffset);
 alias WGPUProcRenderPassEncoderEnd = void function (WGPURenderPassEncoder renderPassEncoder);
 alias WGPUProcRenderPassEncoderEndOcclusionQuery = void function (WGPURenderPassEncoder renderPassEncoder);
-alias WGPUProcRenderPassEncoderEndPipelineStatisticsQuery = void function (WGPURenderPassEncoder renderPassEncoder);
 alias WGPUProcRenderPassEncoderExecuteBundles = void function (WGPURenderPassEncoder renderPassEncoder, size_t bundleCount, const(WGPURenderBundle)* bundles);
 alias WGPUProcRenderPassEncoderInsertDebugMarker = void function (WGPURenderPassEncoder renderPassEncoder, const(char)* markerLabel);
 alias WGPUProcRenderPassEncoderPopDebugGroup = void function (WGPURenderPassEncoder renderPassEncoder);

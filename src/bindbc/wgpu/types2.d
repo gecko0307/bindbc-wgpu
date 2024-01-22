@@ -44,6 +44,8 @@ enum WGPUNativeSType
     InstanceExtras = 0x00030006,
     BindGroupEntryExtras = 0x00030007,
     BindGroupLayoutEntryExtras = 0x00030008,
+    QuerySetDescriptorExtras = 0x00030009,
+    SurfaceConfigurationExtras = 0x0003000A,
     Force32 = 0x7FFFFFFF
 }
 
@@ -56,6 +58,7 @@ enum WGPUNativeFeature
     VertexWritableStorage = 0x00030005,
     TextureBindingArray = 0x00030006,
     SampledTextureAndStorageBufferArrayNonUniformIndexing = 0x00030007,
+    PipelineStatisticsQuery = 0x00030008,
     Force32 = 0x7FFFFFFF
 }
 
@@ -113,6 +116,22 @@ enum WGPUGles3MinorVersion {
     Force32 = 0x7FFFFFFF
 }
 
+enum WGPUPipelineStatisticName
+{
+    VertexShaderInvocations = 0x00000000,
+    ClipperInvocations = 0x00000001,
+    ClipperPrimitivesOut = 0x00000002,
+    FragmentShaderInvocations = 0x00000003,
+    ComputeShaderInvocations = 0x00000004,
+    Force32 = 0x7FFFFFFF
+}
+
+enum WGPUNativeQueryType
+{
+    PipelineStatistics = 0x00030000,
+    Force32 = 0x7FFFFFFF
+}
+
 struct WGPUInstanceExtras
 {
     WGPUChainedStruct chain;
@@ -158,8 +177,8 @@ struct WGPUPushConstantRange
 struct WGPUPipelineLayoutExtras
 {
     WGPUChainedStruct chain;
-    uint pushConstantRangeCount;
-    WGPUPushConstantRange* pushConstantRanges;
+    size_t pushConstantRangeCount;
+    const(WGPUPushConstantRange)* pushConstantRanges;
 }
 
 alias WGPUSubmissionIndex = ulong;
@@ -185,41 +204,42 @@ struct WGPUShaderModuleGLSLDescriptor
     WGPUShaderDefine* defines;
 }
 
-struct WGPUStorageReport
+struct WGPURegistryReport
 {
-    size_t numOccupied;
-    size_t numVacant;
-    size_t numError;
-    size_t elementSize;
+   size_t numAllocated;
+   size_t numKeptFromUser;
+   size_t numReleasedFromUser;
+   size_t numError;
+   size_t elementSize;
 }
 
 struct WGPUHubReport
 {
-    WGPUStorageReport adapters;
-    WGPUStorageReport devices;
-    WGPUStorageReport pipelineLayouts;
-    WGPUStorageReport shaderModules;
-    WGPUStorageReport bindGroupLayouts;
-    WGPUStorageReport bindGroups;
-    WGPUStorageReport commandBuffers;
-    WGPUStorageReport renderBundles;
-    WGPUStorageReport renderPipelines;
-    WGPUStorageReport computePipelines;
-    WGPUStorageReport querySets;
-    WGPUStorageReport buffers;
-    WGPUStorageReport textures;
-    WGPUStorageReport textureViews;
-    WGPUStorageReport samplers;
+    WGPURegistryReport adapters;
+    WGPURegistryReport devices;
+    WGPURegistryReport queues;
+    WGPURegistryReport pipelineLayouts;
+    WGPURegistryReport shaderModules;
+    WGPURegistryReport bindGroupLayouts;
+    WGPURegistryReport bindGroups;
+    WGPURegistryReport commandBuffers;
+    WGPURegistryReport renderBundles;
+    WGPURegistryReport renderPipelines;
+    WGPURegistryReport computePipelines;
+    WGPURegistryReport querySets;
+    WGPURegistryReport buffers;
+    WGPURegistryReport textures;
+    WGPURegistryReport textureViews;
+    WGPURegistryReport samplers;
 }
 
 struct WGPUGlobalReport
 {
-    WGPUStorageReport surfaces;
+    WGPURegistryReport surfaces;
     WGPUBackendType backendType;
     WGPUHubReport vulkan;
     WGPUHubReport metal;
     WGPUHubReport dx12;
-    WGPUHubReport dx11;
     WGPUHubReport gl;
 }
 
@@ -244,6 +264,19 @@ struct WGPUBindGroupLayoutEntryExtras
 {
     WGPUChainedStruct chain;
     uint count;
+}
+
+struct WGPUQuerySetDescriptorExtras
+{
+    WGPUChainedStruct chain;
+    const(WGPUPipelineStatisticName)* pipelineStatistics;
+    size_t pipelineStatisticCount;
+}
+
+struct WGPUSurfaceConfigurationExtras
+{
+    WGPUChainedStruct chain;
+    WGPUBool desiredMaximumFrameLatency;
 }
 
 extern(C):
@@ -273,3 +306,8 @@ alias WGPUProcRenderPassEncoderMultiDrawIndexedIndirect = void function(WGPURend
 
 alias WGPUProcRenderPassEncoderMultiDrawIndirectCount = void function(WGPURenderPassEncoder encoder, WGPUBuffer buffer, ulong offset, WGPUBuffer count_buffer, ulong count_buffer_offset, uint max_count);
 alias WGPUProcRenderPassEncoderMultiDrawIndexedIndirectCount = void function(WGPURenderPassEncoder encoder, WGPUBuffer buffer, ulong offset, WGPUBuffer count_buffer, ulong count_buffer_offset, uint max_count);
+
+alias WGPUProcComputePassEncoderBeginPipelineStatisticsQuery = void function(WGPUComputePassEncoder computePassEncoder, WGPUQuerySet querySet, uint queryIndex);
+alias WGPUProcComputePassEncoderEndPipelineStatisticsQuery = void function(WGPUComputePassEncoder computePassEncoder);
+alias WGPUProcRenderPassEncoderBeginPipelineStatisticsQuery = void function(WGPURenderPassEncoder renderPassEncoder, WGPUQuerySet querySet, uint queryIndex);
+alias WGPUProcRenderPassEncoderEndPipelineStatisticsQuery = void function(WGPURenderPassEncoder renderPassEncoder);
