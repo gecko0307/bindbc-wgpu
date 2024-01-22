@@ -120,8 +120,6 @@ void main(string[] args)
             next: null,
             sType: cast(WGPUSType)WGPUNativeSType.DeviceExtras
         },
-        // nativeFeatures: WGPUNativeFeature.TEXTURE_ADAPTER_SPECIFIC_FORMAT_FEATURES,
-        // label: "Device",
         tracePath: null,
     };
     WGPURequiredLimits limits = {
