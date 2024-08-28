@@ -59,6 +59,32 @@ enum WGPUNativeFeature
     TextureBindingArray = 0x00030006,
     SampledTextureAndStorageBufferArrayNonUniformIndexing = 0x00030007,
     PipelineStatisticsQuery = 0x00030008,
+    StorageResourceBindingArray = 0x00030009,
+    PartiallyBoundBindingArray = 0x0003000A,
+    TextureFormat16bitNorm = 0x0003000B,
+    TextureCompressionAstcHdr = 0x0003000C,
+    // TODO: requires wgpu.h api change
+    // TimestampQueryInsidePasses = 0x0003000D,
+    MappablePrimaryBuffers = 0x0003000E,
+    BufferBindingArray = 0x0003000F,
+    UniformBufferAndStorageTextureArrayNonUniformIndexing = 0x00030010,
+    // TODO: requires wgpu.h api change
+    // AddressModeClampToZero = 0x00030011,
+    // AddressModeClampToBorder = 0x00030012,
+    // PolygonModeLine = 0x00030013,
+    // PolygonModePoint = 0x00030014,
+    // ConservativeRasterization = 0x00030015,
+    // ClearTexture = 0x00030016,
+    // SpirvShaderPassthrough = 0x00030017,
+    // Multiview = 0x00030018,
+    VertexAttribute64bit = 0x00030019,
+    TextureFormatNv12 = 0x0003001A,
+    RayTracingAccelerationStructure = 0x0003001B,
+    RayQuery = 0x0003001C,
+    ShaderF64 = 0x0003001D,
+    ShaderI16 = 0x0003001E,
+    ShaderPrimitiveIndex = 0x0003001F,
+    ShaderEarlyDepthTest = 0x00030020,
     Force32 = 0x7FFFFFFF
 }
 
@@ -276,7 +302,20 @@ struct WGPUQuerySetDescriptorExtras
 struct WGPUSurfaceConfigurationExtras
 {
     WGPUChainedStruct chain;
-    WGPUBool desiredMaximumFrameLatency;
+    uint desiredMaximumFrameLatency;
+}
+
+enum WGPUNativeTextureFormat
+{
+    // From Features::TEXTURE_FORMAT_16BIT_NORM
+    R16Unorm = 0x00030001,
+    R16Snorm = 0x00030002,
+    Rg16Unorm = 0x00030003,
+    Rg16Snorm = 0x00030004,
+    Rgba16Unorm = 0x00030005,
+    Rgba16Snorm = 0x00030006,
+    // From Features::TEXTURE_FORMAT_NV12
+    NV12 = 0x00030007,
 }
 
 extern(C):

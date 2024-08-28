@@ -175,7 +175,9 @@ void main(string[] args)
     WGPUPipelineLayout pipelineLayout = wgpuDeviceCreatePipelineLayout(device, &plDesc);
     writeln("Pipeline layout OK");
     
-    WGPUTextureFormat surfaceFormat = wgpuSurfaceGetPreferredFormat(surface, adapter);
+    WGPUSurfaceCapabilities surfaceCapabilities;
+    wgpuSurfaceGetCapabilities(surface, adapter, &surfaceCapabilities);
+    WGPUTextureFormat surfaceFormat = surfaceCapabilities.formats[0];
     writeln(surfaceFormat);
     
     WGPUBlendState blend = {
@@ -316,13 +318,17 @@ void main(string[] args)
         wgpuRenderPassEncoderSetBindGroup(renderPass, 0, bindGroup, 0, null);
         wgpuRenderPassEncoderDraw(renderPass, 3, 1, 0, 0);
         wgpuRenderPassEncoderEnd(renderPass);
-        wgpuTextureViewRelease(nextTextureView);
         
         WGPUQueue queue = wgpuDeviceGetQueue(device);
         WGPUCommandBufferDescriptor cmdbufDesc = { label: null };
         WGPUCommandBuffer cmdBuffer = wgpuCommandEncoderFinish(encoder, &cmdbufDesc);
         wgpuQueueSubmit(queue, 1, &cmdBuffer);
         wgpuSurfacePresent(surface);
+
+        wgpuCommandBufferRelease(cmdBuffer);
+        wgpuCommandEncoderRelease(encoder);
+        wgpuTextureViewRelease(nextTextureView);
+        wgpuTextureRelease(surfaceTexture.texture);
     }
     
     SDL_Quit();
