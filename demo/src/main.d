@@ -318,11 +318,14 @@ void main(string[] args)
         wgpuRenderPassEncoderSetBindGroup(renderPass, 0, bindGroup, 0, null);
         wgpuRenderPassEncoderDraw(renderPass, 3, 1, 0, 0);
         wgpuRenderPassEncoderEnd(renderPass);
+        wgpuRenderPassEncoderRelease(renderPass);
         
         WGPUQueue queue = wgpuDeviceGetQueue(device);
         WGPUCommandBufferDescriptor cmdbufDesc = { label: null };
         WGPUCommandBuffer cmdBuffer = wgpuCommandEncoderFinish(encoder, &cmdbufDesc);
+
         wgpuQueueSubmit(queue, 1, &cmdBuffer);
+
         wgpuSurfacePresent(surface);
 
         wgpuCommandBufferRelease(cmdBuffer);

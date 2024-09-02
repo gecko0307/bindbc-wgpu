@@ -714,8 +714,8 @@ struct WGPUAdapterInfo
     const(char)* description;
     WGPUBackendType backendType;
     WGPUAdapterType adapterType;
-    uint32_t vendorID;
-    uint32_t deviceID;
+    uint vendorID;
+    uint deviceID;
 }
 
 struct WGPUBindGroupEntry
@@ -1230,7 +1230,7 @@ struct WGPURenderPassColorAttachment
 {
     const(WGPUChainedStruct)* nextInChain;
     WGPUTextureView view; // nullable
-    uint32_t depthSlice;
+    uint depthSlice;
     WGPUTextureView resolveTarget; // nullable
     WGPULoadOp loadOp;
     WGPUStoreOp storeOp;
