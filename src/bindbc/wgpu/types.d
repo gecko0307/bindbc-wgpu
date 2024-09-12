@@ -35,6 +35,7 @@ import core.stdc.stdint;
 
 enum ulong WGPU_ARRAY_LAYER_COUNT_UNDEFINED = 0xffffffffUL;
 enum ulong WGPU_COPY_STRIDE_UNDEFINED = 0xffffffffUL;
+enum ulong WGPU_DEPTH_SLICE_UNDEFINED = 0xffffffffUL;
 enum ulong WGPU_LIMIT_U32_UNDEFINED = 0xffffffffUL;
 enum ulong WGPU_LIMIT_U64_UNDEFINED = 0xffffffffffffffffUL;
 enum ulong WGPU_MIP_LEVEL_COUNT_UNDEFINED = 0xffffffffUL;
