@@ -43,12 +43,15 @@ __gshared
     // Methods of Adapter
     WGPUProcAdapterEnumerateFeatures wgpuAdapterEnumerateFeatures;
     WGPUProcAdapterGetLimits wgpuAdapterGetLimits;
-    WGPUProcAdapterGetProperties wgpuAdapterGetProperties;
+    WGPUProcAdapterGetInfo wgpuAdapterGetInfo;
     WGPUProcAdapterHasFeature wgpuAdapterHasFeature;
     WGPUProcAdapterRequestDevice wgpuAdapterRequestDevice;
     WGPUProcAdapterReference wgpuAdapterReference;
     WGPUProcAdapterRelease wgpuAdapterRelease;
     
+    // Procs of AdapterInfo
+    WGPUProcAdapterInfoFreeMembers wgpuAdapterInfoFreeMembers;
+
     // Methods of BindGroup
     WGPUProcBindGroupSetLabel wgpuBindGroupSetLabel;
     WGPUProcBindGroupReference wgpuBindGroupReference;
@@ -138,12 +141,12 @@ __gshared
     WGPUProcDevicePushErrorScope wgpuDevicePushErrorScope;
     //WGPUProcDeviceSetDeviceLostCallback wgpuDeviceSetDeviceLostCallback;
     WGPUProcDeviceSetLabel wgpuDeviceSetLabel;
-    WGPUProcDeviceSetUncapturedErrorCallback wgpuDeviceSetUncapturedErrorCallback;
     WGPUProcDeviceReference wgpuDeviceReference;
     WGPUProcDeviceRelease wgpuDeviceRelease;
     
     // Methods of Instance
     WGPUProcInstanceCreateSurface wgpuInstanceCreateSurface;
+    WGPUProcInstanceHasWGSLLanguageFeature wgpuInstanceHasWGSLLanguageFeature;
     WGPUProcInstanceProcessEvents wgpuInstanceProcessEvents;
     WGPUProcInstanceRequestAdapter wgpuInstanceRequestAdapter;
     WGPUProcInstanceReference wgpuInstanceReference;
@@ -238,8 +241,8 @@ __gshared
     WGPUProcSurfaceConfigure wgpuSurfaceConfigure;
     WGPUProcSurfaceGetCapabilities wgpuSurfaceGetCapabilities;
     WGPUProcSurfaceGetCurrentTexture wgpuSurfaceGetCurrentTexture;
-    WGPUProcSurfaceGetPreferredFormat wgpuSurfaceGetPreferredFormat;
     WGPUProcSurfacePresent wgpuSurfacePresent;
+    WGPUProcSurfaceSetLabel wgpuSurfaceSetLabel;
     WGPUProcSurfaceUnconfigure wgpuSurfaceUnconfigure;
     WGPUProcSurfaceReference wgpuSurfaceReference;
     WGPUProcSurfaceRelease wgpuSurfaceRelease;
